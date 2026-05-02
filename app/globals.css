@@ -3,25 +3,244 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fafafa;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --primary: #0a0a0a;
+  --primary-foreground: #ffffff;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #f4f4f5;
+  --accent-foreground: #0a0a0a;
+  --border: #e4e4e7;
+  --input: #f4f4f5;
+  --ring: #0a0a0a;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+.dark {
+  /* Terminal-inspired dark palette */
+  --background: #0a0e12;
+  --foreground: #e2e8f0;
+  --card: #0f1419;
+  --card-foreground: #e2e8f0;
+  --primary: #e2e8f0;
+  --primary-foreground: #0a0e12;
+  --muted: #141c24;
+  --muted-foreground: #64748b;
+  --accent: #141c24;
+  --accent-foreground: #4ade80;
+  --border: #1e2d3d;
+  --input: #141c24;
+  --ring: #4ade80;
+  /* Terminal accent — used for highlights, focus rings, active nav */
+  --terminal-green: #4ade80;
+  --terminal-green-dim: #166534;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  summary {
+    transition-property:
+      color, background-color, border-color, box-shadow, opacity, transform;
+    transition-duration: 260ms;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .section-tag {
+    @apply inline-flex items-center rounded-full px-3 py-1 font-mono text-xs uppercase tracking-[0.2em];
+    color: var(--muted-foreground);
+    border: 1px solid var(--border);
+    background-color: var(--muted);
+  }
+
+  .text-outline {
+    -webkit-text-stroke: 2px var(--foreground);
+    color: transparent;
+  }
+
+  .text-outline-thin {
+    -webkit-text-stroke: 1.5px var(--foreground);
+    color: transparent;
+  }
+
+  /* ─── Terminal dark mode accents ──────────────────────── */
+  /* Section headings get a green tint in dark mode */
+  .dark .section-heading-accent {
+    color: var(--terminal-green);
+  }
+
+  /* Scrollbar — terminal green thumb in dark mode */
+  .dark ::-webkit-scrollbar-thumb {
+    background: var(--terminal-green-dim);
+  }
+
+  /* Availability pill — green dot pulse in dark mode */
+  .dark .availability-dot {
+    background-color: var(--terminal-green);
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2);
+  }
+
+  /* Card border glow on hover in dark mode */
+  .dark .card-hover-glow:hover {
+    border-color: var(--terminal-green-dim);
+    box-shadow: 0 0 0 1px var(--terminal-green-dim);
+  }
+
+  /* Active nav item gets terminal green in dark mode */
+  .dark .nav-active {
+    background-color: var(--terminal-green) !important;
+    color: #0a0e12 !important;
+  }
+}
+
+@layer components {
+  /* ─── Hero ─────────────────────────────────────────────── */
+  .hero-stage {
+    /* padding-top clears the absolute name overlay on mobile */
+    padding-top: 3rem;
+  }
+
+  .hero-name-size {
+    font-size: clamp(48px, 14vw, 62px);
+    line-height: 0.88;
+    letter-spacing: -0.04em;
+  }
+
+  .hero-portrait-size {
+    width: clamp(180px, 56vw, 240px);
+  }
+
+  @media (min-width: 640px) {
+    .hero-stage {
+      /* name is larger at sm – clear it with more padding-top */
+      padding-top: 4rem;
+    }
+
+    .hero-name-size {
+      font-size: clamp(62px, 15vw, 96px);
+    }
+
+    .hero-portrait-size {
+      width: 280px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .hero-stage {
+      /* absolute layout at md+ — restore min-height, remove flow padding */
+      min-height: 600px;
+      padding-top: 0;
+    }
+
+    .hero-name-size {
+      font-size: 136px;
+    }
+
+    /* Narrower portrait at tablet so face sits between the two cards
+       without protruding excessively above the card tops. */
+    .hero-portrait-size {
+      width: 260px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero-stage {
+      min-height: 640px;
+    }
+
+    .hero-name-size {
+      font-size: 164px;
+    }
+
+    .hero-portrait-size {
+      width: 340px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .hero-stage {
+      min-height: 700px;
+    }
+
+    .hero-name-size {
+      font-size: 198px;
+    }
+
+    .hero-portrait-size {
+      width: 460px;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    .hero-stage {
+      min-height: 780px;
+    }
+
+    .hero-name-size {
+      font-size: 228px;
+    }
+
+    .hero-portrait-size {
+      width: 500px;
+    }
+  }
+
+  /* ─── Section rhythm ────────────────────────────────────── */
+  /* Shared vertical padding for all portfolio sections        */
+  .section-padding {
+    @apply py-20 sm:py-24 md:py-28;
+  }
+
+  /* Consistent max-width container with responsive x-padding  */
+  .section-container {
+    @apply mx-auto max-w-6xl px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Section heading responsive scale */
+  .section-heading {
+    @apply font-hero text-3xl font-black uppercase tracking-tight text-foreground sm:text-4xl md:text-5xl lg:text-6xl;
   }
 }
