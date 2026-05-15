@@ -68,6 +68,10 @@ export const siteConfig = {
   links: {
     resume: "/john-ross-rivera-resume.pdf",
   },
+  chat: {
+    name: "Nuggets 🐾",
+    avatarPath: "/images/nuggets.png",
+  },
   nav: [
     { label: "About", href: "#about", counter: null },
     { label: "Skills", href: "#skills", counter: "3" },
