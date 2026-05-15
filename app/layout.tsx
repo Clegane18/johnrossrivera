@@ -3,6 +3,7 @@ import { Space_Grotesk, DM_Sans, Space_Mono, Barlow } from "next/font/google";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
+import { ChatWidget } from "@/components/ui/ChatWidget";
 import { siteConfig } from "@/config/site";
 import Script from "next/script";
 import "./globals.css";
@@ -66,6 +67,7 @@ export default function RootLayout({
         <main>{children}</main>
         <Footer />
         <ScrollToTop />
+        <ChatWidget />
       </body>
     </html>
   );
