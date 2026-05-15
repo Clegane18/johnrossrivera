@@ -38,3 +38,8 @@ export interface ContactFormData {
   email: string;
   message: string;
 }
+
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
