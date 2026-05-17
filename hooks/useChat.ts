@@ -4,7 +4,7 @@ import type { ChatMessage } from "@/types";
 const WELCOME_MESSAGE: ChatMessage = {
   role: "assistant",
   content:
-    "Hi! I'm Nuggets 🐾 — John's AI assistant. Ask me anything about his experience, projects, or skills!",
+    "Woof! I'm Nuggets 🐾 — John's very own dog assistant. Ask me anything about his experience, projects, or skills — I know everything about my human! (Virtual tummy scratches also accepted 🐾)",
 };
 
 export function useChat() {
