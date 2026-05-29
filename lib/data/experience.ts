@@ -2,6 +2,29 @@ import { Experience } from "@/types";
 
 export const experiences: Experience[] = [
   {
+    id: "rr-remo-trucking",
+    company: "RR Remo Trucking",
+    role: "Software Engineer (Full Stack) | Freelance",
+    startDate: "May 2026",
+    endDate: "Present",
+    description: [
+      "Built a production-grade company portfolio and AI logistics platform for a Philippine trucking company operating 74 vehicles, with enterprise clients including Lazada, Jollibee, and Shopee Philippines.",
+      "Integrated 'Traki', a streaming AI customer assistant backed by Groq (LLaMA 3.1 8B), delivering token-by-token streaming via ReadableStream with multi-turn conversation history and a strict factual system prompt to prevent hallucination.",
+      "Implemented a full SEO stack — schema.org LocalBusiness JSON-LD, Open Graph, Twitter Card, dynamic sitemap.ts, and robots.ts — alongside a validated contact API route wired to Resend for transactional email.",
+      "Enforced Server Components by default across the App Router, applying 'use client' only to three interactive components to minimise client-side JavaScript bundle.",
+    ],
+    tech: [
+      "Next.js 16",
+      "React 19",
+      "TypeScript",
+      "Tailwind CSS",
+      "Groq API",
+      "LLaMA 3.1",
+      "Resend",
+      "Vercel",
+    ],
+  },
+  {
     id: "smart-lift-ai",
     company: "Smart-lift AI",
     role: "Software Engineer (Full Stack / QA Tester) | Personal Project",
