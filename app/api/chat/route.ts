@@ -75,6 +75,13 @@ Dev Tools: Git, GitHub, Bash, Visual Studio Code, Jira, Docker, Postman, DevOps
 
 ## WORK EXPERIENCE
 
+### RR Remo Trucking (May 2026 – Present) | Software Engineer, Full Stack — Freelance
+- Built a production-grade company portfolio and AI logistics platform for a Philippine trucking company operating 74 vehicles with enterprise clients including Lazada, Jollibee, and Shopee Philippines
+- Integrated 'Traki', a streaming AI customer assistant backed by Groq (LLaMA 3.1 8B), delivering token-by-token streaming via ReadableStream with multi-turn conversation history and a strict factual system prompt to prevent hallucination
+- Implemented a full SEO stack — schema.org LocalBusiness JSON-LD, Open Graph, Twitter Card, dynamic sitemap.ts, and robots.ts — alongside a validated contact API route wired to Resend for transactional email
+- Enforced Server Components by default across the App Router, applying 'use client' only to three interactive components to minimise client-side JavaScript bundle
+Tech: Next.js 16, React 19, TypeScript, Tailwind CSS, Groq API, LLaMA 3.1, Resend, Vercel
+
 ### Smart-lift AI (Mar 2026 – Present) | Software Engineer, Full Stack — Personal Project
 - Built a full-stack fitness platform: Next.js 16 + React 19 frontend, NestJS 11 backend, JWT auth, RBAC, and modular domain workflows across training, nutrition, and analytics
 - Architected rule-driven backend engines for plateau detection, macro auto-adjustment, equipment-aware workout generation, and ego-lift alerts with aggregated analytics
@@ -141,6 +148,15 @@ Tech: Node.js, TypeScript, PostgreSQL, Sequelize, OAuth, Express.js
 - Backend-driven perfume recommendation platform with layered architecture, JWT security, and optimized PostgreSQL queries
 Repos — Frontend: https://github.com/HeisenbergI8/sniffsense-ai-web | Backend: https://github.com/Clegane18/sniff-sense-ai-api
 Tech: Node.js, TypeScript, Express.js, PostgreSQL, Sequelize, JWT
+
+### RR Remo Trucking (Featured) — Freelance
+- Production-grade company portfolio and AI logistics platform for a real Philippine trucking company operating 74 vehicles with enterprise clients including Lazada, Jollibee, and Shopee Philippines
+- Integrated 'Traki', a streaming AI customer assistant backed by Groq (LLaMA 3.1 8B), delivering token-by-token streaming via ReadableStream with multi-turn conversation history and a strict factual system prompt to prevent hallucination
+- Implemented full SEO stack — schema.org LocalBusiness JSON-LD, Open Graph, Twitter Card, dynamic sitemap.ts, robots.ts, and canonical URLs wired to environment variables
+- Validated contact API route wired to Resend with replyTo threading; enforced Server Components by default, applying 'use client' only to three interactive components
+Live: https://rrremo-trucking.vercel.app/
+Repo: https://github.com/HeisenbergI8/rrremo-trucking
+Tech: Next.js 16, React 19, TypeScript, Tailwind CSS, Groq API, LLaMA 3.1, Resend, Vercel
 
 ---
 
