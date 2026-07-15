@@ -1,8 +1,9 @@
 import { contactSchema } from "@/lib/validations/contact";
 import { sendContactEmail } from "@/lib/email/resend";
 import { NextResponse } from "next/server";
+import { rateLimit, type RateLimitEntry } from "@/lib/utils/rate-limit";
 
-const RATE_LIMIT_MAP = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_MAP = new Map<string, RateLimitEntry>();
 const MAX_REQUESTS = 5;
 const WINDOW_MS = 60 * 60 * 1000; // 1 hour
 
@@ -11,27 +12,10 @@ function getRateLimitKey(request: Request): string {
   return forwarded ? forwarded.split(",")[0].trim() : "unknown";
 }
 
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = RATE_LIMIT_MAP.get(ip);
-
-  if (!entry || now > entry.resetAt) {
-    RATE_LIMIT_MAP.set(ip, { count: 1, resetAt: now + WINDOW_MS });
-    return false;
-  }
-
-  if (entry.count >= MAX_REQUESTS) {
-    return true;
-  }
-
-  entry.count += 1;
-  return false;
-}
-
 export async function POST(request: Request): Promise<NextResponse> {
   const ip = getRateLimitKey(request);
 
-  if (isRateLimited(ip)) {
+  if (rateLimit(RATE_LIMIT_MAP, ip, MAX_REQUESTS, WINDOW_MS).limited) {
     return NextResponse.json(
       { success: false, message: "Too many requests. Please try again later." },
       { status: 429 }

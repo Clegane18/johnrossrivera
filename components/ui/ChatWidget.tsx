@@ -3,7 +3,7 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { Send, X } from "lucide-react";
+import { Info, Send, X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { useChat } from "@/hooks/useChat";
 import { siteConfig } from "@/config/site";
@@ -119,6 +119,7 @@ function TypingDots() {
 export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [showTech, setShowTech] = useState(false);
   const hintShownRef = useRef(false);
   const {
     messages,
@@ -129,6 +130,7 @@ export function ChatWidget() {
     typedContent,
     error,
     sendMessage,
+    remaining,
   } = useChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -213,14 +215,56 @@ export function ChatWidget() {
                   </span>
                 </div>
               </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
-                aria-label="Close chat"
-              >
-                <X className="h-4 w-4" />
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setShowTech((v) => !v)}
+                  className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                  aria-label="How Nuggets works"
+                  aria-expanded={showTech}
+                  aria-controls="nuggets-tech-panel"
+                >
+                  <Info className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                  aria-label="Close chat"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
             </div>
+
+            {/* How Nuggets works — collapsible engineering note */}
+            <AnimatePresence initial={false}>
+              {showTech && (
+                <motion.div
+                  id="nuggets-tech-panel"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex-shrink-0 overflow-hidden border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900/60"
+                >
+                  <div className="space-y-1.5 px-4 py-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                      {siteConfig.chat.techNote.heading}
+                    </p>
+                    <ul className="space-y-1">
+                      {siteConfig.chat.techNote.points.map((pt) => (
+                        <li
+                          key={pt}
+                          className="flex gap-1.5 text-[11px] leading-snug text-zinc-600 dark:text-zinc-300"
+                        >
+                          <span className="mt-1 h-1 w-1 flex-shrink-0 rounded-full bg-green-500" />
+                          {pt}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Messages */}
             <div className="flex-1 space-y-3 overflow-y-auto bg-zinc-50 p-4 dark:bg-zinc-900/50">
@@ -308,6 +352,11 @@ export function ChatWidget() {
                   <Send className="h-3.5 w-3.5" />
                 </button>
               </div>
+              {remaining !== null && (
+                <p className="mt-1.5 text-right font-mono text-[10px] text-zinc-400 dark:text-zinc-500">
+                  {remaining} {remaining === 1 ? "ask" : "asks"} left this hour
+                </p>
+              )}
             </div>
           </motion.div>
         )}

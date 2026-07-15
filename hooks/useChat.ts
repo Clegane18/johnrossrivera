@@ -14,6 +14,8 @@ export function useChat() {
   const [isTyping, setIsTyping] = useState(false);
   const [typedContent, setTypedContent] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [remaining, setRemaining] = useState<number | null>(null);
+  const [limit, setLimit] = useState<number | null>(null);
 
   const streamBufferRef = useRef("");
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -79,6 +81,11 @@ export function useChat() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: historyToSend }),
       });
+
+      const remainingHeader = response.headers.get("X-RateLimit-Remaining");
+      if (remainingHeader !== null) setRemaining(Number(remainingHeader));
+      const limitHeader = response.headers.get("X-RateLimit-Limit");
+      if (limitHeader !== null) setLimit(Number(limitHeader));
 
       if (!response.ok) {
         const status = response.status;
@@ -153,5 +160,7 @@ export function useChat() {
     typedContent,
     error,
     sendMessage,
+    remaining,
+    limit,
   };
 }
