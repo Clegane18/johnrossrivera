@@ -8,7 +8,7 @@ export const experiences: Experience[] = [
     startDate: "May 2026",
     endDate: "Present",
     description: [
-      "Built a production-grade company portfolio and AI logistics platform for a Philippine trucking company operating 74 vehicles, with enterprise clients including Lazada, Jollibee, and Shopee Philippines.",
+      "Built a production-grade company portfolio and AI logistics platform for a Philippine trucking company operating 74 vehicles, with enterprise clients including Zuellig, Lazada, Jollibee, and Shopee Philippines — the portfolio site I built was part of the pitch that helped RR Remo win Zuellig, a major Philippine distributor, as a client.",
       "Integrated 'Traki', a streaming AI customer assistant backed by Groq (LLaMA 3.1 8B), delivering token-by-token streaming via ReadableStream with multi-turn conversation history and a strict factual system prompt to prevent hallucination.",
       "Implemented a full SEO stack — schema.org LocalBusiness JSON-LD, Open Graph, Twitter Card, dynamic sitemap.ts, and robots.ts — alongside a validated contact API route wired to Resend for transactional email.",
       "Enforced Server Components by default across the App Router, applying 'use client' only to three interactive components to minimise client-side JavaScript bundle.",
@@ -90,7 +90,7 @@ export const experiences: Experience[] = [
     ],
     tech: [
       "Node.js",
-      "TypeScript",
+      "JavaScript",
       "PostgreSQL",
       "Sequelize",
       "OAuth",
@@ -99,8 +99,8 @@ export const experiences: Experience[] = [
   },
   {
     id: "sniff-sense-ai",
-    company: "Sniff sense-AI",
-    role: "Fullstack Developer / QA Tester",
+    company: "Sniff Sense AI",
+    role: "Fullstack Developer / QA Tester | Personal Project",
     startDate: "Dec 2025",
     endDate: "Present",
     description: [

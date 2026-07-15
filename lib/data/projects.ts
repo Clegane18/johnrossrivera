@@ -3,7 +3,7 @@ import { Project } from "@/types";
 function seq(id: string, count: number): string[] {
   return Array.from(
     { length: count },
-    (_, i) => `/images/projects/${id}/${String(i + 1).padStart(2, "0")}.png`
+    (_, i) => `/images/projects/${id}/${String(i + 1).padStart(2, "0")}.webp`
   );
 }
 
@@ -11,7 +11,7 @@ function seqPrefixed(id: string, prefix: string, count: number): string[] {
   return Array.from(
     { length: count },
     (_, i) =>
-      `/images/projects/${id}/${prefix}${String(i + 1).padStart(2, "0")}.png`
+      `/images/projects/${id}/${prefix}${String(i + 1).padStart(2, "0")}.webp`
   );
 }
 
@@ -20,7 +20,17 @@ export const projects: Project[] = [
     id: "rola-access-platform",
     title: "Rola Access Platform",
     description:
-      "Built to manage a live song competition platform serving 913,989 registered users. Replaced a legacy admin portal with a modular NestJS + Next.js system — implementing guard-based RBAC that isolates judge scoring views from admin management, cursor-based pagination to handle large datasets without performance degradation, and a dedicated judge portal for real-time contest entry scoring. APIs are designed to return only the fields each view requires, minimising payload size across all admin and judge workflows.",
+      "A modular NestJS + Next.js platform for a live song competition serving 917,026 registered users — guard-based RBAC isolates judge and admin views, and cursor pagination holds under load.",
+    problem:
+      "A legacy admin portal couldn't safely scale to a live, ~900k-user song competition — judge and admin responsibilities shared the same surface, and large lists degraded under load.",
+    role: "Full-stack engineer (backend-focused) — owned the NestJS API, guard-based RBAC, and pagination, and built the Next.js + RTK Query admin frontend.",
+    decisions: [
+      "Guard-based RBAC isolating judge scoring from admin management — least privilege enforced per view.",
+      "Cursor-based pagination so large datasets page without offset-scan degradation.",
+      "Field-scoped API responses — each view receives only the fields it needs, minimising payload.",
+    ],
+    impact: [{ metric: "917,026", label: "registered users served" }],
+    architectureSvg: "/images/architecture/rola-access-platform.svg",
     tech: [
       "NestJS 11",
       "Node.js",
@@ -34,6 +44,7 @@ export const projects: Project[] = [
       "RTK Query",
     ],
     liveUrl: "https://dashboard.rola.ai/en/login",
+    liveAuthGated: true,
     images: seq("rola-access-platform", 16),
     featured: true,
   },
@@ -41,7 +52,20 @@ export const projects: Project[] = [
     id: "kol-dashboard",
     title: "KOL Dashboard",
     description:
-      "Operations and earnings dashboard for 1,000+ KOL partners, directly contributing to 5,000 new user acquisitions through transparent performance visibility. Handles 50+ daily transactions with a multi-state withdrawal approval flow, OTP-hardened authentication with brute-force protection, rate-limited resend logic, and expiry enforcement. The Laravel 12 service-layer architecture isolates referral, earnings, and notification workflows to prevent data consistency issues during concurrent transaction processing.",
+      "Operations and earnings dashboard for 1,000+ KOL partners on a Laravel 12 service layer — multi-state withdrawal approvals and OTP-hardened auth that stay consistent under concurrent transactions.",
+    problem:
+      "KOL partners needed transparent, tamper-resistant earnings and a withdrawal flow that stays consistent under concurrent transactions.",
+    role: "Full-stack engineer (backend-focused) — owned the Laravel service layer, auth hardening, the approval workflow, and the operations dashboard UI.",
+    decisions: [
+      "Service-layer architecture isolating referral, earnings, and notification workflows to prevent data-consistency issues under concurrency.",
+      "Multi-state withdrawal approval flow with explicit, auditable state transitions.",
+      "OTP-hardened auth: brute-force protection, rate-limited resend, and expiry enforcement.",
+    ],
+    impact: [
+      { metric: "1,000+", label: "KOL partners served" },
+      { metric: "5,000", label: "referral-driven signups tracked" },
+    ],
+    architectureSvg: "/images/architecture/kol-dashboard.svg",
     tech: [
       "Laravel 12",
       "PHP",
@@ -51,6 +75,7 @@ export const projects: Project[] = [
       "OTP Security",
     ],
     liveUrl: "https://kol.rola.ai/login",
+    liveAuthGated: true,
     images: seq("kol-dashboard", 16),
     featured: true,
   },
@@ -58,7 +83,23 @@ export const projects: Project[] = [
     id: "smart-lift-ai",
     title: "Smart-lift AI",
     description:
-      "Personal production training system with 10 active users, built on one principle: you can't improve what you can't measure. The NestJS backend runs rule-driven engines for automatic plateau detection, macro auto-adjustment, equipment-aware workout generation, and ego-lift alerts — all scoped to each user's goals, training frequency, difficulty level, and muscle prioritization. Tracks strength progressions, body weight, and caloric intake with aggregated analytics across the full training cycle.",
+      "A personal production training system (10 active users) whose NestJS backend runs rule-driven engines for plateau detection, macro auto-adjustment, and equipment-aware workout generation — all scoped per user.",
+    problem:
+      "General fitness apps don't adapt to the individual — plateaus go undetected and macros drift as training changes.",
+    role: "Full-stack — designed the NestJS rule engines and the Next.js client end to end.",
+    decisions: [
+      "Rule-driven engines for plateau detection, macro auto-adjustment, and equipment-aware workout generation, scoped per user.",
+      "Aggregated analytics across strength, body weight, and caloric intake over the full training cycle.",
+      "Modular domain workflows so training, nutrition, and analytics evolve independently.",
+    ],
+    impact: [
+      { metric: "10", label: "active users in production" },
+      {
+        metric: "4",
+        label: "automated coaching engines (plateau, macro, workout, ego-lift)",
+      },
+    ],
+    architectureSvg: "/images/architecture/smart-lift-ai.svg",
     tech: [
       "Next.js 16",
       "React 19",
@@ -93,7 +134,7 @@ export const projects: Project[] = [
       "Unified commerce backend for POS, inventory, payment, and reservation workflows with secure OAuth integration and audit-backed admin analytics for retail operations.",
     tech: [
       "Node.js",
-      "TypeScript",
+      "JavaScript",
       "PostgreSQL",
       "Sequelize",
       "OAuth",
@@ -141,7 +182,29 @@ export const projects: Project[] = [
     id: "rr-remo-trucking",
     title: "RR Remo Trucking",
     description:
-      "Built a production-grade company portfolio and AI logistics platform for a Philippine trucking company operating 74 vehicles with enterprise clients including Lazada, Jollibee, and Shopee Philippines. Integrated 'Traki', a streaming AI customer assistant backed by Groq (LLaMA 3.1 8B), delivering token-by-token streaming via ReadableStream with multi-turn conversation history and a strict factual system prompt to prevent hallucination. Implemented a full SEO stack — schema.org LocalBusiness JSON-LD, Open Graph, Twitter Card, dynamic sitemap.ts, and robots.ts — alongside a validated contact API route wired to Resend for transactional email. Enforced Server Components by default across the App Router, applying 'use client' only to three interactive components to minimise client-side JavaScript.",
+      "A production Next.js portfolio and AI logistics platform for a Philippine trucking company (74 vehicles) whose enterprise clients include Zuellig, Lazada, Jollibee, and Shopee — featuring 'Traki', a streaming Groq-backed assistant with a strict anti-hallucination prompt.",
+    problem:
+      "A growing trucking company needed a credible web presence and an AI assistant that answers customer questions accurately — without hallucinating logistics details.",
+    role: "Full-stack (freelance) — owned the Next.js App Router build, the streaming AI assistant, and the SEO + contact stack.",
+    decisions: [
+      "'Traki' streaming assistant on Groq (LLaMA 3.1 8B) via ReadableStream, with a strict factual system prompt to prevent hallucination.",
+      "Server Components by default — 'use client' on only three interactive components to minimise client JS.",
+      "Full SEO stack: schema.org LocalBusiness JSON-LD, Open Graph, Twitter Card, dynamic sitemap.ts and robots.ts.",
+    ],
+    impact: [
+      { metric: "Zuellig", label: "enterprise client won" },
+      { metric: "74", label: "vehicles on the platform" },
+    ],
+    clients: [
+      {
+        name: "Zuellig",
+        note: "Major PH distributor — the site John built was part of the winning pitch.",
+      },
+      { name: "Lazada" },
+      { name: "Jollibee" },
+      { name: "Shopee Philippines" },
+    ],
+    architectureSvg: "/images/architecture/rr-remo-trucking.svg",
     tech: [
       "Next.js 16",
       "React 19",

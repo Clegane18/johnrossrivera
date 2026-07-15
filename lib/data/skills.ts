@@ -18,7 +18,6 @@ export const skills: Skill[] = [
       "Tailwind CSS",
       "Node.js",
       "Express.js",
-      "Laravel (Blade)",
       "NestJS",
       "Redux Toolkit",
       "RTK Query",

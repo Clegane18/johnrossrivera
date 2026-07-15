@@ -190,9 +190,46 @@ export function Projects() {
                   <h3 className="font-display text-base font-semibold text-foreground sm:text-lg">
                     {project.title}
                   </h3>
+
+                  {project.impact && project.impact.length > 0 && (
+                    <div className="flex flex-wrap gap-x-5 gap-y-2">
+                      {project.impact.map((stat) => (
+                        <div key={stat.label}>
+                          <p className="font-hero text-lg font-black leading-none text-foreground">
+                            {stat.metric}
+                          </p>
+                          <p className="mt-1 text-[11px] leading-tight text-muted-foreground">
+                            {stat.label}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   <p className="flex-1 text-sm leading-relaxed text-muted-foreground">
                     {project.description}
                   </p>
+
+                  {project.problem && (
+                    <Link
+                      href={`/work/${project.id}`}
+                      className="inline-flex w-fit items-center gap-1 text-xs font-semibold text-foreground transition-colors hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    >
+                      Read case study
+                      <svg
+                        className="h-3 w-3"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M2 12L12 2M12 2H5M12 2v7" />
+                      </svg>
+                    </Link>
+                  )}
 
                   <div className="flex flex-wrap gap-1.5 pt-1">
                     {project.tech.map((t) => (
@@ -261,7 +298,9 @@ export function Projects() {
                           className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                         >
                           <ExternalLink className="h-3.5 w-3.5" />
-                          Live Demo
+                          {project.liveAuthGated
+                            ? "View Production (login required)"
+                            : "Live Demo"}
                         </Link>
                       )}
                     </div>

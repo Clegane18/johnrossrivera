@@ -3,12 +3,32 @@ export interface ProjectRepo {
   url: string;
 }
 
+export interface ProjectClient {
+  name: string;
+  note?: string;
+}
+
+export interface ProjectImpact {
+  metric: string;
+  label: string;
+}
+
 export interface Project {
   id: string;
   title: string;
   description: string;
   tech: string[];
+  // Case-study fields (optional — only featured projects fill these; description is the fallback).
+  problem?: string;
+  role?: string;
+  decisions?: string[];
+  impact?: ProjectImpact[];
+  clients?: ProjectClient[];
+  architectureSvg?: string;
   liveUrl?: string;
+  // When the live URL lands on an auth/login wall (e.g. a production admin), the UI labels the link
+  // "View Production (login required)" instead of a dead-ending "Live Demo".
+  liveAuthGated?: boolean;
   repoUrl?: string;
   repoUrls?: ProjectRepo[];
   imageUrl?: string;
