@@ -38,3 +38,7 @@ next-env.d.ts
 # project docs and AI agent config
 project.md
 .github/
+
+# Claude Code AI harness (agents, skills, hooks, docs) — kept local, not committed
+.claude/
+CLAUDE.md
