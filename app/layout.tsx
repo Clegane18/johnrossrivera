@@ -37,8 +37,35 @@ const barlow = Barlow({
 });
 
 export const metadata: Metadata = {
-  title: siteConfig.title,
+  metadataBase: new URL(siteConfig.url),
+  title: { default: siteConfig.title, template: `%s · ${siteConfig.name}` },
   description: siteConfig.description,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: siteConfig.url,
+    siteName: siteConfig.name,
+    title: siteConfig.title,
+    description: siteConfig.description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.title,
+    description: siteConfig.description,
+  },
+  robots: { index: true, follow: true },
+};
+
+// schema.org Person — helps search + rich results associate the site with John. Values come from
+// config/site.ts so this can never contradict the visible page.
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: siteConfig.name,
+  jobTitle: siteConfig.role,
+  url: siteConfig.url,
+  email: `mailto:${siteConfig.email}`,
+  sameAs: [siteConfig.social.github, siteConfig.social.linkedin],
 };
 
 export default function RootLayout({
@@ -51,6 +78,15 @@ export default function RootLayout({
       <body
         className={`${spaceGrotesk.variable} ${dmSans.variable} ${spaceMono.variable} ${barlow.variable} font-sans antialiased`}
       >
+        {/* Reveal animations start at opacity:0 and are un-hidden by JS. Without JS (locked-down
+            networks, non-JS crawlers), force that content visible so the page isn't blank. */}
+        <noscript>
+          <style>{`[style*="opacity:0"]{opacity:1!important;transform:none!important}`}</style>
+        </noscript>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        />
         <Script id="theme-init" strategy="beforeInteractive">
           {`(() => {
             try {
