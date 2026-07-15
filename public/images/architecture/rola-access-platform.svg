@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 730 190" role="img" aria-label="Rola Access Platform architecture: Next.js admin and judge UI to NestJS API with RBAC guards to a service layer with cursor pagination to MySQL via Sequelize.">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#71717a" />
+    </marker>
+  </defs>
+  <style>
+    .box { fill: none; stroke: #71717a; stroke-width: 1.5; }
+    .t { fill: #71717a; font-family: ui-sans-serif, system-ui, sans-serif; font-size: 13px; font-weight: 600; text-anchor: middle; }
+    .s { fill: #71717a; font-family: ui-monospace, monospace; font-size: 10px; opacity: 0.7; text-anchor: middle; }
+    .l { stroke: #71717a; stroke-width: 1.5; }
+    .cap { fill: #71717a; font-family: ui-monospace, monospace; font-size: 10px; opacity: 0.6; }
+  </style>
+  <text class="cap" x="10" y="20">Simplified architecture</text>
+  <rect class="box" x="10" y="50" width="140" height="72" rx="10" />
+  <text class="t" x="80" y="82">Next.js</text>
+  <text class="s" x="80" y="100">Admin + Judge UI</text>
+  <line class="l" x1="150" y1="86" x2="196" y2="86" marker-end="url(#arrow)" />
+  <rect class="box" x="200" y="50" width="140" height="72" rx="10" />
+  <text class="t" x="270" y="82">NestJS API</text>
+  <text class="s" x="270" y="100">RBAC Guards</text>
+  <line class="l" x1="340" y1="86" x2="386" y2="86" marker-end="url(#arrow)" />
+  <rect class="box" x="390" y="50" width="140" height="72" rx="10" />
+  <text class="t" x="460" y="82">Service Layer</text>
+  <text class="s" x="460" y="100">Cursor Pagination</text>
+  <line class="l" x1="530" y1="86" x2="576" y2="86" marker-end="url(#arrow)" />
+  <rect class="box" x="580" y="50" width="140" height="72" rx="10" />
+  <text class="t" x="650" y="82">MySQL</text>
+  <text class="s" x="650" y="100">Sequelize</text>
+</svg>
