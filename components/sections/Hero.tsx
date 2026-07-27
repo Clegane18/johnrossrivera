@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { BriefcaseBusiness, Code2, Mail, type LucideIcon } from "lucide-react";
+import { HeroMetrics } from "@/components/ui/HeroMetrics";
 import { siteConfig } from "@/config/site";
 import { useTheme } from "@/hooks/useTheme";
 
@@ -73,7 +74,7 @@ export function Hero() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.12, ease: smoothEase }}
-            className="pointer-events-none relative z-20 flex justify-center pb-4 md:absolute md:inset-x-0 md:bottom-0 md:pb-0"
+            className="pointer-events-none relative z-20 flex justify-center pb-4 md:pb-0 lg:absolute lg:inset-x-0 lg:bottom-0"
           >
             <Image
               src={profileImageUrl}
@@ -86,13 +87,13 @@ export function Hero() {
             />
           </motion.div>
 
-          <div className="relative z-30 flex flex-col gap-4 sm:gap-6 md:absolute md:inset-x-0 md:bottom-8 md:flex-row md:items-end md:justify-between xl:bottom-10">
+          <div className="relative z-30 flex flex-col gap-4 sm:gap-6 md:flex-row md:items-end md:justify-between lg:absolute lg:inset-x-0 lg:bottom-8 xl:bottom-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.2, ease: smoothEase }}
-              className="bg-card/95 w-full rounded-2xl border border-border p-5 shadow-sm sm:max-w-xs sm:p-6 md:w-80 md:max-w-none"
+              className="bg-card/95 w-full rounded-2xl border border-border p-5 shadow-sm sm:max-w-xs sm:p-6 md:w-80 lg:max-w-none"
             >
               <p className="mb-1 font-display text-lg font-bold text-foreground sm:text-xl md:text-2xl">
                 {siteConfig.role}
@@ -128,6 +129,18 @@ export function Hero() {
                 </Link>
               </div>
             </motion.div>
+
+            {/* Proof strip: the numbers a recruiter scans for, each linked to the work behind it. */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: 0.25, ease: smoothEase }}
+              className="w-full"
+            >
+              <HeroMetrics />
+            </motion.div>
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}

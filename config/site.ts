@@ -8,7 +8,7 @@ export const siteConfig = {
   phone: "+63 921 670 6170",
   role: "Backend Developer",
   heroDescription:
-    "I design backend systems built to handle real load — secure APIs, role-based access control, and data pipelines that hold under production pressure. Open to senior roles and freelance projects.",
+    "I design backend systems built to handle real load — secure APIs, role-based access control, and data pipelines that hold under production pressure. Open to roles where I own the architecture, and to freelance projects.",
   heroPrimaryCta: {
     label: "View My Work",
     href: "#projects",
@@ -17,10 +17,30 @@ export const siteConfig = {
     label: "Download Resume",
     href: "/john-ross-rivera-resume.pdf",
   },
+  // Proof strip under the hero. Every value is a real number already present in lib/data/projects.ts —
+  // these are pointers to it, not new claims, so the two cannot drift into disagreeing.
+  //
+  // "users served" is deliberate. The 917k registered users belong to the CLIENT's platform, not to
+  // John; stating the bare number would read as claiming their userbase, which costs more credibility
+  // than the extra punch is worth. Each tile links to the case study that substantiates it — a number
+  // a recruiter can check is worth more than a bigger one they cannot.
+  heroMetrics: [
+    {
+      value: "917K",
+      label: "users served",
+      href: "/work/rola-access-platform",
+    },
+    { value: "1,000+", label: "KOL partners", href: "/work/kol-dashboard" },
+    { value: "74", label: "vehicles managed", href: "/work/rr-remo-trucking" },
+    { value: "6", label: "projects shipped", href: "#projects" },
+  ],
   heroTagline: "Systems over shortcuts.",
   heroTaglineTranslation: "Deliberate architecture. Reliable by default.",
   about: {
-    bio: "Most of my work happens where users never look — auth systems, service layers, access control, and data pipelines. I build the backend infrastructure that keeps products running when load spikes and edge cases hit.\n\nI've shipped production systems serving 900k+ users, built role-based access platforms for live competition workflows, and designed analytics and earnings dashboards for operations teams. When the scope demands it, I own the full stack.\n\nCurrently refining Smart-lift AI — a personal training system I built around one principle: you can't improve what you can't measure.",
+    // Trimmed 591 -> ~190 chars for the minimalist pass. The two things a recruiter must still take
+    // away are kept deliberately: WHAT I build (backend infrastructure) and PROOF OF SCALE (900k+).
+    // Everything cut was elaboration on those two points, not additional evidence.
+    bio: "Most of my work happens where users never look — auth systems, service layers, access control, data pipelines. I've shipped production systems serving 900k+ users. When the scope demands it, I own the full stack.",
     location: "Philippines",
     lightImageUrl: "/images/light-profile.webp",
     darkImageUrl: "/images/dark-profile.webp",
@@ -50,21 +70,23 @@ export const siteConfig = {
     contact: "/Get In Touch",
   },
   navbar: {
-    availabilityText: "Open to Senior Roles & Freelance Projects",
+    // 41 chars wrapped onto two lines in the navbar. Shortened to hold one line at every
+    // breakpoint — the "Availability" label above it now carries the context the long phrase was
+    // spending words on.
+    availabilityText: "Ownership roles & freelance",
     contactCtaLabel: "Let's Talk",
     resumeCtaLabel: "Resume",
     showCounters: false,
   },
   contact: {
     intro:
-      "I'm not actively job-hunting, but I'm open to the right senior backend or full-stack role — and I take on freelance and contract projects. If you're a potential client, email me and I'll scope the work with you. I respond within 24 hours.",
+      "I'm not actively job-hunting, but I'm open to the right backend or full-stack role with real ownership — and I take on freelance and contract projects. If you're a potential client, email me and I'll scope the work with you. I respond within 24 hours.",
   },
   footer: {
     headline:
-      "Architecting backend systems that scale. Open to senior roles and freelance projects.",
+      "Architecting backend systems that scale. Open to roles where I own the architecture, and to freelance projects.",
     copyrightText: "All rights reserved.",
   },
-  projectFilters: ["All", "Featured", "Other"],
   links: {
     resume: "/john-ross-rivera-resume.pdf",
   },

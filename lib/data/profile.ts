@@ -3,7 +3,10 @@
 // prompt from this module + those two data files, so a fact is edited in exactly one place.
 //
 // IMPORTANT: positioning fields (workSetup, salaryExpectation, freelanceNote) reflect John's current
-// stance — employed, open to senior roles + freelance, and NOT disclosing a salary/rate figure.
+// stance — employed, open to roles with architecture ownership + freelance, and NOT disclosing a
+// salary/rate figure. Level is signalled through SCOPE (owning architecture, leading systems,
+// mentoring) rather than the word "senior" — describing the work is more credible than claiming
+// the title, and it does not date as the title inflates.
 // Edit them here — they flow into everything Nuggets tells a recruiter.
 
 import { siteConfig } from "@/config/site";
@@ -21,15 +24,16 @@ export const profile = {
   roleTarget:
     "Backend Developer (open to full-stack if Node.js/TypeScript-based)",
   availability:
-    "Currently employed and happy in the role — not actively job-hunting, but open to the right senior full-time opportunity and to freelance/contract projects.",
+    "Currently employed and happy in the role — not actively job-hunting, but open to the right full-time opportunity with real ownership, and to freelance/contract projects.",
   workSetup:
     "Open to remote / WFH (including remote roles for overseas companies), onsite, or hybrid — and open to relocation for the right full-time role",
   salaryExpectation:
-    "Open to competitive senior-level compensation — John prefers to discuss specifics directly for the role rather than list a figure.",
+    "Open to competitive compensation matched to the scope of the role — John prefers to discuss specifics directly for the role rather than list a figure.",
   freelanceNote:
     "Available for freelance/contract work; John scopes the project first, then discusses rate directly by email.",
   tagline: "Systems over shortcuts.",
-  careerGoal: "Senior Backend Developer (Node.js/TypeScript/NestJS preferred)",
+  careerGoal:
+    "Owning backend architecture end to end (Node.js/TypeScript/NestJS preferred)",
   summary:
     "John started self-studying programming and building projects in 2022 — about 4 years of hands-on development experience. He specializes in production backend infrastructure: auth systems, service layers, access control, and data pipelines. He has shipped systems serving 900k+ users, built role-based access platforms for live competition workflows, and designed analytics and earnings dashboards for operations teams. When scope demands it, he owns the full stack.",
   education: {
@@ -95,7 +99,7 @@ export const profile = {
     },
     {
       q: "Are you open to opportunities right now?",
-      a: "John is currently employed and happy where he is, so he's not actively job-hunting. That said, he's open to the right senior full-time opportunity down the line, and he takes on freelance/contract projects now. He's driven by growth and genuinely hard engineering problems — for freelance work, the best move is to email him so he can scope it with you.",
+      a: "John is currently employed and happy where he is, so he's not actively job-hunting. That said, he's open to the right full-time opportunity with real ownership down the line, and he takes on freelance/contract projects now. He's driven by growth and genuinely hard engineering problems — for freelance work, the best move is to email him so he can scope it with you.",
     },
     {
       q: "What are your strengths?",
@@ -111,7 +115,7 @@ export const profile = {
     },
     {
       q: "Where do you see yourself in 3–5 years?",
-      a: "John's goal is to grow into a Senior Backend Developer role — owning architecture decisions, mentoring junior developers, and leading complex backend systems from design to production. He's building toward that deliberately with every project.",
+      a: "John's goal is to own backend architecture end to end — making the architecture decisions, mentoring other developers, and leading complex systems from design through production. He's building toward that deliberately with every project.",
     },
     {
       q: "Why should we hire you?",
