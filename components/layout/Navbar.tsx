@@ -2,13 +2,19 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { siteConfig } from "@/config/site";
+import {
+  REQUEST_OPEN_EVENT,
+  useShortcutLabel,
+} from "@/hooks/useCommandPalette";
 import { useMobileMenu } from "@/hooks/useMobileMenu";
+import { useSound } from "@/hooks/useSound";
 import { useTheme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils/cn";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 import { motion } from "framer-motion";
-import { Moon, Sun, X } from "lucide-react";
+import { Moon, Search, Sun, Volume2, VolumeX, X } from "lucide-react";
 import Link from "next/link";
+import type { MouseEvent } from "react";
 
 const sectionIds = siteConfig.nav.map((item) => item.href.replace("#", ""));
 
@@ -29,6 +35,21 @@ export function Navbar() {
   const { isOpen, open, close } = useMobileMenu();
   const activeSection = useScrollSpy(sectionIds);
   const { theme, toggleTheme, isReady } = useTheme();
+  const {
+    enabled: soundEnabled,
+    isReady: soundReady,
+    play,
+    toggleSound,
+  } = useSound();
+  const shortcutLabel = useShortcutLabel();
+
+  // Shared by BOTH theme toggles (desktop and mobile). The click coordinates are what the circular
+  // reveal expands from — without them useTheme falls back to an instant switch, so a call site that
+  // forgets to pass the event silently loses the animation. One handler means that cannot happen.
+  function handleThemeToggle(event: MouseEvent<HTMLButtonElement>) {
+    play(theme === "dark" ? "toggle-off" : "toggle-on");
+    toggleTheme({ x: event.clientX, y: event.clientY });
+  }
 
   return (
     <motion.header
@@ -38,17 +59,22 @@ export function Navbar() {
       className="bg-background/90 fixed inset-x-0 top-0 z-50 backdrop-blur-md"
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
-        <div className="hidden items-center gap-2 rounded-full border border-border bg-card px-4 py-2 shadow-sm lg:flex">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-            <span className="availability-dot relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+        {/* Availability status.
+            Was a pill with a pulsing green dot and 41 characters of text that wrapped onto two
+            lines. The pulsing dot is a SaaS-marketing tell — it says "live status indicator" while
+            indicating nothing, and it animates forever, which also made it a source of flicker
+            during the theme transition. A quiet uppercase mono label reads as deliberate; a
+            blinking badge reads as decoration. `whitespace-nowrap` guarantees one line. */}
+        <div className="hidden lg:flex lg:flex-col">
+          <span className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            Availability
           </span>
-          <span className="text-xs font-medium text-foreground">
+          <span className="whitespace-nowrap text-xs font-medium text-foreground">
             {siteConfig.navbar.availabilityText}
           </span>
         </div>
 
-        <ul className="hidden items-center gap-1 md:flex">
+        <ul className="hidden items-center gap-1 lg:flex">
           {siteConfig.nav.map((item) => {
             const isActive = activeSection === item.href.replace("#", "");
             return (
@@ -81,26 +107,78 @@ export function Navbar() {
           })}
         </ul>
 
-        <div className="hidden items-center gap-3 md:flex">
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground transition-colors duration-300 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            aria-label={
-              isReady && theme === "dark"
-                ? "Switch to light mode"
-                : "Switch to dark mode"
-            }
-          >
-            {isReady && theme === "dark" ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
-            <span className="hidden lg:inline">
-              {isReady && theme === "dark" ? "Light" : "Dark"}
-            </span>
-          </button>
+        <div className="hidden items-center gap-3 lg:flex">
+          {/* UTILITY CLUSTER — search, theme, sound in ONE segmented control.
+              Three separate pills read as three unrelated decisions competing with Resume and
+              Let's Talk for attention. Grouping them into a single bordered unit with hairline
+              dividers drops the visual object count in the bar from five to three, and says these
+              belong together. Each control keeps its own accessible name. */}
+          <div className="inline-flex items-center overflow-hidden rounded-full border border-border bg-card">
+            <button
+              type="button"
+              onClick={() =>
+                window.dispatchEvent(new Event(REQUEST_OPEN_EVENT))
+              }
+              className="hidden items-center gap-1.5 px-3.5 py-2.5 text-sm text-foreground transition-colors duration-200 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring lg:inline-flex"
+              aria-label="Ask anything"
+            >
+              <Search className="h-4 w-4" aria-hidden="true" />
+              <kbd className="rounded border border-border px-1.5 py-0.5 font-mono text-[10px] leading-none">
+                {shortcutLabel}
+              </kbd>
+            </button>
+
+            <span
+              className="hidden h-5 w-px bg-border lg:block"
+              aria-hidden="true"
+            />
+
+            <button
+              type="button"
+              onClick={handleThemeToggle}
+              data-sound-self
+              className="inline-flex items-center px-3.5 py-2.5 text-foreground transition-colors duration-200 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+              aria-label={
+                isReady && theme === "dark"
+                  ? "Switch to light mode"
+                  : "Switch to dark mode"
+              }
+            >
+              {isReady && theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </button>
+
+            <span className="h-5 w-px bg-border" aria-hidden="true" />
+
+            {/* Sound is OFF by default, so this control is the only way anyone discovers it.
+                soundReady mirrors the theme toggle's isReady guard against a hydration mismatch. */}
+            <button
+              type="button"
+              onClick={() => {
+                // Play on the way ON only: making a noise to announce silence is absurd.
+                if (!soundEnabled) play("toggle-on");
+                toggleSound();
+              }}
+              data-sound-self
+              className="inline-flex items-center px-3.5 py-2.5 text-foreground transition-colors duration-200 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+              aria-pressed={soundReady ? soundEnabled : undefined}
+              aria-label={
+                soundReady && soundEnabled
+                  ? "Turn interface sounds off"
+                  : "Turn interface sounds on"
+              }
+            >
+              {soundReady && soundEnabled ? (
+                <Volume2 className="h-4 w-4" />
+              ) : (
+                <VolumeX className="h-4 w-4" />
+              )}
+            </button>
+          </div>
+
           <Link
             href={siteConfig.links.resume}
             target="_blank"
@@ -133,7 +211,7 @@ export function Navbar() {
         <Dialog.Root open={isOpen} onOpenChange={(v) => (v ? open() : close())}>
           <Dialog.Trigger asChild>
             <button
-              className="hover:border-foreground/40 relative flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-sm transition-all duration-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background md:hidden"
+              className="hover:border-foreground/40 relative flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-sm transition-all duration-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background lg:hidden"
               aria-label={
                 isOpen ? "Close navigation menu" : "Open navigation menu"
               }
@@ -171,15 +249,12 @@ export function Navbar() {
             <Dialog.Content className="fixed inset-y-0 right-0 z-50 flex w-[300px] max-w-[85vw] flex-col bg-card shadow-2xl outline-none data-[state=closed]:animate-slide-out data-[state=open]:animate-slide-in">
               {/* Panel header */}
               <div className="border-border/60 flex items-center justify-between border-b px-5 py-4">
-                <div className="flex items-center gap-2">
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  </span>
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                    Navigation
-                  </span>
-                </div>
+                {/* Same reasoning as the desktop availability label: a pulsing dot next to the word
+                    "Navigation" indicates nothing — it is motion for its own sake. The label alone
+                    is the whole content. */}
+                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                  Navigation
+                </span>
                 <Dialog.Close asChild>
                   <button
                     aria-label="Close menu"
@@ -236,7 +311,8 @@ export function Navbar() {
               <div className="border-border/60 flex flex-col gap-3 border-t px-5 py-5">
                 <button
                   type="button"
-                  onClick={toggleTheme}
+                  onClick={handleThemeToggle}
+                  data-sound-self
                   className="flex w-full items-center justify-center gap-2 rounded-full border border-border bg-background py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   aria-label={
                     isReady && theme === "dark"
@@ -250,6 +326,28 @@ export function Navbar() {
                     <Moon className="h-4 w-4" />
                   )}
                   {isReady && theme === "dark" ? "Light mode" : "Dark mode"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!soundEnabled) play("toggle-on");
+                    toggleSound();
+                  }}
+                  data-sound-self
+                  className="flex w-full items-center justify-center gap-2 rounded-full border border-border bg-background py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  aria-pressed={soundReady ? soundEnabled : undefined}
+                  aria-label={
+                    soundReady && soundEnabled
+                      ? "Turn interface sounds off"
+                      : "Turn interface sounds on"
+                  }
+                >
+                  {soundReady && soundEnabled ? (
+                    <Volume2 className="h-4 w-4" />
+                  ) : (
+                    <VolumeX className="h-4 w-4" />
+                  )}
+                  {soundReady && soundEnabled ? "Sound on" : "Sound off"}
                 </button>
                 <div className="grid grid-cols-2 gap-2.5">
                   <Link

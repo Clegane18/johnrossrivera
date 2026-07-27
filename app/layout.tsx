@@ -4,6 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { ChatWidget } from "@/components/ui/ChatWidget";
+import { SoundEffects } from "@/components/ui/SoundEffects";
 import { siteConfig } from "@/config/site";
 import Script from "next/script";
 import "./globals.css";
@@ -104,6 +105,7 @@ export default function RootLayout({
         <Footer />
         <ScrollToTop />
         <ChatWidget />
+        <SoundEffects />
       </body>
     </html>
   );

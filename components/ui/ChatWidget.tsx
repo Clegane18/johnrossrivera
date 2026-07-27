@@ -1,11 +1,19 @@
 "use client";
 
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { Info, Mail, Send, X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { useChat } from "@/hooks/useChat";
+import { useCommandPalette } from "@/hooks/useCommandPalette";
+import { useSound } from "@/hooks/useSound";
 import { siteConfig } from "@/config/site";
 
 // ── Message render helpers ──────────────────────────────────────────────────
@@ -23,10 +31,7 @@ function hlText(s: string, k: number): ReactNode[] {
   while ((m = HL_RE.exec(s)) !== null) {
     if (m.index > last) out.push(s.slice(last, m.index));
     out.push(
-      <span
-        key={k++}
-        className="font-semibold text-green-600 dark:text-green-400"
-      >
+      <span key={k++} className="font-semibold text-foreground">
         {m[0]}
       </span>
     );
@@ -62,7 +67,7 @@ function renderSegment(text: string, k: number): ReactNode[] {
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-green-600 underline underline-offset-2 transition-colors hover:text-green-500 dark:text-green-400 dark:hover:text-green-300"
+        className="text-foreground underline underline-offset-2 transition-colors hover:text-muted-foreground"
       >
         {label}
       </a>
@@ -132,6 +137,7 @@ export function ChatWidget() {
     sendMessage,
     remaining,
   } = useChat();
+  const { play } = useSound();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -163,10 +169,26 @@ export function ChatWidget() {
     }
   }, [isOpen]);
 
+  // ⌘K / Ctrl+K opens the chat. When it is already open, focus the input rather than toggling it
+  // shut — a shortcut that closes what you just reached for feels broken.
+  useCommandPalette(
+    useCallback(() => {
+      setIsOpen(true);
+      inputRef.current?.focus();
+    }, [])
+  );
+
+  // Both send paths (Enter and the button) go through here so the sound cannot be wired to one and
+  // forgotten on the other. play() is a no-op unless the visitor opted in.
+  const handleSend = () => {
+    play("send");
+    sendMessage();
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      sendMessage();
+      handleSend();
     }
   };
 
@@ -191,7 +213,7 @@ export function ChatWidget() {
             {/* Header */}
             <div className="flex flex-shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900">
               <div className="flex items-center gap-2.5">
-                <div className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-full ring-2 ring-amber-400">
+                <div className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-full ring-1 ring-border">
                   <Image
                     src={siteConfig.chat.avatarPath}
                     alt="Nuggets"
@@ -206,8 +228,8 @@ export function ChatWidget() {
                   </p>
                   <span className="mt-1 flex items-center gap-1">
                     <span className="relative flex h-1.5 w-1.5">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
-                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-500" />
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-foreground opacity-75" />
+                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-foreground" />
                     </span>
                     <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
                       Online
@@ -256,7 +278,7 @@ export function ChatWidget() {
                           key={pt}
                           className="flex gap-1.5 text-[11px] leading-snug text-zinc-600 dark:text-zinc-300"
                         >
-                          <span className="mt-1 h-1 w-1 flex-shrink-0 rounded-full bg-green-500" />
+                          <span className="mt-1 h-1 w-1 flex-shrink-0 rounded-full bg-muted-foreground" />
                           {pt}
                         </li>
                       ))}
@@ -282,7 +304,7 @@ export function ChatWidget() {
                     })}
                   >
                     {msg.role === "assistant" && (
-                      <div className="relative h-7 w-7 flex-shrink-0 overflow-hidden rounded-full ring-1 ring-amber-400">
+                      <div className="relative h-7 w-7 flex-shrink-0 overflow-hidden rounded-full ring-1 ring-border">
                         <Image
                           src={siteConfig.chat.avatarPath}
                           alt="Nuggets"
@@ -293,7 +315,7 @@ export function ChatWidget() {
                       </div>
                     )}
                     {msg.role === "user" ? (
-                      <div className="max-w-[82%] rounded-2xl rounded-br-sm bg-green-500 px-4 py-2.5 text-sm text-white">
+                      <div className="max-w-[82%] rounded-2xl rounded-br-sm bg-foreground px-4 py-2.5 text-sm text-background">
                         {msg.content}
                       </div>
                     ) : (
@@ -302,7 +324,7 @@ export function ChatWidget() {
                           isTyping ? (
                             <>
                               {renderMsg(typedContent)}
-                              <span className="animate-pulse text-green-500">
+                              <span className="animate-pulse text-muted-foreground">
                                 |
                               </span>
                             </>
@@ -326,7 +348,7 @@ export function ChatWidget() {
               {fallback && (
                 <div
                   role="alert"
-                  className="flex flex-col gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-900 dark:border-amber-800/50 dark:bg-amber-950/30 dark:text-amber-200"
+                  className="flex flex-col gap-2 rounded-xl border border-border bg-muted px-3 py-2.5 text-xs text-foreground"
                 >
                   <span>{fallback.message}</span>
 
@@ -337,7 +359,7 @@ export function ChatWidget() {
                   {fallback.showContact && (
                     <a
                       href={`mailto:${siteConfig.email}`}
-                      className="inline-flex w-fit items-center gap-1.5 rounded-lg bg-amber-700 px-2.5 py-1.5 font-medium text-white transition-colors hover:bg-amber-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700"
+                      className="inline-flex w-fit items-center gap-1.5 rounded-lg bg-foreground px-2.5 py-1.5 font-medium text-background transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                     >
                       <Mail className="h-3.5 w-3.5" aria-hidden="true" />
                       Email John directly
@@ -360,13 +382,13 @@ export function ChatWidget() {
                   onKeyDown={handleKeyDown}
                   placeholder="Ask Nuggets anything..."
                   disabled={isStreaming}
-                  className="max-h-24 w-full resize-none overflow-y-auto rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-green-500"
+                  className="max-h-24 w-full resize-none overflow-y-auto rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-foreground"
                 />
                 <button
-                  onClick={sendMessage}
+                  onClick={handleSend}
                   disabled={!input.trim() || isStreaming}
                   aria-label="Send message"
-                  className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-green-500 text-white transition-colors hover:bg-green-600 disabled:opacity-30"
+                  className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-foreground text-background transition-opacity hover:opacity-90 disabled:opacity-30"
                 >
                   <Send className="h-3.5 w-3.5" />
                 </button>
@@ -405,13 +427,13 @@ export function ChatWidget() {
             )}
           </AnimatePresence>
           {!isOpen && (
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-25" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-foreground opacity-25" />
           )}
           <motion.button
             onClick={() => setIsOpen((prev) => !prev)}
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.93 }}
-            className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-full shadow-[0_0_20px_rgba(251,146,60,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-full shadow-[0_0_20px_rgba(251,146,60,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             aria-label={isOpen ? "Close chat" : "Open chat"}
           >
             <Image
