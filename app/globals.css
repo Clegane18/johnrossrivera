@@ -27,15 +27,17 @@
   --primary: #e2e8f0;
   --primary-foreground: #0a0e12;
   --muted: #141c24;
-  --muted-foreground: #64748b;
+  /* Was #64748b, which is 3.89:1 against --card and 4.07:1 against --background — both under the
+     4.5:1 WCAG AA floor for normal text. This token carries ~70 usages across the site (every
+     secondary label, date, caption), so the whole page's supporting text was failing AA in dark
+     mode. #7c8797 is the nearest value that clears it on both surfaces (5.09:1 / 5.32:1) while
+     staying visibly secondary to --foreground. */
+  --muted-foreground: #7c8797;
   --accent: #141c24;
-  --accent-foreground: #4ade80;
+  --accent-foreground: #e2e8f0;
   --border: #1e2d3d;
   --input: #141c24;
-  --ring: #4ade80;
-  /* Terminal accent — used for highlights, focus rings, active nav */
-  --terminal-green: #4ade80;
-  --terminal-green-dim: #166534;
+  --ring: #7c8797;
 }
 
 html {
@@ -106,33 +108,27 @@ body {
     color: transparent;
   }
 
-  /* ─── Terminal dark mode accents ──────────────────────── */
-  /* Section headings get a green tint in dark mode */
-  .dark .section-heading-accent {
-    color: var(--terminal-green);
-  }
+  /* ─── Dark mode accents ───────────────────────────────── */
+  /* Monochrome. These rules were the last green on the site and the monochrome sweep missed them
+     entirely: it searched Tailwind colour CLASSES, and these are custom classes driven by CSS
+     variables. `.nav-active` in particular is what made the active nav pill bright green. */
 
-  /* Scrollbar — terminal green thumb in dark mode */
+  /* Scrollbar thumb — visible against the track without becoming an accent. */
   .dark ::-webkit-scrollbar-thumb {
-    background: var(--terminal-green-dim);
+    background: var(--border);
   }
 
-  /* Availability pill — green dot pulse in dark mode */
-  .dark .availability-dot {
-    background-color: var(--terminal-green);
-    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2);
-  }
-
-  /* Card border glow on hover in dark mode */
+  /* Card border response on hover. */
   .dark .card-hover-glow:hover {
-    border-color: var(--terminal-green-dim);
-    box-shadow: 0 0 0 1px var(--terminal-green-dim);
+    border-color: var(--muted-foreground);
   }
 
-  /* Active nav item gets terminal green in dark mode */
+  /* Active nav item: inverted fill, the monochrome way to say "you are here".
+     !important is inherited from the rule this replaces — it has to beat the Tailwind utilities on
+     the same element. */
   .dark .nav-active {
-    background-color: var(--terminal-green) !important;
-    color: #0a0e12 !important;
+    background-color: var(--foreground) !important;
+    color: var(--background) !important;
   }
 }
 
@@ -243,4 +239,61 @@ body {
   .section-heading {
     @apply font-hero text-3xl font-black uppercase tracking-tight text-foreground sm:text-4xl md:text-5xl lg:text-6xl;
   }
+}
+
+/* ── Theme transition (View Transitions API) ──────────────────────────────────
+   The default cross-fade is disabled so hooks/useTheme.ts can animate a clip-path
+   circle on the INCOMING snapshot instead. The outgoing snapshot stays put underneath,
+   which is what makes it read as a reveal rather than a dissolve.
+
+   Browsers without the API never create these pseudo-elements, so this whole block is
+   inert there and the theme simply switches instantly — which is the intended fallback,
+   not a degradation to fix. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 0;
+}
+
+::view-transition-new(root) {
+  z-index: 1;
+}
+
+/* A reveal that sweeps the whole viewport is exactly the kind of motion that triggers
+   vestibular discomfort. useTheme.ts already skips the animation when this is set; this
+   is the belt-and-braces half, covering any transition it does not drive. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}
+
+/* Suppress CSS transitions while a theme reveal is running.
+   ::view-transition-new(root) renders the LIVE new state, so the ~37 elements carrying
+   `transition-colors duration-300` were still animating their colours underneath the
+   expanding circle — you saw the reveal AND a colour cross-fade at once, which reads as a
+   glitch mid-way. The theme flip should be instant under the circle; the circle is the
+   only thing that animates. */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: none !important;
+  /* Freeze looping animations (ping, bounce, pulse, spin, marquee) so they are not moving
+     underneath the expanding circle — two independent motions at once reads as a stutter.
+
+     PAUSED, not `animation: none`. Removing an animation and then restoring it makes the browser
+     restart it from frame zero, so toggling the theme with the mobile menu OPEN replayed the
+     panel's `animate-slide-in` — the menu appeared to re-render itself. Pausing freezes a running
+     animation in place and resumes it where it left off, and does nothing at all to an animation
+     that has already finished, which is the common case for the menu.
+
+     The universal selector matches ELEMENTS only, so this cannot touch the
+     ::view-transition-* pseudo-elements that drive the reveal itself. */
+  animation-play-state: paused !important;
 }

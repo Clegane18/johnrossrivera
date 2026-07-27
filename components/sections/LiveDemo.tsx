@@ -148,9 +148,7 @@ export function LiveDemo() {
                   <div className="flex flex-wrap gap-x-6 gap-y-1">
                     <span>
                       status:{" "}
-                      <span className="text-green-600 dark:text-green-400">
-                        {ping.status}
-                      </span>
+                      <span className="text-foreground">{ping.status}</span>
                     </span>
                     <span>region: {ping.region}</span>
                     <span>
@@ -224,8 +222,8 @@ export function LiveDemo() {
                       <span
                         className={
                           echoStatus >= 200 && echoStatus < 300
-                            ? "text-green-600 dark:text-green-400"
-                            : "text-amber-600 dark:text-amber-400"
+                            ? "text-foreground"
+                            : "text-muted-foreground"
                         }
                       >
                         {echoStatus}

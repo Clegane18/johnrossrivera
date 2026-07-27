@@ -154,9 +154,7 @@ export function ImageLightbox({
           onClick={(e) => e.stopPropagation()}
         >
           <motion.div
-            className={cn(
-              "h-full bg-gradient-to-r from-violet-500 to-indigo-400"
-            )}
+            className={cn("h-full bg-foreground")}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.3, ease: EASE }}
           />
