@@ -3,10 +3,17 @@ import { Experience } from "@/types";
 export const experiences: Experience[] = [
   {
     id: "rr-remo-trucking",
+    group: "work",
+    employmentType: "Freelance",
+    workMode: "Remote",
     company: "RR Remo Trucking",
-    role: "Software Engineer (Full Stack) | Freelance",
+    highlights: [
+      "Built the platform for a 74-vehicle logistics firm; the site was part of the pitch that won Zuellig.",
+      "Shipped 'Traki', a token-streaming Groq assistant with an anti-hallucination prompt.",
+    ],
+    role: "Full-Stack Developer / QA",
     startDate: "May 2026",
-    endDate: "Present",
+    endDate: "Jun 2026",
     description: [
       "Built a production-grade company portfolio and AI logistics platform for a Philippine trucking company operating 74 vehicles, with enterprise clients including Zuellig, Lazada, Jollibee, and Shopee Philippines — the portfolio site I built was part of the pitch that helped RR Remo win Zuellig, a major Philippine distributor, as a client.",
       "Integrated 'Traki', a streaming AI customer assistant backed by Groq (LLaMA 3.1 8B), delivering token-by-token streaming via ReadableStream with multi-turn conversation history and a strict factual system prompt to prevent hallucination.",
@@ -26,10 +33,17 @@ export const experiences: Experience[] = [
   },
   {
     id: "smart-lift-ai",
+    group: "personal",
+    employmentType: "Personal project",
+    workMode: "Remote",
     company: "Smart-lift AI",
-    role: "Software Engineer (Full Stack / QA Tester) | Personal Project",
+    highlights: [
+      "Full-stack training platform on Next.js + NestJS with JWT auth and role-based access.",
+      "Rule-driven engines for workout planning, progression, and nutrition on Prisma/MySQL.",
+    ],
+    role: "Full-Stack Developer / QA",
     startDate: "Mar 2026",
-    endDate: "Present",
+    endDate: "Apr 2026",
     description: [
       "Built a full-stack fitness platform with Next.js 16 (React 19, TypeScript, RTK Query) and NestJS 11, integrating JWT authentication, role-based access control, and scalable modular domain workflows across training, nutrition, and analytics.",
       "Architected a modular NestJS backend with Prisma and MySQL, implementing DTO validation, transactional service layers, aggregated analytics endpoints, and rule-driven engines for workout planning, progression evaluation, and nutrition logic.",
@@ -49,8 +63,15 @@ export const experiences: Experience[] = [
   },
   {
     id: "crystal-vision",
+    group: "work",
+    employmentType: "Full-time",
+    workMode: "Remote",
     company: "Crystal Vision",
-    role: "Software Engineer / QA Tester",
+    highlights: [
+      "Modular NestJS backend with JWT/Passport, throttling, and indexed cursor pagination.",
+      "Admin APIs across auth, moderation, payments, contests, and analytics; Laravel earnings workflows.",
+    ],
+    role: "Full-Stack Developer / QA",
     startDate: "Aug 2025",
     endDate: "Present",
     description: [
@@ -78,8 +99,15 @@ export const experiences: Experience[] = [
   },
   {
     id: "gf-auto-supply",
+    group: "academic",
+    employmentType: "Capstone project",
+    workMode: "Remote",
     company: "G&F Auto Supply",
-    role: "Fullstack Developer / QA Tester",
+    highlights: [
+      "Unified commerce backend on Node.js + PostgreSQL for POS and inventory workflows.",
+      "Payment and reservation pipelines with OAuth and audit-backed admin analytics.",
+    ],
+    role: "Full-Stack Developer / QA",
     startDate: "Aug 2024",
     endDate: "Nov 2024",
     description: [
@@ -95,27 +123,6 @@ export const experiences: Experience[] = [
       "Sequelize",
       "OAuth",
       "Express.js",
-    ],
-  },
-  {
-    id: "sniff-sense-ai",
-    company: "Sniff Sense AI",
-    role: "Fullstack Developer / QA Tester | Personal Project",
-    startDate: "Dec 2025",
-    endDate: "Present",
-    description: [
-      "Built a scalable backend with Node.js, TypeScript, Express, Sequelize, and PostgreSQL using layered architecture and JWT security.",
-      "Implemented robust validation, logging, and optimized query strategies to support intelligent perfume recommendation workflows.",
-      "Engineered collection management, scent logging, and analytics services with indexing and raw query optimizations for reliable API performance.",
-      "Owned QA validation of key API flows to maintain stability across iterative feature releases.",
-    ],
-    tech: [
-      "Node.js",
-      "TypeScript",
-      "Express.js",
-      "PostgreSQL",
-      "Sequelize",
-      "JWT",
     ],
   },
 ];
