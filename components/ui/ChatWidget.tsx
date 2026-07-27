@@ -3,7 +3,7 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { Info, Send, X } from "lucide-react";
+import { Info, Mail, Send, X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { useChat } from "@/hooks/useChat";
 import { siteConfig } from "@/config/site";
@@ -128,7 +128,7 @@ export function ChatWidget() {
     isStreaming,
     isTyping,
     typedContent,
-    error,
+    fallback,
     sendMessage,
     remaining,
   } = useChat();
@@ -320,10 +320,29 @@ export function ChatWidget() {
                 );
               })}
 
-              {error && (
-                <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-600 dark:border-red-800/50 dark:bg-red-950/30 dark:text-red-400">
-                  <span className="mt-px flex-shrink-0 font-bold">!</span>
-                  <span>{error}</span>
+              {/* An outage is styled as a NOTICE, not an error. A red "!" box reads as a broken
+                  site, and the visitor is often a recruiter — so when the chat cannot answer, the
+                  job of this block is to keep the conversion path open, not to report a fault. */}
+              {fallback && (
+                <div
+                  role="alert"
+                  className="flex flex-col gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-900 dark:border-amber-800/50 dark:bg-amber-950/30 dark:text-amber-200"
+                >
+                  <span>{fallback.message}</span>
+
+                  {/* amber-700, not amber-600: white on amber-600 is 3.19:1 and fails WCAG AA for
+                      normal text (needs 4.5:1). amber-700 is 5.02:1, hover amber-800 is 7.09:1.
+                      No dark: override — the ratio is text vs button fill, so it does not change
+                      with the page background. */}
+                  {fallback.showContact && (
+                    <a
+                      href={`mailto:${siteConfig.email}`}
+                      className="inline-flex w-fit items-center gap-1.5 rounded-lg bg-amber-700 px-2.5 py-1.5 font-medium text-white transition-colors hover:bg-amber-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700"
+                    >
+                      <Mail className="h-3.5 w-3.5" aria-hidden="true" />
+                      Email John directly
+                    </a>
+                  )}
                 </div>
               )}
 

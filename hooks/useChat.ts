@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react";
-import type { ChatMessage } from "@/types";
+import { chatFallback } from "@/lib/utils/chat-fallback";
+import type { ChatFallback, ChatMessage } from "@/types";
 
 const WELCOME_MESSAGE: ChatMessage = {
   role: "assistant",
@@ -13,7 +14,7 @@ export function useChat() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [typedContent, setTypedContent] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [fallback, setFallback] = useState<ChatFallback | null>(null);
   const [remaining, setRemaining] = useState<number | null>(null);
   const [limit, setLimit] = useState<number | null>(null);
 
@@ -65,13 +66,19 @@ export function useChat() {
 
     setMessages(nextMessages);
     setInput("");
-    setError(null);
+    setFallback(null);
     setIsStreaming(true);
     isStreamingRef.current = true;
     streamBufferRef.current = "";
     typedContentRef.current = "";
     setTypedContent("");
     setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+
+    // Captured here rather than encoded into the thrown Error, so the catch can tell an HTTP
+    // failure (which has a status, and therefore a specific fallback) from a transport failure
+    // (which has none). Left null for network errors — chatFallback(null) is the connection case.
+    let failureStatus: number | null = null;
+    let failureMessage: string | null = null;
 
     try {
       const historyToSend = nextMessages.slice(-10);
@@ -88,21 +95,14 @@ export function useChat() {
       if (limitHeader !== null) setLimit(Number(limitHeader));
 
       if (!response.ok) {
-        const status = response.status;
-        let message = "Oops! Nuggets had a hiccup. Please try again.";
+        failureStatus = response.status;
         try {
           const json = await response.json();
-          if (json?.message) message = json.message;
+          if (typeof json?.message === "string") failureMessage = json.message;
         } catch {
-          if (status === 400) {
-            message =
-              "Something went wrong with that message. Please try again.";
-          } else if (status >= 500) {
-            message =
-              "Nuggets is having trouble right now. Please try again in a bit.";
-          }
+          // Body was not JSON. The status alone is enough to choose a fallback.
         }
-        throw new Error(message);
+        throw new Error("chat-unavailable");
       }
 
       const reader = response.body?.getReader();
@@ -117,19 +117,11 @@ export function useChat() {
         streamBufferRef.current += chunk;
         startTypingInterval();
       }
-    } catch (err) {
-      let msg = "Oops! Nuggets had a hiccup. Please try again.";
-      if (err instanceof Error) {
-        if (
-          err.name === "TypeError" ||
-          err.message.toLowerCase().includes("fetch")
-        ) {
-          msg = "Connection issue. Please check your internet and try again.";
-        } else {
-          msg = err.message;
-        }
-      }
-      setError(msg);
+    } catch {
+      // failureStatus is null for anything that never produced an HTTP response — a dropped
+      // connection, a missing stream body — which is exactly the case chatFallback treats as a
+      // connection problem rather than an outage.
+      setFallback(chatFallback(failureStatus, failureMessage));
       streamBufferRef.current = "";
       if (intervalRef.current !== null) {
         clearInterval(intervalRef.current);
@@ -158,7 +150,7 @@ export function useChat() {
     isStreaming,
     isTyping,
     typedContent,
-    error,
+    fallback,
     sendMessage,
     remaining,
     limit,

@@ -63,3 +63,12 @@ export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
 }
+
+// What the chat shows when it cannot answer. Not an "error" shape on purpose: on a portfolio the
+// visitor is often a recruiter, so an outage has to keep offering a way through to John rather than
+// dead-ending in a red box. See lib/utils/chat-fallback.ts.
+export interface ChatFallback {
+  message: string;
+  canRetry: boolean;
+  showContact: boolean;
+}
