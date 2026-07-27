@@ -19,6 +19,8 @@ export const projects: Project[] = [
   {
     id: "rola-access-platform",
     title: "Rola Access Platform",
+    summary:
+      "Guard-based RBAC and cursor pagination for a live competition console that holds under load.",
     description:
       "A modular NestJS + Next.js platform for a live song competition serving 917,026 registered users — guard-based RBAC isolates judge and admin views, and cursor pagination holds under load.",
     problem:
@@ -51,6 +53,8 @@ export const projects: Project[] = [
   {
     id: "kol-dashboard",
     title: "KOL Dashboard",
+    summary:
+      "Earnings and withdrawal approvals that stay consistent under concurrent transactions.",
     description:
       "Operations and earnings dashboard for 1,000+ KOL partners on a Laravel 12 service layer — multi-state withdrawal approvals and OTP-hardened auth that stay consistent under concurrent transactions.",
     problem:
@@ -82,6 +86,8 @@ export const projects: Project[] = [
   {
     id: "smart-lift-ai",
     title: "Smart-lift AI",
+    summary:
+      "Rule-driven training engines — plateau detection, macro adjustment, workout generation.",
     description:
       "A personal production training system (10 active users) whose NestJS backend runs rule-driven engines for plateau detection, macro auto-adjustment, and equipment-aware workout generation — all scoped per user.",
     problem:
@@ -181,6 +187,8 @@ export const projects: Project[] = [
   {
     id: "rr-remo-trucking",
     title: "RR Remo Trucking",
+    summary:
+      "Logistics platform with a streaming AI assistant built against hallucination.",
     description:
       "A production Next.js portfolio and AI logistics platform for a Philippine trucking company (74 vehicles) whose enterprise clients include Zuellig, Lazada, Jollibee, and Shopee — featuring 'Traki', a streaming Groq-backed assistant with a strict anti-hallucination prompt.",
     problem:
