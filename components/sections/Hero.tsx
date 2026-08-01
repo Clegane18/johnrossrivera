@@ -128,13 +128,16 @@ export function Hero() {
                     <path d="M2 12L12 2M12 2H5M12 2v7" />
                   </svg>
                 </Link>
-                <Link
+                {/* A plain <a>, not next/link. The resume is a static file in public/, not an app
+                    route — next/link treats it as one and RSC-prefetches it, which requests
+                    /john-ross-rivera-resume.pdf?_rsc=... and 404s in production. */}
+                <a
                   href={siteConfig.heroSecondaryCta.href}
                   download="John-Ross-Rivera-Resume.pdf"
                   className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground transition-colors duration-300 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   {siteConfig.heroSecondaryCta.label}
-                </Link>
+                </a>
               </div>
             </motion.div>
 
