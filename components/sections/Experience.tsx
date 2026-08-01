@@ -44,7 +44,10 @@ export function Experience() {
 
         <div className="flex flex-col gap-12 sm:gap-16">
           {GROUP_ORDER.map((group) => {
-            const entries = experiences.filter((e) => e.group === group);
+            // `hiddenOnPage` entries stay in lib/data for the chat but do not render here.
+            const entries = experiences.filter(
+              (e) => e.group === group && !e.hiddenOnPage
+            );
 
             // A group with no entries renders nothing — no empty heading when, say, the academic
             // entry is eventually retired.

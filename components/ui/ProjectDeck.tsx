@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
@@ -8,32 +8,44 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import type { Project } from "@/types";
 
-// A card index: one project face-up, the next few receding beneath it.
+// A three-card diagonal carousel: the selected project centred at full size, its neighbours receding
+// up-left and down-right.
 //
-// The first cut of this failed for a concrete reason — the card was as wide as the section and its
-// content was taller than the container, so the "stack" was completely hidden behind the front card
-// and the whole thing read as one enormous screenshot. Two fixes: the card is CONSTRAINED (a card
-// containing a screenshot, not a screenshot pretending to be a card) and it has a FIXED height, so
-// the cards behind reliably peek out below it.
+// WHY THIS REPLACED THE VERTICAL STACK. The previous version laid every card on the same spot and
+// pushed the ones behind down by 22px each. The intent was a thin sliver of card edge peeking out
+// below the front card — but each card renders its FULL content, and the bottom ~22px of a card is
+// exactly where the Case study / Live buttons sit. So the sliver was never an empty edge: it was two
+// semi-transparent, slightly-offset copies of the button row bleeding out from underneath the real
+// ones. Translucent, misaligned and repeating, which read as a holographic glitch rather than depth.
 //
-// The recession is vertical + inset rather than rotated. Bryl's fanned, tilted deck is the most
-// recognisable thing about his site; this reads as a considered stack without borrowing his gesture.
+// The fix is structural, not cosmetic: the neighbours are now beside the active card rather than
+// beneath it, and they render IMAGE AND TITLE ONLY. There is no second copy of the buttons anywhere
+// on screen, so the artifact cannot come back by tuning an offset.
 
 type Props = {
   projects: Project[];
 };
 
-/** How many cards sit visibly behind the front one. Past this they fade out entirely. */
-const VISIBLE_BEHIND = 3;
-/** Vertical peek per card behind, in px. 16 was too subtle to register as a stack at all. */
-const PEEK = 22;
-/** Width lost per card behind. Combined with the peek this reads as depth rather than a shadow. */
-const SCALE_STEP = 0.05;
-/** Cards behind dim slightly — depth cue the eye reads before it reads the offset. */
-const DIM_STEP = 0.18;
+/** Drag distance, in px, that commits to the next/previous card. Below this the deck springs back. */
+const SWIPE_COMMIT_PX = 56;
+/** Movement past this cancels the click-to-select, so a drag never also selects a card. */
+const DRAG_SLOP_PX = 8;
+/**
+ * How far the deck follows the finger, as a fraction of the drag. Under 1 on purpose: the deck moves
+ * with you but lags, which reads as weight and makes the snap-back feel intentional.
+ */
+const DRAG_FOLLOW = 0.32;
+/**
+ * Where a card waits while off-stage, in --x steps. Must be large enough that the card's near edge
+ * clears the stage's clip at every breakpoint — at the natural ±2 the card still poked into view
+ * and showed as a sliding shadow whenever its opacity was mid-transition.
+ */
+const OFFSTAGE_STEPS = 2.6;
 
 export function ProjectDeck({ projects }: Props) {
   const [active, setActive] = useState(0);
+  const [drag, setDrag] = useState(0);
+  const gesture = useRef({ startX: 0, pointer: false, moved: false });
   const count = projects.length;
 
   const go = useCallback(
@@ -47,10 +59,56 @@ export function ProjectDeck({ projects }: Props) {
     return null;
   }
 
+  /**
+   * Signed distance from the active card: 0 centre, -1 previous, +1 next, anything else off-stage.
+   * Taking the SHORT way around the loop is what lets a 4-project deck show a "previous" card that
+   * is really index 3 — without it, the leftmost slot would sit empty on the first card.
+   */
+  const relativeTo = (index: number): number => {
+    const forward = (index - active + count) % count;
+
+    return forward > count / 2 ? forward - count : forward;
+  };
+
+  function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    gesture.current = { startX: event.clientX, pointer: true, moved: false };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
+
+  function onPointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    if (!gesture.current.pointer) return;
+
+    const dx = event.clientX - gesture.current.startX;
+
+    if (Math.abs(dx) > DRAG_SLOP_PX) {
+      gesture.current.moved = true;
+    }
+
+    setDrag(dx);
+  }
+
+  function onPointerUp(event: React.PointerEvent<HTMLDivElement>) {
+    if (!gesture.current.pointer) return;
+
+    const dx = event.clientX - gesture.current.startX;
+
+    gesture.current.pointer = false;
+    setDrag(0);
+
+    if (dx <= -SWIPE_COMMIT_PX) go(active + 1);
+    else if (dx >= SWIPE_COMMIT_PX) go(active - 1);
+  }
+
   return (
-    <div className="mx-auto w-full max-w-2xl">
+    <div className="mx-auto w-full max-w-6xl">
+      {/* The stage owns the geometry as CSS variables so the three-card diagonal can collapse to a
+          single card with peeking edges on small screens WITHOUT branching on a media query in JS —
+          which would need the viewport at render time and mismatch on hydration.
+            --x  horizontal offset per step   --y  vertical offset per step (0 on mobile = flat)
+            --s  scale of a neighbour         --o  opacity of a neighbour                        */}
       <div
-        role="listbox"
+        role="group"
+        aria-roledescription="carousel"
         aria-label="Featured projects"
         tabIndex={0}
         onKeyDown={(event) => {
@@ -63,112 +121,184 @@ export function ProjectDeck({ projects }: Props) {
             go(active - 1);
           }
         }}
-        className="relative rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background"
-        // The FRONT card stays in normal flow, so the container height follows its real content.
-        // A fixed height was the cause of the dead gap: the card was 480px for ~150px of content,
-        // and `mt-auto` gathered the leftover ~140px into a single void above the buttons. The
-        // padding below just reserves room for the peeking cards, which are absolute.
-        style={{ paddingBottom: VISIBLE_BEHIND * PEEK }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+        className={cn(
+          "relative h-[400px] overflow-hidden rounded-2xl sm:h-[520px] lg:h-[560px]",
+          // pan-y keeps vertical page scrolling working while we claim the horizontal axis.
+          "touch-pan-y select-none",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background",
+          // --x is a percentage of the CARD's own width, so it has to grow as the neighbour shrinks
+          // or the three collapse into each other. At 56% the neighbours were ~42% buried under the
+          // active card, which hid the left one's screenshot and the right one's title entirely.
+          "[--o:0.55] [--s:0.9] [--x:84%] [--y:0px]",
+          "sm:[--o:0.62] sm:[--s:0.8] sm:[--x:60%] sm:[--y:54px]",
+          "lg:[--o:0.6] lg:[--s:0.78] lg:[--x:66%] lg:[--y:64px]"
+        )}
       >
-        {projects.map((project, index) => {
-          const offset = (index - active + count) % count;
-          const isActive = offset === 0;
-          const faded = offset > VISIBLE_BEHIND;
+        {/* Only this wrapper moves during a drag, so all three cards travel together and none of
+            their own transitions have to be fought. */}
+        <div
+          className="absolute inset-0"
+          style={{ transform: `translateX(${drag * DRAG_FOLLOW}px)` }}
+        >
+          {projects.map((project, index) => {
+            const rel = relativeTo(index);
+            const isActive = rel === 0;
+            const offStage = Math.abs(rel) > 1;
+            // Park off-stage cards WELL past the clip rather than at their natural ±2. At ±2 a card
+            // still overlapped the stage, so while its opacity was mid-transition it was visible —
+            // a card-shaped shadow sliding in at the right edge on every step. OFFSTAGE_STEPS is
+            // chosen so the card's near edge clears the stage at every breakpoint.
+            const pos = offStage ? Math.sign(rel) * OFFSTAGE_STEPS : rel;
 
-          return (
-            <div
-              key={project.id}
-              role="option"
-              aria-selected={isActive}
-              aria-hidden={!isActive}
-              onClick={() => !isActive && go(index)}
-              style={{
-                transform: `translateY(${offset * PEEK}px) scale(${1 - offset * SCALE_STEP})`,
-                zIndex: count - offset,
-                opacity: faded ? 0 : 1 - offset * DIM_STEP,
-              }}
-              className={cn(
-                "flex flex-col overflow-hidden rounded-2xl border border-border bg-card",
-                "transition-[transform,opacity,box-shadow] duration-500 ease-out motion-reduce:transition-none",
-                // Only the focused card is in flow; the rest are absolute so they cannot stretch
-                // the container to their own height.
-                isActive
-                  ? "relative shadow-2xl"
-                  : "absolute inset-x-0 top-0 cursor-pointer shadow-lg",
-                faded && "pointer-events-none"
-              )}
-            >
-              {/* Inset preview. Padding around the screenshot is what makes this read as a card
-                  holding an image rather than a bare screenshot with a border. */}
-              <div className="p-3 pb-0">
-                {/* aspect-video, NOT a fixed height. At 672px wide a fixed h-44 made the box 3.68:1
-                    while the screenshots are 16:9 — object-cover was discarding 52% of every image,
-                    which is the "cut out" look. Matching the source ratio crops nothing. */}
-                <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-muted">
-                  {project.images?.[0] ? (
-                    <Image
-                      src={project.images[0]}
-                      alt={`${project.title} interface`}
-                      fill
-                      className="object-cover object-top"
-                      sizes="(max-width: 672px) 100vw, 672px"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center">
-                      <span className="font-hero text-5xl font-black uppercase text-border">
-                        {project.title.slice(0, 2)}
-                      </span>
-                    </div>
-                  )}
+            return (
+              <div
+                key={project.id}
+                aria-hidden={!isActive}
+                style={{
+                  transform: `translate(calc(-50% + (${pos} * var(--x))), calc(-50% + (${pos} * var(--y)))) scale(${
+                    isActive ? "1" : "var(--s)"
+                  })`,
+                  zIndex: 10 - Math.abs(rel),
+                  opacity: offStage ? 0 : isActive ? 1 : "var(--o)",
+                }}
+                className={cn(
+                  "absolute left-1/2 top-1/2 w-[84vw] max-w-[380px] sm:w-[52%] sm:max-w-[480px] lg:w-[44%]",
+                  "flex flex-col overflow-hidden rounded-2xl border border-border bg-card",
+                  // Off-stage cards must not ANIMATE into position. The deck loops, so on every step
+                  // one card has to move from the far left to the far right to queue up again — with
+                  // a transition that journey is a ghost travelling across the whole stage. Without
+                  // one it teleports instantly, outside the clip, where nobody can see it. The three
+                  // on-stage cards keep their transition, which is all the motion the eye follows.
+                  offStage
+                    ? "transition-none"
+                    : "transition-[transform,opacity] duration-500 ease-out motion-reduce:transition-none",
+                  isActive ? "shadow-2xl" : "shadow-lg",
+                  offStage && "pointer-events-none"
+                )}
+              >
+                {/* Select-this-card is a real <button> covering the neighbour, not an onClick on
+                    the card div — a clickable div has no role, no key handling and no focus. It
+                    cannot WRAP the card, because the card contains links and interactive content
+                    inside a <button> is invalid HTML; an overlay gives the whole card as a hit area
+                    with valid semantics. tabIndex -1 on purpose: the card is aria-hidden while
+                    inactive, so a focusable control inside it would be an axe violation, and the
+                    labelled dot buttons below already own the keyboard and screen-reader path. This
+                    is the pointer convenience, not the only way in. */}
+                {!isActive && (
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    aria-label={`Show ${project.title}`}
+                    onClick={() => {
+                      // A drag that ends over a neighbour must not also select it.
+                      if (gesture.current.moved) return;
+                      go(index);
+                    }}
+                    className="absolute inset-0 z-10 cursor-pointer"
+                  />
+                )}
+
+                <div className="p-3 pb-0">
+                  {/* aspect-video matches the source screenshots, so object-cover crops nothing. */}
+                  <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-muted">
+                    {project.images?.[0] ? (
+                      <Image
+                        src={project.images[0]}
+                        alt={`${project.title} interface`}
+                        fill
+                        className="object-cover object-top"
+                        sizes="(max-width: 640px) 84vw, (max-width: 1024px) 58vw, 553px"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center">
+                        <span className="font-hero text-5xl font-black uppercase text-border">
+                          {project.title.slice(0, 2)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex flex-col gap-2.5 p-5">
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                  <h3 className="font-display text-lg font-semibold text-foreground">
+                <div className="flex flex-col p-5">
+                  {/* Centred on a neighbour, left-aligned on the active card. A neighbour is
+                      partially covered by the active card, and it is always the INNER half that is
+                      covered — so a left-aligned title on the right-hand neighbour lands underneath
+                      the active card and cannot be read at all. Centring puts it in the exposed
+                      half on whichever side the card sits. */}
+                  <h3
+                    className={cn(
+                      "font-display text-base font-semibold text-foreground sm:text-lg",
+                      !isActive && "text-center"
+                    )}
+                  >
                     {project.title}
                   </h3>
-                  {project.impact?.[0] && (
-                    <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                      {project.impact[0].metric} {project.impact[0].label}
-                    </span>
-                  )}
-                </div>
 
-                <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
-                  {project.summary ?? project.description}
-                </p>
-
-                <div className="mt-1 flex flex-wrap gap-2">
-                  {/* Inert cards must not be tab stops. */}
-                  <Link
-                    href={`/work/${project.id}`}
-                    tabIndex={isActive ? undefined : -1}
-                    className="inline-flex items-center gap-1 rounded-full bg-foreground px-3.5 py-1.5 text-xs font-medium text-background transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  {/* Everything below the title belongs to the SELECTED card only — this is the
+                      change that kills the ghosting, since a neighbour has no buttons to duplicate.
+                      grid-rows 0fr -> 1fr animates to the content's natural height, which a plain
+                      height transition cannot do without a hardcoded pixel value. */}
+                  <div
+                    className={cn(
+                      "grid transition-all duration-500 ease-out motion-reduce:transition-none",
+                      isActive
+                        ? "grid-rows-[1fr] opacity-100"
+                        : "grid-rows-[0fr] opacity-0"
+                    )}
                   >
-                    Case study
-                  </Link>
-                  {project.liveUrl && (
-                    <Link
-                      href={project.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      tabIndex={isActive ? undefined : -1}
-                      className="inline-flex items-center gap-1 rounded-full border border-border px-3.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                    >
-                      Live
-                      <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
-                    </Link>
-                  )}
+                    <div className="overflow-hidden">
+                      {project.impact?.[0] && (
+                        <p className="pt-1.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                          {project.impact[0].metric} {project.impact[0].label}
+                        </p>
+                      )}
+
+                      <p className="line-clamp-3 pt-2 text-sm leading-relaxed text-muted-foreground">
+                        {project.summary ?? project.description}
+                      </p>
+
+                      <div className="flex flex-wrap gap-2 pt-3">
+                        {/* Inert cards must not be tab stops. */}
+                        <Link
+                          href={`/work/${project.id}`}
+                          tabIndex={isActive ? undefined : -1}
+                          draggable={false}
+                          className="inline-flex items-center gap-1 rounded-full bg-foreground px-3.5 py-1.5 text-xs font-medium text-background transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                        >
+                          Case study
+                        </Link>
+                        {project.liveUrl && (
+                          <Link
+                            href={project.liveUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            tabIndex={isActive ? undefined : -1}
+                            draggable={false}
+                            className="inline-flex items-center gap-1 rounded-full border border-border px-3.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                          >
+                            Live
+                            <ArrowUpRight
+                              className="h-3 w-3"
+                              aria-hidden="true"
+                            />
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
-      {/* Explicit controls. Arrow keys only help someone who already knows they exist, and the
-          click-a-card-behind affordance is invisible on the last card in the stack. */}
+      {/* Explicit controls. Arrow keys only help someone who already knows they exist, and neither
+          click-a-neighbour nor swipe is discoverable to a keyboard or screen-reader user. */}
       <div className="mt-6 flex items-center justify-between">
         <span className="font-mono text-[11px] tracking-wider text-muted-foreground">
           {String(active + 1).padStart(2, "0")} /{" "}

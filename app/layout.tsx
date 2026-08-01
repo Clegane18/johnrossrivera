@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, DM_Sans, Space_Mono, Barlow } from "next/font/google";
 import { Footer } from "@/components/layout/Footer";
+import { MobileDock } from "@/components/layout/MobileDock";
 import { Navbar } from "@/components/layout/Navbar";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { ChatWidget } from "@/components/ui/ChatWidget";
@@ -80,10 +81,19 @@ export default function RootLayout({
         className={`${spaceGrotesk.variable} ${dmSans.variable} ${spaceMono.variable} ${barlow.variable} font-sans antialiased`}
       >
         {/* Reveal animations start at opacity:0 and are un-hidden by JS. Without JS (locked-down
-            networks, non-JS crawlers), force that content visible so the page isn't blank. */}
-        <noscript>
-          <style>{`[style*="opacity:0"]{opacity:1!important;transform:none!important}`}</style>
-        </noscript>
+            networks, non-JS crawlers), force that content visible so the page isn't blank.
+            Currently 27 elements depend on this, including the entire hero.
+
+            dangerouslySetInnerHTML is REQUIRED, not a shortcut. As a JSX text child React escapes
+            the quotes to &quot;, and <style> is a raw-text element — the HTML parser does NOT decode
+            entities inside it. The browser therefore received the literal selector
+            [style*=&quot;opacity:0&quot;], which is invalid, so the rule was dropped and the
+            fallback silently did nothing at all. */}
+        <noscript
+          dangerouslySetInnerHTML={{
+            __html: `<style>[style*="opacity:0"]{opacity:1!important;transform:none!important}</style>`,
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
@@ -103,6 +113,7 @@ export default function RootLayout({
         <Navbar />
         <main>{children}</main>
         <Footer />
+        <MobileDock />
         <ScrollToTop />
         <ChatWidget />
         <SoundEffects />

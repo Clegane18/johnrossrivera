@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
+import { experiences } from "@/lib/data/experience";
 import { profile } from "@/lib/data/profile";
+import { projects } from "@/lib/data/projects";
+import { skills } from "@/lib/data/skills";
 
 import {
   ANSWER_RULES,
@@ -97,6 +100,103 @@ describe("buildSystemPrompt", () => {
 
   it("speaks as Nuggets in the first person", () => {
     expect(PERSONA).toContain("Nuggets");
+  });
+});
+
+describe("skills are derived, never a second copy", () => {
+  // The page and the chat used to keep SEPARATE skill lists (lib/data/skills.ts and a profile.skills
+  // field). They drifted exactly as you would expect: the visible section was trimmed to a
+  // defensible core while the chat went on reciting Angular, Moleculer.js and "DevOps" to recruiters.
+  // profile.skills is gone and the prompt now derives from lib/data/skills.ts. These tests exist so
+  // a future edit cannot reintroduce the second copy without going red.
+  const prompt = buildSystemPrompt();
+
+  it("keeps the page's shortlist a strict subset of the CV list", () => {
+    // The chat carries two skill lists on purpose: the page's shortlist and the full CV list. That
+    // is only safe while the shortlist is contained in the CV — otherwise the site would feature a
+    // skill the CV in the recruiter's inbox does not claim, which is the worse direction to drift.
+    const cv = new Set(
+      [
+        ...profile.cvSkills.languages,
+        ...profile.cvSkills.frameworks,
+        ...profile.cvSkills.devTools,
+      ].map((s) => s.toLowerCase())
+    );
+
+    // Page-only entries: "REST" is a style, not a CV line item, and Engineering Leverage describes
+    // tooling John built rather than a technology the CV lists.
+    const pageOnly = new Set(
+      [
+        "REST",
+        ...skills.flatMap((s) =>
+          s.id === "engineering-leverage" ? s.items : []
+        ),
+      ].map((s) => s.toLowerCase())
+    );
+
+    for (const group of skills) {
+      for (const item of group.items) {
+        const key = item.toLowerCase();
+        expect(
+          cv.has(key) || pageOnly.has(key),
+          `"${item}" is on the page but not on the CV`
+        ).toBe(true);
+      }
+    }
+  });
+
+  it("renders every skill the Skills section renders", () => {
+    expect(prompt).toContain("## TECHNICAL SKILLS");
+
+    for (const group of skills) {
+      expect(prompt).toContain(group.category);
+      for (const item of group.items) {
+        expect(prompt).toContain(item);
+      }
+    }
+  });
+
+  it("carries a category's note through to the chat", () => {
+    // The note is where the non-obvious claims live, so a note the page shows and the chat does not
+    // know about is drift in the direction that costs the most.
+    for (const group of skills) {
+      if (group.note) expect(prompt).toContain(group.note);
+    }
+  });
+
+  it("still tells the chat about entries hidden from the page", () => {
+    // `hiddenOnPage` means "off the CV, off the page, still fair game in conversation". If the
+    // prompt ever stopped deriving from the FULL arrays, the flag would silently become a delete —
+    // and the one thing it must never do is take work away from the chat.
+    const hidden = [
+      ...experiences.filter((e) => e.hiddenOnPage).map((e) => e.company),
+      ...projects.filter((p) => p.hiddenOnPage).map((p) => p.title),
+    ];
+
+    expect(hidden.length).toBeGreaterThan(0);
+
+    for (const name of hidden) {
+      expect(prompt).toContain(name);
+    }
+  });
+
+  it("no longer names stacks that are on neither the page nor the CV", () => {
+    // Not a style rule — these are the exact strings the old duplicated list leaked, and none of
+    // them survives on John's current CV. PHPUnit deliberately is NOT in this list: it leaked from
+    // the old list too, but "Pest / PHPUnit" is a real line on the CV, so the chat naming it is
+    // correct rather than stale. The bar is "absent from both sources", not "absent from the page".
+    const dropped = ["Angular", "Moleculer", "DevOps", "Visual Studio Code"];
+    const everythingClaimed = [
+      ...skills.flatMap((s) => s.items),
+      ...profile.cvSkills.languages,
+      ...profile.cvSkills.frameworks,
+      ...profile.cvSkills.devTools,
+    ].join(" ");
+
+    for (const stale of dropped) {
+      expect(everythingClaimed).not.toContain(stale);
+      expect(prompt).not.toContain(stale);
+    }
   });
 });
 

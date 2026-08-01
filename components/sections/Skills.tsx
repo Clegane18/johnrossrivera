@@ -4,68 +4,54 @@ import { siteConfig } from "@/config/site";
 import { skills } from "@/lib/data/skills";
 import { motion } from "framer-motion";
 import {
-  Braces,
+  Bot,
   Code2,
-  Coffee,
   Cpu,
   Database,
   FileCode2,
-  FlaskConical,
   GitBranch,
   Layers,
-  Monitor,
   Network,
   Package,
-  Palette,
+  ScanSearch,
   Server,
   Shield,
-  Terminal,
+  ShieldCheck,
   TestTube,
   Wrench,
   type LucideIcon,
 } from "lucide-react";
 
 const categoryIconMap: Record<string, LucideIcon> = {
-  Languages: Braces,
-  Frameworks: Layers,
-  "Dev Tools": Wrench,
+  "Core Stack": Layers,
+  "Data & APIs": Database,
+  "Testing & Tooling": Wrench,
+  "Engineering Leverage": Cpu,
 };
 
 const skillIconMap: Record<string, LucideIcon> = {
-  JavaScript: FileCode2,
   TypeScript: Code2,
-  Java: Coffee,
-  SQL: Database,
-  HTML: Braces,
-  CSS: Palette,
-  PHP: FileCode2,
   React: Layers,
   "Next.js": Layers,
-  Angular: Layers,
-  "Moleculer.js": Network,
-  Laravel: Server,
-  "Tailwind CSS": Palette,
-  "Node.js": Server,
-  "Express.js": Server,
-  "Laravel (Blade)": Server,
   NestJS: Server,
-  "Redux Toolkit": Layers,
-  "RTK Query": Network,
-  Sequelize: Database,
+  "Node.js": Server,
+  Laravel: Server,
+  PHP: FileCode2,
+  MySQL: Database,
   Prisma: Database,
-  "Passport.js": Shield,
+  Sequelize: Database,
+  REST: Network,
+  "RTK Query": Network,
+  JWT: Shield,
+  RBAC: Shield,
   Jest: TestTube,
   Playwright: TestTube,
-  Pest: FlaskConical,
-  PHPUnit: TestTube,
   Git: GitBranch,
-  GitHub: GitBranch,
-  Bash: Terminal,
-  "Visual Studio Code": Monitor,
-  Jira: Package,
   Docker: Package,
-  Postman: Network,
-  DevOps: Cpu,
+  "Agentic dev harness": Bot,
+  "Automated code review": ScanSearch,
+  "Test generation": TestTube,
+  "Secret scanning": ShieldCheck,
 };
 
 function getSkillIcon(label: string): LucideIcon {
@@ -104,8 +90,15 @@ export function Skills() {
           <h2 className="section-heading">{siteConfig.sectionLabels.skills}</h2>
         </motion.div>
 
-        {/* Marquee strip */}
-        <div className="relative mb-10 overflow-hidden border-y border-border py-3 sm:mb-12 sm:py-4 md:mb-14">
+        {/* Marquee strip.
+            aria-hidden: this is a decorative restatement of the grid below, and the list is rendered
+            TWICE inside it so the CSS translate can loop seamlessly. Exposed to assistive tech that
+            meant every skill was announced three times before the grid was reached. The grid is the
+            accessible source of truth. */}
+        <div
+          aria-hidden="true"
+          className="relative mb-10 overflow-hidden border-y border-border py-3 sm:mb-12 sm:py-4 md:mb-14"
+        >
           <div className="flex w-max animate-marquee items-center gap-10 hover:[animation-play-state:paused] motion-reduce:animate-none">
             {[...allItems, ...allItems].map(({ label, Icon }, i) => (
               <span
@@ -120,8 +113,10 @@ export function Skills() {
         </div>
 
         {/* Skills grid */}
+        {/* Two columns, not three: four categories in a 3-col grid leave one orphaned on its own
+            row, and the Engineering Leverage card carries a paragraph that needs the width. */}
         <motion.ul
-          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          className="grid gap-4 sm:grid-cols-2"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
@@ -161,6 +156,11 @@ export function Skills() {
                     </span>
                   ))}
                 </div>
+                {skill.note && (
+                  <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+                    {skill.note}
+                  </p>
+                )}
               </div>
             </motion.li>
           ))}

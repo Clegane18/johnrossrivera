@@ -87,13 +87,21 @@ export function Hero() {
             />
           </motion.div>
 
-          <div className="relative z-30 flex flex-col gap-4 sm:gap-6 md:flex-row md:items-end md:justify-between lg:absolute lg:inset-x-0 lg:bottom-8 xl:bottom-10">
+          {/* Stacked until lg, NOT md. NOTE `lg` is 1280px here, not Tailwind's default 1024 — see
+              tailwind.config.ts. So the broken window was 768px–1279px, which is every tablet and a
+              good many laptops. Across it this was a three-across row while the absolute
+              bottom-anchored layout had not yet engaged, so all three blocks competed for one flow
+              row; flex items shrink by default and the metrics block is w-full, so the role card
+              collapsed to ~150px and its heading broke onto three lines. Nothing in that range needs
+              a row — there is ample height to stack. shrink-0 below keeps the card and the socials
+              at their intended widths once the row DOES engage at 1280. */}
+          <div className="relative z-30 flex flex-col gap-4 sm:gap-6 lg:absolute lg:inset-x-0 lg:bottom-8 lg:flex-row lg:items-end lg:justify-between xl:bottom-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.2, ease: smoothEase }}
-              className="bg-card/95 w-full rounded-2xl border border-border p-5 shadow-sm sm:max-w-xs sm:p-6 md:w-80 lg:max-w-none"
+              className="bg-card/95 w-full shrink-0 rounded-2xl border border-border p-5 shadow-sm sm:max-w-xs sm:p-6 lg:w-80 lg:max-w-none"
             >
               <p className="mb-1 font-display text-lg font-bold text-foreground sm:text-xl md:text-2xl">
                 {siteConfig.role}
@@ -146,7 +154,7 @@ export function Hero() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.3, ease: smoothEase }}
-              className="bg-card/95 w-fit rounded-2xl border border-border p-3 shadow-sm"
+              className="bg-card/95 w-fit shrink-0 rounded-2xl border border-border p-3 shadow-sm"
             >
               <div className="flex flex-row flex-wrap gap-2 md:flex-col md:gap-2.5">
                 {socialLinks.map((item) => {

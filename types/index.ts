@@ -13,7 +13,7 @@ export interface ProjectImpact {
   label: string;
 }
 
-export interface Project extends ProjectCardCopy {
+export interface Project extends ProjectCardCopy, PageHideable {
   id: string;
   title: string;
   description: string;
@@ -37,10 +37,31 @@ export interface Project extends ProjectCardCopy {
   featured: boolean;
 }
 
+/**
+ * Keep the entry in the data but do NOT render it on the page.
+ *
+ * The chat's system prompt is derived from the full arrays (see lib/ai/system-prompt.ts), so an
+ * entry flagged here still answers a question a recruiter asks Nuggets — it just no longer competes
+ * for space in a section. That is the whole point: deleting the entry would take it away from the
+ * chat too, and hiding it in the component would hide it from the chat's source of truth.
+ *
+ * Used for work that is real and worth discussing but is no longer on the CV.
+ */
+export interface PageHideable {
+  hiddenOnPage?: boolean;
+}
+
 export interface Skill {
   id: string;
   category: string;
   items: string[];
+  /**
+   * One line of prose under the chips. Exists for the categories where the bare chip list
+   * understates the claim — "Claude Code subagents" as a tag reads as a tool John consumes, not a
+   * harness he engineered. Optional on purpose: most categories are self-explanatory and a note on
+   * every card would be noise.
+   */
+  note?: string;
 }
 
 /**
@@ -59,7 +80,7 @@ export type EmploymentType =
   | "Personal project"
   | "Capstone project";
 
-export interface Experience {
+export interface Experience extends PageHideable {
   id: string;
   company: string;
   role: string;

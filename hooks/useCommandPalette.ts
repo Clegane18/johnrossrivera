@@ -8,8 +8,14 @@ import { useEffect, useState } from "react";
 // answer, so a palette listing "jump to Projects" alongside it would be a second navigation system
 // competing with the nav that already exists. The shortcut's whole job is to open the thing.
 
-const MAC_LABEL = "⌘K";
-const OTHER_LABEL = "Ctrl K";
+// The modifier and the key are separate values, NOT one "⌘ K" string, because the nav has to style
+// them differently. Space Mono has no ⌘ (U+2318), so it falls back to a system face that draws the
+// glyph well below the cap height of the K beside it — at 10px that reads as a smudge, not a key.
+// Keeping them apart lets the view size the glyph up on its own without touching the letter.
+const MAC_MODIFIER = "⌘";
+const OTHER_MODIFIER = "Ctrl";
+/** The key never varies by platform; only the modifier does. */
+export const SHORTCUT_KEY = "K";
 
 /**
  * A key event that lands while the user is typing must be left alone — ⌘K is a browser-level
@@ -40,35 +46,33 @@ export function isTypingTarget(target: EventTarget | null): boolean {
 }
 
 /**
- * Rendering "⌘K" to a Windows visitor tells them to press a key their keyboard does not have.
+ * Rendering "⌘" to a Windows visitor tells them to press a key their keyboard does not have.
  * Exported for tests — a platform check that silently gets it backwards is invisible in review.
  */
-export function getShortcutLabel(platform: string): string {
-  return /mac|iphone|ipad|ipod/i.test(platform) ? MAC_LABEL : OTHER_LABEL;
+export function getShortcutModifier(platform: string): string {
+  return /mac|iphone|ipad|ipod/i.test(platform) ? MAC_MODIFIER : OTHER_MODIFIER;
 }
 
 /** Event the nav's affordance fires so it can open the chat without importing it. */
 export const REQUEST_OPEN_EVENT = "nuggets:request-open";
 
 /**
- * Label only. Split out so the nav can render "⌘K" WITHOUT registering a second keydown listener —
+ * Modifier only. Split out so the nav can render the hint WITHOUT registering a second keydown listener —
  * two components both calling useCommandPalette would open the chat twice per press.
  */
-export function useShortcutLabel() {
+export function useShortcutModifier() {
   // Rendered on the server with no platform knowledge, so start with the neutral label and correct
   // it after mount. Guessing on the server would be a hydration mismatch.
-  const [shortcutLabel, setShortcutLabel] = useState(OTHER_LABEL);
+  const [modifier, setModifier] = useState(OTHER_MODIFIER);
 
   useEffect(() => {
-    setShortcutLabel(getShortcutLabel(window.navigator.platform));
+    setModifier(getShortcutModifier(window.navigator.platform));
   }, []);
 
-  return shortcutLabel;
+  return modifier;
 }
 
 export function useCommandPalette(onTrigger: () => void) {
-  const shortcutLabel = useShortcutLabel();
-
   // The nav's clickable hint routes through the same handler as the keypress, so both entry points
   // can never drift apart.
   useEffect(() => {
@@ -105,6 +109,4 @@ export function useCommandPalette(onTrigger: () => void) {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [onTrigger]);
-
-  return { shortcutLabel };
 }
