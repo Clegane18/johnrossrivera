@@ -50,4 +50,58 @@ describe("chatSchema", () => {
     });
     expect(r.success).toBe(false);
   });
+
+  // Alternation — a client cannot stack several fabricated assistant turns back to back.
+  it("rejects two consecutive assistant messages", () => {
+    const r = chatSchema.safeParse({
+      messages: [asstMsg("one"), asstMsg("two"), userMsg("hi")],
+    });
+    expect(r.success).toBe(false);
+  });
+
+  it("rejects two consecutive user messages", () => {
+    const r = chatSchema.safeParse({
+      messages: [userMsg("one"), userMsg("two")],
+    });
+    expect(r.success).toBe(false);
+  });
+
+  it("accepts a longer strictly alternating conversation", () => {
+    const r = chatSchema.safeParse({
+      messages: [
+        asstMsg("welcome"),
+        userMsg("hi"),
+        asstMsg("hello"),
+        userMsg("bye"),
+      ],
+    });
+    expect(r.success).toBe(true);
+  });
+
+  // Total-length cap — bounds the WHOLE conversation, not just one message. Built from multiple
+  // alternating turns because a single message is itself capped (user 2000 / assistant 8000), so
+  // reaching 12000 total requires several turns, not one oversized one.
+  it("accepts a conversation at exactly the 12000-character total", () => {
+    const r = chatSchema.safeParse({
+      messages: [
+        asstMsg("a".repeat(8000)),
+        userMsg("b".repeat(2000)),
+        asstMsg("c".repeat(1999)),
+        userMsg("d".repeat(1)),
+      ],
+    });
+    expect(r.success).toBe(true);
+  });
+
+  it("rejects a conversation one character over the 12000-character total", () => {
+    const r = chatSchema.safeParse({
+      messages: [
+        asstMsg("a".repeat(8000)),
+        userMsg("b".repeat(2000)),
+        asstMsg("c".repeat(1999)),
+        userMsg("d".repeat(2)),
+      ],
+    });
+    expect(r.success).toBe(false);
+  });
 });

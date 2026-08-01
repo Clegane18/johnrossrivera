@@ -2,18 +2,14 @@ import { contactSchema } from "@/lib/validations/contact";
 import { sendContactEmail } from "@/lib/email/resend";
 import { NextResponse } from "next/server";
 import { rateLimit, type RateLimitEntry } from "@/lib/utils/rate-limit";
+import { getClientIp } from "@/lib/utils/client-ip";
 
 const RATE_LIMIT_MAP = new Map<string, RateLimitEntry>();
 const MAX_REQUESTS = 5;
 const WINDOW_MS = 60 * 60 * 1000; // 1 hour
 
-function getRateLimitKey(request: Request): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  return forwarded ? forwarded.split(",")[0].trim() : "unknown";
-}
-
 export async function POST(request: Request): Promise<NextResponse> {
-  const ip = getRateLimitKey(request);
+  const ip = getClientIp(request);
 
   if (rateLimit(RATE_LIMIT_MAP, ip, MAX_REQUESTS, WINDOW_MS).limited) {
     return NextResponse.json(
@@ -44,7 +40,18 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  const { name, email, message } = result.data;
+  const { name, email, message, company } = result.data;
+
+  // Honeypot tripped: a real visitor never sees or fills this field, so a non-empty value means a
+  // bot filled it. Return the exact same success shape a genuine submission gets — WITHOUT sending
+  // an email — so the bot has no signal that it was caught and no reason to adapt.
+  if (company) {
+    return NextResponse.json(
+      { success: true, message: "Message sent successfully." },
+      { status: 200 }
+    );
+  }
+
   const toEmail = process.env.CONTACT_TO_EMAIL;
 
   if (!toEmail) {

@@ -1,12 +1,12 @@
 "use client";
 
+import { Reveal } from "@/components/ui/Reveal";
 import { siteConfig } from "@/config/site";
 import {
   contactSchema,
   type ContactFormValues,
 } from "@/lib/validations/contact";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
 import { Loader2, Mail, MapPin, Phone, Send } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -50,27 +50,15 @@ export function Contact() {
     <section id="contact" className="section-padding bg-muted/40">
       <div className="section-container">
         {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="mb-10 sm:mb-12 md:mb-14"
-        >
+        <Reveal className="mb-10 sm:mb-12 md:mb-14">
           <h2 className="section-heading">
             {siteConfig.sectionLabels.contact}
           </h2>
-        </motion.div>
+        </Reveal>
 
         <div className="grid gap-10 md:grid-cols-2 md:gap-12">
           {/* Info */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="flex flex-col gap-6"
-          >
+          <Reveal x={-20} y={0} className="flex flex-col gap-6">
             <p className="text-base leading-relaxed text-muted-foreground">
               {siteConfig.contact.intro}
             </p>
@@ -130,20 +118,33 @@ export function Contact() {
                 LinkedIn
               </Link>
             </div>
-          </motion.div>
+          </Reveal>
 
           {/* Form */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
+          <Reveal x={20} y={0} delay={0.1}>
             <form
               onSubmit={handleSubmit(onSubmit)}
               noValidate
               className="flex flex-col gap-5"
             >
+              {/* Honeypot — see lib/validations/contact.ts. `sr-only` clips it to a 1px box
+                  (not display:none, some bots skip that check) rather than offsetting it far
+                  off-screen, which would enlarge the page's scrollable area. Unreachable by
+                  keyboard and, via aria-hidden, invisible to assistive tech too — a sighted or
+                  screen-reader visitor never knows this exists. Any bot that blindly fills every
+                  field in the form trips it; app/api/contact/route.ts silently no-ops instead of
+                  sending the email. */}
+              <div className="sr-only" aria-hidden="true">
+                <label htmlFor="company">Company</label>
+                <input
+                  id="company"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  {...register("company")}
+                />
+              </div>
+
               <div className="flex flex-col gap-1.5">
                 <label
                   htmlFor="name"
@@ -234,7 +235,7 @@ export function Contact() {
                 )}
               </button>
             </form>
-          </motion.div>
+          </Reveal>
         </div>
       </div>
     </section>

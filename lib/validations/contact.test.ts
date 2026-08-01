@@ -35,4 +35,28 @@ describe("contactSchema", () => {
       contactSchema.safeParse({ ...valid, message: "a".repeat(2001) }).success
     ).toBe(false);
   });
+
+  // Honeypot field — see the `company` comment in contact.ts. The schema only bounds its shape;
+  // the actual bot-vs-human decision is made by app/api/contact/route.ts checking truthiness.
+  it("accepts a payload with no company field at all", () => {
+    expect(contactSchema.safeParse(valid).success).toBe(true);
+  });
+
+  it("accepts an empty company field", () => {
+    expect(contactSchema.safeParse({ ...valid, company: "" }).success).toBe(
+      true
+    );
+  });
+
+  it("accepts a company field up to 200 characters", () => {
+    expect(
+      contactSchema.safeParse({ ...valid, company: "a".repeat(200) }).success
+    ).toBe(true);
+  });
+
+  it("rejects a company field over 200 characters", () => {
+    expect(
+      contactSchema.safeParse({ ...valid, company: "a".repeat(201) }).success
+    ).toBe(false);
+  });
 });
