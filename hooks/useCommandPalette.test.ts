@@ -1,21 +1,21 @@
 import { describe, expect, it } from "vitest";
 
-import { getShortcutLabel, isTypingTarget } from "./useCommandPalette";
+import { getShortcutModifier, isTypingTarget } from "./useCommandPalette";
 
 // The hook itself needs a DOM and is not covered here. These two pure helpers carry the parts that
 // break silently: a platform check that gets it backwards looks fine in review, and a typing guard
 // that misfires steals keystrokes from the contact form without throwing anything.
 
-describe("getShortcutLabel", () => {
+describe("getShortcutModifier", () => {
   it("shows the Command glyph on Apple platforms", () => {
     for (const platform of ["MacIntel", "iPhone", "iPad", "MacARM"]) {
-      expect(getShortcutLabel(platform)).toBe("⌘K");
+      expect(getShortcutModifier(platform)).toBe("⌘");
     }
   });
 
   it("shows Ctrl everywhere else — a Windows visitor has no ⌘ key", () => {
     for (const platform of ["Win32", "Linux x86_64", ""]) {
-      expect(getShortcutLabel(platform)).toBe("Ctrl K");
+      expect(getShortcutModifier(platform)).toBe("Ctrl");
     }
   });
 });
