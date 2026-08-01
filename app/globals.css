@@ -166,9 +166,14 @@ body {
 
   @media (min-width: 768px) {
     .hero-stage {
-      /* absolute layout at md+ — restore min-height, remove flow padding */
+      /* The portrait is still in NORMAL FLOW here — it only becomes absolute at lg, and lg is
+         1280px in this project (see tailwind.config.ts), not Tailwind's default 1024. This block
+         used to set padding-top:0 on the assumption the absolute layout had already engaged, so
+         from 768px to 1279px the portrait started at the top of the stage and painted straight over
+         the name beneath it (portrait is z-20, name is z-10). The padding has to stay until the
+         name is genuinely out of the flow. Name here is 136px at line-height .88 ≈ 120px tall. */
       min-height: 600px;
-      padding-top: 0;
+      padding-top: 8.5rem;
     }
 
     .hero-name-size {
@@ -185,6 +190,8 @@ body {
   @media (min-width: 1024px) {
     .hero-stage {
       min-height: 640px;
+      /* Name grows to 164px (≈144px tall at .88) — still in flow, so still needs clearing. */
+      padding-top: 10rem;
     }
 
     .hero-name-size {
@@ -199,6 +206,9 @@ body {
   @media (min-width: 1280px) {
     .hero-stage {
       min-height: 700px;
+      /* lg — the portrait and the bottom row both go absolute here, so the name no longer shares
+         the flow with anything and the reserved space can finally be released. */
+      padding-top: 0;
     }
 
     .hero-name-size {
