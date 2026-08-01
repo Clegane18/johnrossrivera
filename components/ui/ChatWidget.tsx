@@ -21,7 +21,7 @@ const BOLD_RE = /\*\*(.+?)\*\*/g;
 const LINK_RE =
   /(?:\*\s*)?([\w][\w\s&\-/.()]{0,50}?):\s*(https?:\/\/[^\s\n,]+)|(https?:\/\/[^\s\n,]+)/g;
 const HL_RE =
-  /(John Ross Rivera|John Ross|Smart-lift AI|KOL Dashboard|Rola Access Platform|Sniff Sense AI|Crystal Vision|G&F Auto Supply|Bulacan State University|Philippines)/gi;
+  /(John Ross Rivera|John Ross|Smart-lift AI|KOL Dashboard|Rola Competition Platform|Rola Access Platform|Sniff Sense AI|Crystal Vision|G&F Auto Supply|Bulacan State University|Philippines)/gi;
 
 function hlText(s: string, k: number): ReactNode[] {
   const out: ReactNode[] = [];
@@ -406,7 +406,7 @@ export function ChatWidget() {
       {/* Floating Button */}
       <div
         className={cn(
-          "fixed bottom-6 right-6 z-[70]",
+          "fixed bottom-24 right-6 z-[70] lg:bottom-6",
           isOpen && "max-md:hidden"
         )}
       >

@@ -31,7 +31,7 @@ export function ScrollToTop() {
           exit={{ opacity: 0, scale: 0.8, y: 8 }}
           transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
           className={cn(
-            "fixed bottom-[30px] right-24 z-[60] flex h-11 w-11 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-900 shadow-lg transition-colors duration-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100",
+            "fixed bottom-24 right-24 z-[60] flex h-11 w-11 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-900 shadow-lg transition-colors duration-200 lg:bottom-[30px] dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100",
             "hover:bg-zinc-100 dark:hover:bg-zinc-700",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
             isChatOpen && "max-md:hidden"
