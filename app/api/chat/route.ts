@@ -2,16 +2,12 @@ import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
 import { buildSystemPrompt } from "@/lib/ai/system-prompt";
 import { rateLimit, type RateLimitEntry } from "@/lib/utils/rate-limit";
+import { getClientIp } from "@/lib/utils/client-ip";
 import { chatSchema } from "@/lib/validations/chat";
 
 const RATE_LIMIT_MAP = new Map<string, RateLimitEntry>();
 const MAX_REQUESTS = 20;
 const WINDOW_MS = 60 * 60 * 1000; // 1 hour
-
-function getRateLimitKey(request: Request): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  return forwarded ? forwarded.split(",")[0].trim() : "unknown";
-}
 
 // The system prompt lives in lib/ai/system-prompt.ts so its invariants (scope contract present and
 // FIRST, never-disclose rules intact) can be unit-tested. Built once at module load — it is derived
@@ -19,7 +15,7 @@ function getRateLimitKey(request: Request): string {
 const SYSTEM_PROMPT = buildSystemPrompt();
 
 export async function POST(request: Request): Promise<Response> {
-  const ip = getRateLimitKey(request);
+  const ip = getClientIp(request);
 
   const { limited, minutesLeft, remaining } = rateLimit(
     RATE_LIMIT_MAP,

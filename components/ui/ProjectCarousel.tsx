@@ -42,7 +42,7 @@ function CarouselInner({ images, mobileImages, title }: ProjectCarouselProps) {
   const activeImages =
     viewMode === "mobile" && mobileImages ? mobileImages : images;
 
-  const { index, next, prev, goTo, pause, resume } = useCarousel(
+  const { index, next, prev, goTo, pause, resume, containerRef } = useCarousel(
     activeImages.length
   );
   const safeIndex = Math.min(index, activeImages.length - 1);
@@ -102,6 +102,7 @@ function CarouselInner({ images, mobileImages, title }: ProjectCarouselProps) {
 
   return (
     <div
+      ref={containerRef}
       className="group relative aspect-video w-full overflow-hidden bg-black"
       onMouseEnter={pause}
       onMouseLeave={resume}

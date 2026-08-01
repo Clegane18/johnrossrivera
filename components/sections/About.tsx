@@ -1,35 +1,19 @@
-"use client";
-
+import { Reveal } from "@/components/ui/Reveal";
 import { siteConfig } from "@/config/site";
-import { motion } from "framer-motion";
 import { MapPin, BookOpen } from "lucide-react";
-
-const smoothEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export function About() {
   return (
     <section id="about" className="section-padding">
       <div className="section-container">
         {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="mb-10 sm:mb-12 md:mb-14"
-        >
+        <Reveal className="mb-10 sm:mb-12 md:mb-14">
           <h2 className="section-heading">{siteConfig.sectionLabels.about}</h2>
-        </motion.div>
+        </Reveal>
 
         <div className="grid gap-8 md:grid-cols-2 lg:gap-12">
           {/* Bio */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: smoothEase }}
-            className="flex flex-col gap-6"
-          >
+          <Reveal x={-20} y={0} duration={0.6} className="flex flex-col gap-6">
             <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
               {siteConfig.about.bio}
             </p>
@@ -37,15 +21,10 @@ export function About() {
               <MapPin className="h-4 w-4 shrink-0 text-foreground" />
               <span>{siteConfig.about.location}</span>
             </div>
-          </motion.div>
+          </Reveal>
 
           {/* Education card */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1, ease: smoothEase }}
-          >
+          <Reveal x={20} y={0} duration={0.6} delay={0.1}>
             <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
               <div className="flex items-start gap-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted">
@@ -77,7 +56,7 @@ export function About() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </Reveal>
         </div>
       </div>
     </section>

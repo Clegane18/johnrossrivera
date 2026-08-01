@@ -10,7 +10,6 @@ import { useSound } from "@/hooks/useSound";
 import { useTheme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils/cn";
 import { useScrollSpy } from "@/hooks/useScrollSpy";
-import { motion } from "framer-motion";
 import { Moon, Search, Sun, Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
 import type { MouseEvent } from "react";
@@ -37,12 +36,7 @@ export function Navbar() {
   }
 
   return (
-    <motion.header
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className="bg-background/90 fixed inset-x-0 top-0 z-50 backdrop-blur-md"
-    >
+    <header className="navbar-reveal bg-background/90 fixed inset-x-0 top-0 z-50 backdrop-blur-md">
       <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
         {/* Availability status.
             Was a pill with a pulsing green dot and 41 characters of text that wrapped onto two
@@ -179,14 +173,15 @@ export function Navbar() {
             </button>
           </div>
 
-          <Link
+          {/* Plain <a> — see Hero. next/link RSC-prefetches this static PDF and 404s. */}
+          <a
             href={siteConfig.links.resume}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold text-foreground transition-colors duration-300 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             {siteConfig.navbar.resumeCtaLabel}
-          </Link>
+          </a>
           {/* Desktop only. Below lg the dock's Contact chip is this link, permanently in the thumb
               zone — keeping both would put the same destination on screen twice and crowd a 360px
               top bar. */}
@@ -210,6 +205,6 @@ export function Navbar() {
           </Link>
         </div>
       </nav>
-    </motion.header>
+    </header>
   );
 }

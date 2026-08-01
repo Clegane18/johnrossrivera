@@ -1,10 +1,8 @@
-"use client";
-
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 import { ProjectDeck } from "@/components/ui/ProjectDeck";
+import { Reveal } from "@/components/ui/Reveal";
 import { siteConfig } from "@/config/site";
 import { projects } from "@/lib/data/projects";
 
@@ -13,8 +11,6 @@ import { projects } from "@/lib/data/projects";
 // The filter tabs (All / Featured / Other) are gone: with the split made structural, they let a
 // visitor rearrange a decision that has already been made for them, and every extra control in a
 // section is one more thing between a recruiter and the work.
-
-const smoothEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 // `hiddenOnPage` entries stay in lib/data so the chat still knows them; they just don't render here.
 const visible = projects.filter((p) => !p.hiddenOnPage);
@@ -25,13 +21,7 @@ export function Projects() {
   return (
     <section id="projects" className="section-padding">
       <div className="section-container">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: smoothEase }}
-          className="mb-10 sm:mb-12"
-        >
+        <Reveal duration={0.6} className="mb-10 sm:mb-12">
           <h2 className="section-heading mb-6 sm:mb-8">
             {siteConfig.sectionLabels.projects}
           </h2>
@@ -51,25 +41,14 @@ export function Projects() {
               <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
             </Link>
           </div>
-        </motion.div>
+        </Reveal>
 
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: smoothEase }}
-        >
+        <Reveal y={24} duration={0.6}>
           <ProjectDeck projects={featured} />
-        </motion.div>
+        </Reveal>
 
         {other.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, ease: smoothEase }}
-            className="mt-14 sm:mt-16"
-          >
+          <Reveal y={16} duration={0.5} className="mt-14 sm:mt-16">
             <h3 className="mb-5 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
               Also built
             </h3>
@@ -94,7 +73,7 @@ export function Projects() {
                 </li>
               ))}
             </ul>
-          </motion.div>
+          </Reveal>
         )}
       </div>
     </section>

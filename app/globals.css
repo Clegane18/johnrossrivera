@@ -149,6 +149,24 @@ body {
     width: clamp(180px, 56vw, 240px);
   }
 
+  /* Theme-correct portrait picked by the `dark` class already set (before paint) by the
+     beforeInteractive script in app/layout.tsx — see components/sections/Hero.tsx. */
+  .hero-portrait-light {
+    display: block;
+  }
+
+  .hero-portrait-dark {
+    display: none;
+  }
+
+  .dark .hero-portrait-light {
+    display: none;
+  }
+
+  .dark .hero-portrait-dark {
+    display: block;
+  }
+
   @media (min-width: 640px) {
     .hero-stage {
       /* name is larger at sm – clear it with more padding-top */
@@ -248,6 +266,80 @@ body {
   /* Section heading responsive scale */
   .section-heading {
     @apply font-hero text-3xl font-black uppercase tracking-tight text-foreground sm:text-4xl md:text-5xl lg:text-6xl;
+  }
+
+  /* ─── Navbar mount animation ────────────────────────────── */
+  /* Replaces a `motion.header` (initial/animate, no scroll trigger) so framer-motion no longer
+     ships in the shared layout chunk loaded on every route. Pure CSS: it runs on paint with no JS
+     at all, so — unlike the framer-motion version it replaces — it never needs the noscript
+     opacity fallback below; a non-JS visitor sees the exact same animation. */
+  .navbar-reveal {
+    animation: navbar-reveal 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* ─── Scroll reveal ──────────────────────────────────────── */
+  /* Replaces framer-motion's `whileInView` fade/slide-up across About/Skills/Experience/Contact/
+     Projects/LiveDemo. hooks/useReveal.ts flips data-reveal to "visible" via IntersectionObserver,
+     once, matching every prior call site's `viewport={{ once: true }}`. Distance/timing come in as
+     per-instance custom properties (set by components/ui/Reveal.tsx) so this one rule reproduces
+     every section's tuned values instead of needing one class per variant. */
+  [data-reveal] {
+    transition:
+      opacity var(--reveal-duration, 0.5s) var(--reveal-ease)
+        var(--reveal-delay, 0s),
+      transform var(--reveal-duration, 0.5s) var(--reveal-ease)
+        var(--reveal-delay, 0s);
+  }
+
+  [data-reveal="hidden"] {
+    opacity: 0;
+    transform: translate(var(--reveal-x, 0px), var(--reveal-y, 0px));
+  }
+
+  [data-reveal="visible"] {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+
+  /* Skills' tech-tag grid: framer's `staggerChildren` orchestrated the LIST, not each item — here
+     the list (a <ul>) toggles this attribute once via useReveal, and every child carries its own
+     --reveal-delay (index * 0.08s), so the stagger timing lives with the item exactly as framer's
+     `itemVariants` did. */
+  [data-reveal-group="hidden"] > * {
+    opacity: 0;
+    transform: translateY(var(--reveal-y, 16px));
+    transition:
+      opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0s),
+      transform 0.45s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0s);
+  }
+
+  [data-reveal-group="visible"] > * {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes navbar-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar-reveal {
+    animation: none;
+  }
+
+  [data-reveal],
+  [data-reveal-group] > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
   }
 }
 
