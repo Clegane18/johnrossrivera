@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, DM_Sans, Space_Mono, Barlow } from "next/font/google";
+import { DeferredWidgets } from "@/components/layout/DeferredWidgets";
 import { Footer } from "@/components/layout/Footer";
 import { MobileDock } from "@/components/layout/MobileDock";
 import { Navbar } from "@/components/layout/Navbar";
-import { ScrollToTop } from "@/components/layout/ScrollToTop";
-import { ChatWidget } from "@/components/ui/ChatWidget";
 import { SoundEffects } from "@/components/ui/SoundEffects";
 import { siteConfig } from "@/config/site";
 import Script from "next/script";
@@ -80,9 +79,17 @@ export default function RootLayout({
       <body
         className={`${spaceGrotesk.variable} ${dmSans.variable} ${spaceMono.variable} ${barlow.variable} font-sans antialiased`}
       >
-        {/* Reveal animations start at opacity:0 and are un-hidden by JS. Without JS (locked-down
+        {/* Reveal animations start hidden and are un-hidden by JS. Without JS (locked-down
             networks, non-JS crawlers), force that content visible so the page isn't blank.
-            Currently 27 elements depend on this, including the entire hero.
+
+            Two mechanisms depend on this now: `[style*="opacity:0"]` covers the framer-motion
+            elements that remain (Hero, ProjectCarousel/ImageLightbox's AnimatePresence, the lazily
+            loaded ChatWidget/ScrollToTop) — their `initial` prop renders as an inline style, which
+            only their own animate() call (JS) ever clears. `[data-reveal="hidden"]` and
+            `[data-reveal-group="hidden"] > *` cover the CSS-only reveal that replaced
+            `whileInView` in About/Skills/Experience/Contact/Projects/LiveDemo (see globals.css and
+            hooks/useReveal.ts) — that attribute is only ever flipped to "visible" by the
+            IntersectionObserver in useReveal, which likewise never runs without JS.
 
             dangerouslySetInnerHTML is REQUIRED, not a shortcut. As a JSX text child React escapes
             the quotes to &quot;, and <style> is a raw-text element — the HTML parser does NOT decode
@@ -91,7 +98,7 @@ export default function RootLayout({
             fallback silently did nothing at all. */}
         <noscript
           dangerouslySetInnerHTML={{
-            __html: `<style>[style*="opacity:0"]{opacity:1!important;transform:none!important}</style>`,
+            __html: `<style>[style*="opacity:0"],[data-reveal="hidden"],[data-reveal-group="hidden"]>*{opacity:1!important;transform:none!important}</style>`,
           }}
         />
         <script
@@ -114,8 +121,7 @@ export default function RootLayout({
         <main>{children}</main>
         <Footer />
         <MobileDock />
-        <ScrollToTop />
-        <ChatWidget />
+        <DeferredWidgets />
         <SoundEffects />
       </body>
     </html>

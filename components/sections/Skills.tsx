@@ -1,8 +1,10 @@
 "use client";
 
+import type { CSSProperties } from "react";
+import { Reveal } from "@/components/ui/Reveal";
 import { siteConfig } from "@/config/site";
+import { useReveal } from "@/hooks/useReveal";
 import { skills } from "@/lib/data/skills";
-import { motion } from "framer-motion";
 import {
   Bot,
   Code2,
@@ -65,30 +67,20 @@ const allItems = skills.flatMap((s) =>
   }))
 );
 
-const containerVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.08 } },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.45 } },
-};
+/** staggerChildren offset framer used between each tag card — reproduced per-item below. */
+const STAGGER_STEP_S = 0.08;
 
 export function Skills() {
+  const { ref: gridRef, isVisible: gridVisible } =
+    useReveal<HTMLUListElement>();
+
   return (
     <section id="skills" className="section-padding bg-muted/40">
       <div className="section-container">
         {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="mb-10 sm:mb-12 md:mb-14"
-        >
+        <Reveal className="mb-10 sm:mb-12 md:mb-14">
           <h2 className="section-heading">{siteConfig.sectionLabels.skills}</h2>
-        </motion.div>
+        </Reveal>
 
         {/* Marquee strip.
             aria-hidden: this is a decorative restatement of the grid below, and the list is rendered
@@ -115,15 +107,18 @@ export function Skills() {
         {/* Skills grid */}
         {/* Two columns, not three: four categories in a 3-col grid leave one orphaned on its own
             row, and the Engineering Leverage card carries a paragraph that needs the width. */}
-        <motion.ul
+        <ul
+          ref={gridRef}
+          data-reveal-group={gridVisible ? "visible" : "hidden"}
           className="grid gap-4 sm:grid-cols-2"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
         >
-          {skills.map((skill) => (
-            <motion.li key={skill.id} variants={itemVariants}>
+          {skills.map((skill, i) => (
+            <li
+              key={skill.id}
+              style={
+                { "--reveal-delay": `${i * STAGGER_STEP_S}s` } as CSSProperties
+              }
+            >
               <div className="h-full rounded-2xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
                 <div className="mb-4 inline-flex items-center gap-2">
                   {(() => {
@@ -162,9 +157,9 @@ export function Skills() {
                   </p>
                 )}
               </div>
-            </motion.li>
+            </li>
           ))}
-        </motion.ul>
+        </ul>
       </div>
     </section>
   );

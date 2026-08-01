@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { BriefcaseBusiness, Code2, Mail, type LucideIcon } from "lucide-react";
 import { HeroMetrics } from "@/components/ui/HeroMetrics";
 import { siteConfig } from "@/config/site";
-import { useTheme } from "@/hooks/useTheme";
 
 const smoothEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -41,13 +40,6 @@ const socialLinks: SocialLink[] = [
 ];
 
 export function Hero() {
-  const { theme, isReady } = useTheme();
-
-  const profileImageUrl =
-    isReady && theme === "dark"
-      ? siteConfig.about.darkImageUrl
-      : siteConfig.about.lightImageUrl;
-
   return (
     <section
       id="hero"
@@ -76,14 +68,30 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.12, ease: smoothEase }}
             className="pointer-events-none relative z-20 flex justify-center pb-4 md:pb-0 lg:absolute lg:inset-x-0 lg:bottom-0"
           >
+            {/* Two portraits, not one swapped via useTheme(). The theme-init script in
+                app/layout.tsx already resolves light/dark and sets the `dark` class on <html>
+                BEFORE this paints, so a plain CSS rule (.hero-portrait-light/-dark below) can
+                pick the right one with zero extra JS and no post-hydration repaint.
+
+                Neither carries `priority`: eager-loading both would defeat the point (both would
+                fetch regardless of which is hidden). Left at the default `loading="lazy"`, the
+                hidden one has no layout box, so browsers never consider it near-viewport and never
+                fetch it — only the one the CSS rule actually shows loads, for either theme. */}
             <Image
-              src={profileImageUrl}
+              src={siteConfig.about.lightImageUrl}
               alt={siteConfig.about.imageAlt}
               width={448}
               height={557}
-              priority
               sizes="(max-width: 639px) 240px, (max-width: 767px) 280px, (max-width: 1023px) 260px, (max-width: 1279px) 340px, 460px"
-              className="hero-portrait-size block h-auto object-contain"
+              className="hero-portrait-size hero-portrait-light h-auto object-contain"
+            />
+            <Image
+              src={siteConfig.about.darkImageUrl}
+              alt={siteConfig.about.imageAlt}
+              width={448}
+              height={557}
+              sizes="(max-width: 639px) 240px, (max-width: 767px) 280px, (max-width: 1023px) 260px, (max-width: 1279px) 340px, 460px"
+              className="hero-portrait-size hero-portrait-dark h-auto object-contain"
             />
           </motion.div>
 

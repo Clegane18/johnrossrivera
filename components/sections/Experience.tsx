@@ -1,8 +1,5 @@
-"use client";
-
-import { motion } from "framer-motion";
-
 import { ExperienceEntry } from "@/components/ui/ExperienceEntry";
+import { Reveal } from "@/components/ui/Reveal";
 import { siteConfig } from "@/config/site";
 import { experiences } from "@/lib/data/experience";
 import type { ExperienceGroup } from "@/types";
@@ -30,17 +27,11 @@ export function Experience() {
   return (
     <section id="experience" className="section-padding">
       <div className="section-container">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="mb-10 sm:mb-12 md:mb-14"
-        >
+        <Reveal className="mb-10 sm:mb-12 md:mb-14">
           <h2 className="section-heading">
             {siteConfig.sectionLabels.experience}
           </h2>
-        </motion.div>
+        </Reveal>
 
         <div className="flex flex-col gap-12 sm:gap-16">
           {GROUP_ORDER.map((group) => {
@@ -56,13 +47,7 @@ export function Experience() {
             }
 
             return (
-              <motion.div
-                key={group}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-              >
+              <Reveal key={group} y={16}>
                 <h3 className="mb-6 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
                   {GROUP_LABEL[group]}
                 </h3>
@@ -76,7 +61,7 @@ export function Experience() {
                     />
                   ))}
                 </ol>
-              </motion.div>
+              </Reveal>
             );
           })}
         </div>

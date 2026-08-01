@@ -1,11 +1,9 @@
 "use client";
 
+import { Reveal } from "@/components/ui/Reveal";
 import { siteConfig } from "@/config/site";
-import { motion } from "framer-motion";
 import { Activity, Loader2, Send, Terminal } from "lucide-react";
 import { useState } from "react";
-
-const smoothEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 type PingResult = {
   status: string;
@@ -90,13 +88,7 @@ export function LiveDemo() {
   return (
     <section id="live-demo" className="section-padding bg-muted/40">
       <div className="section-container">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: smoothEase }}
-          className="mb-10 sm:mb-12"
-        >
+        <Reveal duration={0.6} className="mb-10 sm:mb-12">
           <h2 className="section-heading">
             {siteConfig.sectionLabels.liveDemo}
           </h2>
@@ -105,7 +97,7 @@ export function LiveDemo() {
             server-side — a health check and a Zod-validated endpoint. Try to
             break the validation.
           </p>
-        </motion.div>
+        </Reveal>
 
         <div className="grid gap-5 md:grid-cols-2 md:gap-6">
           {/* Ping panel */}
