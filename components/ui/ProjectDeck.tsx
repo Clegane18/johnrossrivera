@@ -45,7 +45,12 @@ const OFFSTAGE_STEPS = 2.6;
 export function ProjectDeck({ projects }: Props) {
   const [active, setActive] = useState(0);
   const [drag, setDrag] = useState(0);
-  const gesture = useRef({ startX: 0, pointer: false, moved: false });
+  const gesture = useRef({
+    startX: 0,
+    pointer: false,
+    moved: false,
+    captured: false,
+  });
   const count = projects.length;
 
   const go = useCallback(
@@ -70,9 +75,27 @@ export function ProjectDeck({ projects }: Props) {
     return forward > count / 2 ? forward - count : forward;
   };
 
+  // NOTHING happens until the pointer has travelled past DRAG_SLOP_PX. That threshold is not a
+  // nicety, it is what makes the buttons on the active card clickable at all.
+  //
+  // The first version called setPointerCapture on pointerdown, unconditionally. Per the Pointer
+  // Events spec the capture target override retargets the compatibility mouse events too —
+  // mousedown, mouseup and click all get delivered to the capturing element rather than to what is
+  // actually under the cursor. So every press on "Case study" or "Live" was claimed by this stage
+  // div and the anchor never saw a click. Capturing now waits until the gesture is definitely a
+  // drag, which leaves an ordinary click entirely alone.
+  //
+  // Deferring setDrag matters for the same reason at one remove: it used to run on every
+  // pointermove, so the pixel or two of jitter in a real mouse click re-rendered the deck and slid
+  // the card under the cursor. That alone can break a click, and it made the bug look
+  // input-dependent — a touch tap moves ~0px, so phones were unaffected.
   function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
-    gesture.current = { startX: event.clientX, pointer: true, moved: false };
-    event.currentTarget.setPointerCapture(event.pointerId);
+    gesture.current = {
+      startX: event.clientX,
+      pointer: true,
+      moved: false,
+      captured: false,
+    };
   }
 
   function onPointerMove(event: React.PointerEvent<HTMLDivElement>) {
@@ -80,8 +103,14 @@ export function ProjectDeck({ projects }: Props) {
 
     const dx = event.clientX - gesture.current.startX;
 
-    if (Math.abs(dx) > DRAG_SLOP_PX) {
+    if (!gesture.current.moved) {
+      if (Math.abs(dx) <= DRAG_SLOP_PX) return;
+
       gesture.current.moved = true;
+      // Capture only once this is definitely a drag. Capturing on pointerdown would claim every
+      // press, including the ones that are just clicks on a link.
+      event.currentTarget.setPointerCapture(event.pointerId);
+      gesture.current.captured = true;
     }
 
     setDrag(dx);
@@ -91,9 +120,21 @@ export function ProjectDeck({ projects }: Props) {
     if (!gesture.current.pointer) return;
 
     const dx = event.clientX - gesture.current.startX;
+    const dragged = gesture.current.moved;
 
     gesture.current.pointer = false;
+
+    if (gesture.current.captured) {
+      gesture.current.captured = false;
+      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      }
+    }
+
     setDrag(0);
+
+    // A press that never became a drag is a click; leave it alone so the link can do its job.
+    if (!dragged) return;
 
     if (dx <= -SWIPE_COMMIT_PX) go(active + 1);
     else if (dx >= SWIPE_COMMIT_PX) go(active - 1);
