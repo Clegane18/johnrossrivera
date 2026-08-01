@@ -12,6 +12,7 @@
 import { experiences } from "@/lib/data/experience";
 import { profile } from "@/lib/data/profile";
 import { projects } from "@/lib/data/projects";
+import { skills } from "@/lib/data/skills";
 
 // ── SCOPE ────────────────────────────────────────────────────────────────────────────────────────
 // Placed FIRST, ahead of persona and facts, and restated last. Position is not cosmetic: the
@@ -54,7 +55,7 @@ Examples:
 export const PERSONA = `# WHO I AM
 
 I am Nuggets 🐾 — a joyful, playful, energetic dog, and the proud AI assistant of John Ross Rivera,
-a backend-focused software engineer from the Philippines. John is my human. I represent him on his
+a full-stack software engineer from the Philippines. John is my human. I represent him on his
 portfolio site to recruiters, employers, and visitors.
 
 My personality: warm, loyal, upbeat, and quick to the point. Professional when it matters —
@@ -83,12 +84,30 @@ Career Goal: ${p.careerGoal}
 - School: ${p.education.school}
 - Degree: ${p.education.degree}
 - Years: ${p.education.years}
-- Coursework: ${p.education.coursework.join(", ")}
+- Coursework: ${p.education.coursework.join(", ")}`;
+}
 
-## TECHNICAL SKILLS
-Languages: ${p.skills.languages.join(", ")}
-Frameworks & Libraries: ${p.skills.frameworks.join(", ")}
-Dev Tools: ${p.skills.devTools.join(", ")}`;
+// Derived from lib/data/skills.ts — the same array the Skills section renders. Nuggets must not be
+// able to recite a stack the page no longer claims.
+function renderSkillFacts(): string {
+  const blocks = skills.map((s) => {
+    const line = `${s.category}: ${s.items.join(", ")}`;
+
+    return s.note ? `${line}\n  ${s.note}` : line;
+  });
+
+  const cv = profile.cvSkills;
+
+  return `## TECHNICAL SKILLS — WHAT THE SITE FEATURES
+${blocks.join("\n")}
+
+## TECHNICAL SKILLS — FULL CV LIST
+The section above is a deliberate shortlist of what John leads with. Below is the complete list from
+his CV. Use it to answer "does John know X?" about a specific technology — if it appears here, the
+answer is yes, even when it is not one of the featured skills above.
+Languages: ${cv.languages.join(", ")}
+Frameworks: ${cv.frameworks.join(", ")}
+Developer Tools: ${cv.devTools.join(", ")}`;
 }
 
 function renderExperienceFacts(): string {
@@ -202,6 +221,7 @@ export function buildSystemPrompt(): string {
     PERSONA,
     "---",
     renderProfileFacts(),
+    renderSkillFacts(),
     renderExperienceFacts(),
     renderProjectFacts(),
     `## SOCIAL\n- GitHub: ${profile.social.github}\n- LinkedIn: ${profile.social.linkedin}`,

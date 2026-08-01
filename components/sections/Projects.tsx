@@ -16,8 +16,10 @@ import { projects } from "@/lib/data/projects";
 
 const smoothEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-const featured = projects.filter((p) => p.featured);
-const other = projects.filter((p) => !p.featured);
+// `hiddenOnPage` entries stay in lib/data so the chat still knows them; they just don't render here.
+const visible = projects.filter((p) => !p.hiddenOnPage);
+const featured = visible.filter((p) => p.featured);
+const other = visible.filter((p) => !p.featured);
 
 export function Projects() {
   return (
