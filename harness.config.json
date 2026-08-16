@@ -1,0 +1,28 @@
+{
+  "$schema": "https://raw.githubusercontent.com/HeisenbergI8/claude-harness/main/harness.schema.json",
+  "commands": {
+    "verify": "npm run verify",
+    "verifyFast": "npm run typecheck"
+  },
+  "source": {
+    "include": [
+      "app/**",
+      "components/**",
+      "hooks/**",
+      "lib/**",
+      "config/**",
+      "types/**"
+    ],
+    "exclude": [
+      "**/*.md",
+      "**/__snapshots__/**"
+    ]
+  },
+  "readOnlyAgents": [
+    "tester",
+    "auditor",
+    "change-auditor",
+    "Explore",
+    "Plan"
+  ]
+}
