@@ -52,6 +52,12 @@ export const skills: Skill[] = [
     // No "this isn't a crutch" disclaimer here on purpose. Two independent recruiter-lens passes
     // read the earlier defensive version as planting the exact doubt it was rebutting. What replaces
     // it is falsifiable: the harness is in this repo, and every claim below is a hook you can open.
-    note: "I build my own agentic tooling. This portfolio ships with a 14-subagent Claude Code harness that checks every diff against the architecture rules, generates the tests, and hard-blocks any commit that would leak a secret or break the production build — and a separate 8-subagent harness does the same for my production work at Crystal Vision.",
+    //
+    // The counts are measured, not remembered. `.claude/agents` (5), `.claude/skills` (8) and
+    // `.claude/harness` (31 scripts) are tracked in this repository, so the numbers here can be
+    // checked by counting files rather than taken on trust — which is the whole point of linking the
+    // harness from the same page. An earlier version of this note said "14-subagent", which matched
+    // nothing countable.
+    note: "I build my own agentic tooling. This portfolio ships with claude-harness — my own MIT-licensed gate layer for Claude Code, 5 role-separated agents, 8 skills and 31 hooks that stop a turn claiming a green test run the evidence ledger cannot support, and hard-block a commit carrying a secret, a build artefact or a red tree. It is open source with 523 tests and zero dependencies, and a separate 8-subagent harness does the same for my production work at Crystal Vision.",
   },
 ];
