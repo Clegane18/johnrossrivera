@@ -26,6 +26,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+.env
 .env*.local
 
 # vercel
@@ -39,6 +40,16 @@ next-env.d.ts
 project.md
 .github/
 
-# Claude Code AI harness (agents, skills, hooks, docs) — kept local, not committed
-.claude/
+# Claude Code AI harness. The parts that DEFINE behaviour are tracked — settings, gates,
+# agents and skills decide what "verified" means here, and a definition that can change
+# without appearing in a diff is a suggestion rather than a gate. Everything else under
+# .claude/ (runtime state, local overrides, plan artifacts) stays local.
+.claude/*
+!.claude/settings.json
+!.claude/agents/
+!.claude/skills/
+!.claude/harness/
+!.claude/lessons/
+.claude/.harness/
 CLAUDE.md
+.env*

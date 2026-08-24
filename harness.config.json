@@ -1,0 +1,48 @@
+{
+  "$schema": "https://raw.githubusercontent.com/HeisenbergI8/claude-harness/main/harness.schema.json",
+
+  "commands": {
+    "verify": "npm run verify",
+    "verifyFast": "npm run typecheck",
+    "editCheck": null
+  },
+
+  "verifyTimeoutMs": 30000,
+
+  "source": {
+    "include": [
+      "app/**",
+      "components/**",
+      "hooks/**",
+      "lib/**",
+      "config/**",
+      "types/**",
+      "global.d.ts",
+      "*.config.mjs",
+      "*.config.ts",
+      "tsconfig.json",
+      "package.json"
+    ],
+    "exclude": ["**/*.md", "**/*.png", "**/*.webp"]
+  },
+
+  "evidence": {
+    "patterns": [
+      { "kind": "check", "match": "node\\s+\\.claude/harness/selftest\\.mjs" }
+    ]
+  },
+
+  "preflight": {
+    "enabled": true,
+    "cleanTree": true,
+    "treeGreen": true
+  },
+
+  "readOnlyAgents": [
+    "tester",
+    "auditor",
+    "change-auditor",
+    "Explore",
+    "Plan"
+  ]
+}
