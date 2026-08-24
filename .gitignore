@@ -52,3 +52,4 @@ project.md
 !.claude/lessons/
 .claude/.harness/
 CLAUDE.md
+.env*
