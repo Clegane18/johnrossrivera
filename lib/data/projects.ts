@@ -154,6 +154,52 @@ export const projects: Project[] = [
     featured: true,
   },
   {
+    id: "claude-harness",
+    title: "claude-harness",
+    summary:
+      "Open-source gate layer for Claude Code — blocks a turn that claims the tests passed when the ledger says nothing ran.",
+    description:
+      "An MIT-licensed harness that installs into any repository and makes an AI agent's claims checkable. A per-turn ledger records which source files were edited and which verification commands actually ran, with each one's exit code; a Stop gate refuses a turn that edited source and verified nothing, or that asserts a green gate the ledger cannot support. 31 hook scripts, 5 role-separated agents, 8 skills and a 602-line installer — zero npm dependencies, 523 tests on Node's built-in runner, on macOS, Linux and Windows.",
+    problem:
+      "An agent that writes code will eventually tell you it verified the code, sometimes having run nothing — not maliciously, but because 'the change looks right' and 'the change is checked' feel identical from the inside. A false green is worse than a reported red: a red gate gets fixed, a false green gets shipped. Instructions cannot close it, because a CLAUDE.md rule saying 'always run the tests' holds most of the time, which is the worst possible reliability — high enough to trust, low enough to burn you.",
+    role: "Sole author — the evidence ledger and Stop gates, the four PreToolUse guards, the agent role separation, the plan pipeline and supervised task loop, the installer, the docs, and the 523-test suite.",
+    decisions: [
+      "The fix lives outside the model. Hooks record what actually ran and a Stop gate compares the turn's claims against that record, so 'verified' stops being something the agent can assert about itself.",
+      "Claims are classified by use versus mention. A naive matcher for 'all tests pass' fired 29 times in one session on pasted command output and on the tables documenting the matcher itself — the 29th on the table listing the first 28. Commands are classified by the binary invoked per command segment, so grepping for a verify command in the docs never counts as having run it.",
+      "The repair loop escalates on stuck failures, not on retries. Each iteration fingerprints the failure set with line and column numbers stripped; a changed fingerprint resets the counter, an unchanged one escalates and names what was already tried. Counting retries punishes a loop that is converging and rewards one that thrashes.",
+      "The writer owns the format: the ledger writer exports its own reader, so a consumer cannot drift onto a field the writer never emits. Agreement is structural rather than merely tested — the worst bug here is a gate that silently stops working while its unit tests keep passing.",
+      "'Registered' and 'firing' are different states. A heartbeat records which hooks actually fired and the selftest fails on anything registered but never seen, because a guard that never runs looks exactly like a guard with nothing to do.",
+      "Every gate fails open on a broken payload and blocks a bounded number of times before standing aside. A gate that can trap a session gets switched off, and a switched-off gate protects nothing.",
+    ],
+    impact: [
+      { metric: "523", label: "tests, on Node's built-in runner" },
+      { metric: "31", label: "gates, guards and hooks shipped" },
+      { metric: "0", label: "npm dependencies" },
+      {
+        metric: "29",
+        label: "false blocks removed by scoping claims to use, not mention",
+      },
+    ],
+    architectureSvg: "/images/architecture/claude-harness.svg",
+    tech: [
+      "Node.js",
+      "JavaScript (ESM)",
+      "Claude Code Hooks",
+      "node:test",
+      "JSON Schema",
+    ],
+    // No liveUrl and no screenshots on purpose: it is a set of hooks, so there is nothing to look at
+    // and no deployment to visit. The repo is the artifact, and the deck card falls back to its
+    // monogram tile rather than dressing a CLI up as a product.
+    repoUrls: [
+      {
+        label: "Source",
+        url: "https://github.com/HeisenbergI8/claude-harness",
+      },
+    ],
+    featured: true,
+  },
+  {
     id: "gf-commerce",
     // See the matching entry in lib/data/experience.ts — dropped from the CV, hidden from the page,
     // retained here so the chat can still speak to it.
