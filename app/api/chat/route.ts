@@ -73,19 +73,31 @@ export async function POST(request: Request): Promise<Response> {
 
   try {
     const stream = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: "openai/gpt-oss-120b",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         ...result.data.messages,
       ],
       stream: true,
+      // gpt-oss is a reasoning model: it thinks before answering. "low" is the cheapest setting that
+      // still reasons at all — enough to hold the scope contract and pick the right project, without
+      // the latency of the "medium" default. "none" is not an option on gpt-oss.
+      reasoning_effort: "low",
+      // Reasoning must never reach the client. The stream handler below reads only `delta.content`,
+      // and "raw" would inline the thinking there inside <think> tags, rendering it in the chat
+      // bubble. "hidden" drops it server-side; "parsed" would also work but ships tokens we discard.
+      reasoning_format: "hidden",
       // Brevity is enforced in two places, because the prompt alone did not hold: the rules ask for
       // 2–4 sentences, and this is the hard ceiling behind them. 1024 permitted ~750 words, which is
       // far longer than any answer here should be. 400 leaves headroom for a genuinely detailed
       // answer (an interview-style story with a Live URL) without allowing a wall of text —
       // truncating mid-sentence reads worse than being slightly long, so this is deliberately not
       // set to the 2–4 sentence budget itself.
-      max_tokens: 400,
+      //
+      // 600, not 400: reasoning tokens are drawn from this same budget before the first visible
+      // token is emitted, so the old ceiling would have cut answers short by however much the model
+      // thought. The ~200 added is headroom for the hidden reasoning, not a longer answer.
+      max_completion_tokens: 600,
       // Lowered from 0.4: less drift from the answer rules and the scope contract, tighter phrasing.
       temperature: 0.2,
     });
