@@ -126,6 +126,7 @@ export function ChatWidget() {
   const [showHint, setShowHint] = useState(false);
   const [showTech, setShowTech] = useState(false);
   const [atContact, setAtContact] = useState(false);
+  const [atHero, setAtHero] = useState(true);
   const hintShownRef = useRef(false);
   const {
     messages,
@@ -167,6 +168,29 @@ export function ChatWidget() {
       { rootMargin: "-25% 0px -10% 0px" }
     );
     observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
+  // Drop the label back to the bare avatar while the hero is on screen.
+  //
+  // The hero parks its GitHub/LinkedIn/Email column in the bottom-right corner of the stage at lg,
+  // which is the corner this launcher lives in. The old 56px circle cleared it; the labelled pill is
+  // 172px and, at 1440 exactly, covered LinkedIn and Email — a fixed control sitting on top of two
+  // real links. Collapsing to the circle over the hero restores the original footprint precisely
+  // where the conflict is, and the label returns for the rest of the page. Nothing is lost at the
+  // top: the hero is already carrying the introduction the label would give.
+  useEffect(() => {
+    const hero = document.getElementById("hero");
+    if (!hero) {
+      setAtHero(false);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setAtHero(entry.isIntersecting),
+      { rootMargin: "0px 0px -35% 0px" }
+    );
+    observer.observe(hero);
     return () => observer.disconnect();
   }, []);
 
@@ -281,15 +305,14 @@ export function ChatWidget() {
                   <p className="text-sm font-semibold leading-none text-zinc-900 dark:text-zinc-100">
                     {siteConfig.chat.name}
                   </p>
-                  <span className="mt-1 flex items-center gap-1">
-                    <span className="relative flex h-1.5 w-1.5">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-foreground opacity-75" />
-                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-foreground" />
-                    </span>
-                    <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
-                      Online
-                    </span>
-                  </span>
+                  {/* What it is, not a pulsing "Online" dot.
+                      The dot indicated nothing — the panel is open, so of course it is reachable —
+                      and it animated forever. The navbar dropped exactly this pattern for exactly
+                      this reason; the widget kept it. A plain role line uses the same space to
+                      answer the question a first-time visitor actually has. */}
+                  <p className="mt-1 text-[11px] leading-none text-zinc-500 dark:text-zinc-400">
+                    {siteConfig.chat.role}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
@@ -476,30 +499,48 @@ export function ChatWidget() {
                 animate={{ opacity: 1, x: 0, scale: 1 }}
                 exit={{ opacity: 0, x: 12, scale: 0.88 }}
                 transition={{ type: "spring", stiffness: 380, damping: 22 }}
-                className="absolute bottom-2 right-16 w-44 rounded-2xl border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold leading-snug text-zinc-800 shadow-[0_8px_24px_rgba(0,0,0,0.18)] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
+                className="absolute bottom-2 right-16 w-52 rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-xs font-medium leading-snug text-zinc-700 shadow-[0_8px_24px_rgba(0,0,0,0.18)] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
               >
-                Chat with Nuggets to know more about John!
+                Ask Nuggets about John&rsquo;s work &mdash; it answers from this
+                site&rsquo;s project data.
                 <span className="absolute right-[-6px] top-1/2 -translate-y-1/2 border-4 border-transparent border-l-white dark:border-l-zinc-900" />
               </motion.div>
             )}
           </AnimatePresence>
-          {!isOpen && (
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-foreground opacity-25" />
-          )}
           <motion.button
             onClick={() => setIsOpen((prev) => !prev)}
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.93 }}
-            className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-full shadow-[0_0_20px_rgba(251,146,60,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            aria-label={isOpen ? "Close chat" : "Open chat"}
+            /* A labelled control on anything wider than a phone.
+               A bare circular portrait with an orange halo is a mascot: it says "pet" and gives no
+               clue what pressing it does. Naming the action is the single biggest thing separating
+               a tool from a toy, so the avatar keeps its place as the mark and the label sits beside
+               it. Below sm there is no room for the label and the circle stands alone.
+               The halo also went: it was `rgba(251,146,60,.35)`, the last orange on a site that was
+               deliberately swept to monochrome, so the widget glowed in a colour used nowhere else. */
+            className={cn(
+              "relative flex h-14 items-center gap-2.5 overflow-hidden rounded-full border border-border bg-card p-1 text-sm font-semibold text-foreground shadow-md transition-shadow duration-200 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+              // Also collapsed while the panel is open: the close overlay is `inset-0` and was drawn
+              // for a 56px circle, so over the 172px pill it painted a dark slab across the label
+              // with the X centred on top of it — "As✕Nuggets".
+              !atHero && !isOpen && "sm:pr-5"
+            )}
+            aria-label={isOpen ? "Close chat" : "Ask Nuggets about John's work"}
           >
-            <Image
-              src={siteConfig.chat.avatarPath}
-              alt="Nuggets"
-              fill
-              className="object-cover"
-              sizes="56px"
-            />
+            <span className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-full">
+              <Image
+                src={siteConfig.chat.avatarPath}
+                alt=""
+                fill
+                className="object-cover"
+                sizes="48px"
+              />
+            </span>
+            {!atHero && !isOpen && (
+              <span className="hidden whitespace-nowrap sm:inline">
+                Ask {siteConfig.chat.name}
+              </span>
+            )}
             <AnimatePresence>
               {isOpen && (
                 <motion.span
@@ -508,7 +549,7 @@ export function ChatWidget() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute inset-0 flex items-center justify-center rounded-full bg-zinc-900/70"
+                  className="absolute inset-0 flex items-center justify-center rounded-full bg-zinc-900/80"
                 >
                   <X className="h-5 w-5 text-white" />
                 </motion.span>

@@ -6,9 +6,10 @@ import type { ChatFallback } from "@/types";
 // network drops — the visitor is very often a recruiter. A red "!" error box reads as a broken site,
 // which on a hiring artifact costs more than having no chat at all.
 //
-// So an outage is treated as a ROUTING problem, not an error: say something warm in Nuggets' voice
-// and hand the visitor the thing they actually came for — a way to reach John. The conversion path
-// must survive the outage.
+// So an outage is treated as a ROUTING problem, not an error: say plainly what happened and hand
+// the visitor the thing they actually came for — a way to reach John. The conversion path must
+// survive the outage. State the cause without apologising for it; a recruiter wants the email
+// address, not contrition.
 //
 // The split that matters:
 //   canRetry   — the visitor can fix this themselves by trying again (bad payload, dropped network).
@@ -23,7 +24,7 @@ export function chatFallback(
   if (status === null) {
     return {
       message:
-        "Woof — I can't reach my treat jar right now. Check your connection and try again?",
+        "I can't reach the server right now. Check your connection and try again.",
       canRetry: true,
       showContact: false,
     };
@@ -35,7 +36,7 @@ export function chatFallback(
     return {
       message:
         serverMessage ??
-        "🐾 Nuggets has done a lot of talking today and needs a nap! She'll be back soon.",
+        "Nuggets has hit its message limit for now. It resets shortly — or reach John directly below.",
       canRetry: true,
       showContact: true,
     };
@@ -46,7 +47,7 @@ export function chatFallback(
   if (status >= 500) {
     return {
       message:
-        "Woof — Nuggets can't fetch an answer right now. Sorry about that! You can still reach John directly.",
+        "Nuggets can't reach the model right now. You can still reach John directly.",
       canRetry: true,
       showContact: true,
     };

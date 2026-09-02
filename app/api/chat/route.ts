@@ -32,7 +32,7 @@ export async function POST(request: Request): Promise<Response> {
     return NextResponse.json(
       {
         success: false,
-        message: `🐾 Nuggets is on a little break right now! Please wait ${minutesLeft} minute${minutesLeft === 1 ? "" : "s"} and she'll be right back to help you! 🐾`,
+        message: `Nuggets has hit its message limit. Try again in ${minutesLeft} minute${minutesLeft === 1 ? "" : "s"}, or email John directly.`,
       },
       { status: 429, headers: rateLimitHeaders }
     );
@@ -144,7 +144,7 @@ export async function POST(request: Request): Promise<Response> {
         {
           success: false,
           message:
-            "🐾 Nuggets is catching her breath — too many messages right now. Please try again in a moment!",
+            "Nuggets is handling too many messages right now. Try again in a moment.",
         },
         { status: 429, headers: rateLimitHeaders }
       );
