@@ -58,6 +58,6 @@ export const skills: Skill[] = [
     // checked by counting files rather than taken on trust — which is the whole point of linking the
     // harness from the same page. An earlier version of this note said "14-subagent", which matched
     // nothing countable.
-    note: "I build my own agentic tooling. This portfolio ships with claude-harness — my own MIT-licensed gate layer for Claude Code, 5 role-separated agents, 8 skills and 31 hooks that stop a turn claiming a green test run the evidence ledger cannot support, and hard-block a commit carrying a secret, a build artefact or a red tree. It is open source with 523 tests and zero dependencies, and a separate 8-subagent harness does the same for my production work at Crystal Vision.",
+    note: "I build my own agentic tooling. This portfolio ships with provenly — my own MIT-licensed gate layer for Claude Code, 5 role-separated agents, 8 skills and 31 hooks that stop a turn claiming a green test run the evidence ledger cannot support, and hard-block a commit carrying a secret, a build artefact or a red tree. It is open source with 523 tests and zero dependencies, and a separate 8-subagent harness does the same for my production work at Crystal Vision.",
   },
 ];

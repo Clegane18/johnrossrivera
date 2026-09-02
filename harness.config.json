@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/HeisenbergI8/claude-harness/main/harness.schema.json",
+  "$schema": "https://raw.githubusercontent.com/HeisenbergI8/provenly/main/harness.schema.json",
 
   "commands": {
     "verify": "npm run verify",

@@ -154,22 +154,30 @@ export const projects: Project[] = [
     featured: true,
   },
   {
-    id: "claude-harness",
-    title: "claude-harness",
+    // Renamed from `claude-harness` on 2026-09-01, when the package became `provenly` on npm and the
+    // GitHub repo followed. The slug moves with it, unlike `rola-access-platform` above, because the
+    // reason that comment gives does not hold here: this entry was nine days old, GitHub 301s the old
+    // repo name, and what changed is the project's public identity rather than a display title — a
+    // /work/claude-harness URL would name a package that no longer exists anywhere.
+    id: "provenly",
+    title: "provenly",
     summary:
       "Open-source gate layer for Claude Code — blocks a turn that claims the tests passed when the ledger says nothing ran.",
     description:
-      "An MIT-licensed harness that installs into any repository and makes an AI agent's claims checkable. A per-turn ledger records which source files were edited and which verification commands actually ran, with each one's exit code; a Stop gate refuses a turn that edited source and verified nothing, or that asserts a green gate the ledger cannot support. 31 hook scripts, 5 role-separated agents, 8 skills and a 602-line installer — zero npm dependencies, 523 tests on Node's built-in runner, on macOS, Linux and Windows.",
+      "An MIT-licensed harness that installs into any repository and makes an AI agent's claims checkable. A per-turn ledger records which source files were edited and which verification commands actually ran, with each one's exit code; a Stop gate refuses a turn that edited source and verified nothing, or that asserts a green gate the ledger cannot support. Above the gates sit a plan pipeline and supervised task loop, advisory locks for two sessions sharing one checkout, and three reporters that price what the harness costs and grade the subagents whose only output is a report. 31 hook scripts, 5 role-separated agents, 8 skills and a 602-line installer — zero npm dependencies, 523 tests on Node's built-in runner, on macOS, Linux and Windows.",
     problem:
       "An agent that writes code will eventually tell you it verified the code, sometimes having run nothing — not maliciously, but because 'the change looks right' and 'the change is checked' feel identical from the inside. A false green is worse than a reported red: a red gate gets fixed, a false green gets shipped. Instructions cannot close it, because a CLAUDE.md rule saying 'always run the tests' holds most of the time, which is the worst possible reliability — high enough to trust, low enough to burn you.",
-    role: "Sole author — the evidence ledger and Stop gates, the four PreToolUse guards, the agent role separation, the plan pipeline and supervised task loop, the installer, the docs, and the 523-test suite.",
+    role: "Sole author — the evidence ledger and Stop gates, the five PreToolUse guards, the agent role separation, the plan pipeline and supervised task loop, the agent locks, the cost and agent-grading reporters, the installer, the docs, and the 523-test suite.",
     decisions: [
       "The fix lives outside the model. Hooks record what actually ran and a Stop gate compares the turn's claims against that record, so 'verified' stops being something the agent can assert about itself.",
       "Claims are classified by use versus mention. A naive matcher for 'all tests pass' fired 29 times in one session on pasted command output and on the tables documenting the matcher itself — the 29th on the table listing the first 28. Commands are classified by the binary invoked per command segment, so grepping for a verify command in the docs never counts as having run it.",
       "The repair loop escalates on stuck failures, not on retries. Each iteration fingerprints the failure set with line and column numbers stripped; a changed fingerprint resets the counter, an unchanged one escalates and names what was already tried. Counting retries punishes a loop that is converging and rewards one that thrashes.",
       "The writer owns the format: the ledger writer exports its own reader, so a consumer cannot drift onto a field the writer never emits. Agreement is structural rather than merely tested — the worst bug here is a gate that silently stops working while its unit tests keep passing.",
       "'Registered' and 'firing' are different states. A heartbeat records which hooks actually fired and the selftest fails on anything registered but never seen, because a guard that never runs looks exactly like a guard with nothing to do.",
-      "Every gate fails open on a broken payload and blocks a bounded number of times before standing aside. A gate that can trap a session gets switched off, and a switched-off gate protects nothing.",
+      "Model-authored strings get no shell. The plan verifier runs the command attached to each plan step, and a plan is a document a model wrote — so it executes an argument vector instead of a shell string, and ';', '&&' and '|' become inert literal arguments by construction. An earlier fix stripped metacharacters by regex and immediately refused legitimate checks. Nothing has to recognise an attack, so nothing can fail to; the commands you committed to the config still get a shell, because the boundary is provenance, not uniformity.",
+      "A check that cannot fail is not a gate. A step verified by grepping for the token that same step writes passes the instant the text is typed — on one real plan, 11 of 16 checks were that shape. So every check is graded real, self, exists or none, and a linter scores every plan and diffs two scorings, because a number you can re-take and difference is an instrument where a number written down once is only a measurement.",
+      "The graders get graded. A tester reporting PASS and an auditor reporting a score out of 100 are self-assessments no mechanism had ever checked, so the claim checker was pointed at the subagents' own transcripts. Across 71 real runs it found five audit reports whose rubric rows did not sum to the confidence score in their own header. It stays advisory: it reports on history, and history cannot be fixed by failing a build.",
+      "Failure direction is chosen per actor and written down. A write guard fails closed for an agent under a rule, because a guard that fails open produces confidence it has not earned; for everyone else it fails open, because the alternative blocks every write in the session over a bug in one file. Every gate also stands aside after a bounded number of blocks — a gate that can trap a session gets switched off, and a switched-off gate protects nothing.",
     ],
     impact: [
       { metric: "523", label: "tests, on Node's built-in runner" },
@@ -179,8 +187,17 @@ export const projects: Project[] = [
         metric: "29",
         label: "false blocks removed by scoping claims to use, not mention",
       },
+      {
+        metric: "56%",
+        label:
+          "of 473 plan steps found gated on a check that cannot report failure",
+      },
+      {
+        metric: "71",
+        label: "subagent runs graded against their own transcripts",
+      },
     ],
-    architectureSvg: "/images/architecture/claude-harness.svg",
+    architectureSvg: "/images/architecture/provenly.svg",
     tech: [
       "Node.js",
       "JavaScript (ESM)",
@@ -190,11 +207,13 @@ export const projects: Project[] = [
     ],
     // No liveUrl and no screenshots on purpose: it is a set of hooks, so there is nothing to look at
     // and no deployment to visit. The repo is the artifact, and the deck card falls back to its
-    // monogram tile rather than dressing a CLI up as a product.
+    // monogram tile rather than dressing a CLI up as a product. The README's demo GIF is the one
+    // frame worth showing, and it is deliberately not wired in here: next/image would serve a static
+    // first frame, and un-optimising it means changing the carousel for every other project too.
     repoUrls: [
       {
         label: "Source",
-        url: "https://github.com/HeisenbergI8/claude-harness",
+        url: "https://github.com/HeisenbergI8/provenly",
       },
     ],
     featured: true,
