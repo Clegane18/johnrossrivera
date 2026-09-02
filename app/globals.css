@@ -350,6 +350,21 @@ body {
     transform: translate(var(--reveal-x, 0px), var(--reveal-y, 0px));
   }
 
+  /* No horizontal slide on phones.
+     A translated element still contributes to scrollWidth, so About's and Contact's -20px/+20px
+     columns pushed the document 4px past the viewport at 375 and 430 — a page you can drag
+     sideways for no reason, on the two most common widths. It only showed on a FRESH load, because
+     scrolling settles every reveal to translate(0) and takes the overflow with it, which is what
+     hid it from the earlier sweep. Overriding `transform` rather than `--reveal-x` is deliberate:
+     the variable is set inline by Reveal.tsx and an inline custom property would win.
+     The motion is no loss here — below sm those two-column grids are already stacked full-width,
+     so a left column arriving from the left and a right column from the right says nothing. */
+  @media (max-width: 639px) {
+    [data-reveal="hidden"] {
+      transform: translateY(var(--reveal-y, 0px));
+    }
+  }
+
   [data-reveal="visible"] {
     opacity: 1;
     transform: translate(0, 0);
