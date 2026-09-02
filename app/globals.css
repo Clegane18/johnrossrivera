@@ -220,21 +220,6 @@ body {
        than 512px later. */
     /* Two-class selectors on purpose: the elements carry unprefixed `relative` and `justify-center`
        utilities, and Tailwind's utilities layer outranks this components layer at equal specificity. */
-    .hero-stage .hero-portrait-slot {
-      position: absolute;
-      right: 0;
-      /* Top-anchored, level with where the content column starts — the same 8.5rem the stage
-         reserves for the name overlay. Anchoring it to the stage BOTTOM instead puts it below the
-         fold whenever the content column is taller than one screen, which is the exact failure this
-         whole block exists to fix: it emptied the right half of the first view all over again. */
-      top: 8.5rem;
-      align-items: flex-start;
-      justify-content: flex-end;
-    }
-
-    .hero-stage .hero-content-col {
-      width: min(58%, 26rem);
-    }
   }
 
   @media (min-width: 1024px) {
@@ -250,11 +235,6 @@ body {
 
     .hero-portrait-size {
       width: 320px;
-    }
-
-    /* Tracks the stage's padding-top at this breakpoint. */
-    .hero-stage .hero-portrait-slot {
-      top: 10rem;
     }
   }
 
@@ -280,17 +260,68 @@ body {
        outrank the element's own `lg:inset-x-0 lg:bottom-0` utilities on specificity and every
        property set above has to be handed back explicitly — leaving `right` at auto alone dropped
        the portrait onto the left edge, on top of the role card. */
+
+
+  }
+
+  /* ─── Tablet band: 768–1279 ────────────────────────────────
+     Bounded at BOTH ends on purpose. These rules use two-class selectors to outrank Tailwind's
+     utilities inside the band, which means they would also outrank the `lg:` utilities that are
+     supposed to take over at 1280 — an earlier version tried to hand each property back in a reset
+     block and silently clobbered the desktop card's own width. A max-width on the query means
+     there is nothing to reset: at 1280 these rules simply stop matching. */
+  @media (min-width: 768px) and (max-width: 1279.98px) {
     .hero-stage .hero-portrait-slot {
       position: absolute;
-      inset: auto 0 0 0;
-      align-items: stretch;
-      justify-content: center;
+      right: 0;
+      /* Spans the content column's full height and centres the portrait inside it, rather than
+         hanging from the top edge. Top-anchoring left ~400px of empty right column below the
+         portrait on a tall tablet (iPad Pro is 1024x1366), which read as an unbalanced composition;
+         bottom-anchoring is what pushed it off a short one (1024x768). Spanning both and centring
+         is the only version that holds at either height. The 8.5rem top matches the space the stage
+         reserves for the name overlay. */
+      top: 8.5rem;
+      bottom: 0;
+      align-items: center;
+      justify-content: flex-end;
     }
 
     .hero-stage .hero-content-col {
-      width: auto;
+      width: min(58%, 26rem);
+    }
+
+    /* One width for the whole stack.
+       The three blocks used to render at three different widths — the role card capped at 320px by
+       max-w-xs, the metrics filling the 416px column, and the socials shrink-wrapped to ~140px —
+       so the column had three ragged right edges down its length. Sharing one edge is most of what
+       "harmony" means for a stack like this. */
+    .hero-stage .hero-content-col > * {
+      width: 100%;
+      max-width: none;
+    }
+
+    /* The socials go back to a row here. `md:flex-col` was written for the 1280+ layout, where the
+       block sits in a narrow right-hand gutter; in this band that same rule turns it into a tall
+       thin stub under a full-width card. */
+    .hero-stage .hero-social-row {
+      flex-direction: row;
+      gap: 0.5rem;
+    }
+
+    /* Scales with the room actually available beside the column, instead of stepping between two
+       fixed widths — 260px looked stranded at 1024 and 340px crowded the card at 768. */
+    .hero-stage .hero-portrait-size {
+      width: clamp(232px, 33vw, 400px);
+    }
+
+    /* Tracks the stage's larger padding-top from 1024 up. */
+    @media (min-width: 1024px) {
+      .hero-stage .hero-portrait-slot {
+        top: 10rem;
+      }
     }
   }
+
 
   @media (min-width: 1440px) {
     .hero-stage {
@@ -467,4 +498,38 @@ html.theme-switching *::after {
      The universal selector matches ELEMENTS only, so this cannot touch the
      ::view-transition-* pseudo-elements that drive the reveal itself. */
   animation-play-state: paused !important;
+}
+
+/* ─── Large-display type scale ──────────────────────────────────────────────
+   Deliberately at the very END of the file and OUTSIDE @layer, so it lands
+   after `@tailwind utilities` in source order and wins against the same
+   single-class utilities it overrides.
+
+   Why here and not on 118 call sites. The site's supporting type — chips, mono
+   labels, card body — sits at 10-14px, which is set for a phone held at arm's
+   length and never grows again. Above 1280 that includes a Nest Hub Max, a
+   10-inch panel read from across a room, where those sizes stop being readable.
+   Adding an `lg:` variant to every one of the 118 places they appear would be a
+   large diff, easy to apply inconsistently, and impossible to tune afterwards.
+   One block scales the whole supporting scale together and can be adjusted in
+   one place.
+
+   Type only — no padding, margin or gap is touched here, so nothing reflows;
+   the elements around this text keep the proportions they were designed with. */
+@media (min-width: 1280px) {
+  .text-\[10px\] {
+    font-size: 12px;
+  }
+
+  .text-\[11px\] {
+    font-size: 13px;
+  }
+
+  .text-xs {
+    font-size: 0.8125rem; /* 13px */
+  }
+
+  .text-sm {
+    font-size: 0.9375rem; /* 15px */
+  }
 }

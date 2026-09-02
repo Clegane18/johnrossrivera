@@ -172,7 +172,7 @@ export function Hero() {
               transition={{ duration: 0.7, delay: 0.3, ease: smoothEase }}
               className="bg-card/95 w-fit shrink-0 rounded-2xl border border-border p-3 shadow-sm"
             >
-              <div className="flex flex-row flex-wrap gap-2 md:flex-col md:gap-2.5">
+              <div className="hero-social-row flex flex-row flex-wrap gap-2 md:flex-col md:gap-2.5">
                 {socialLinks.map((item) => {
                   const Icon = item.icon;
                   return (
