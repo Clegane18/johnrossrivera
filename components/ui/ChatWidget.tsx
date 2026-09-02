@@ -125,6 +125,7 @@ export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [showTech, setShowTech] = useState(false);
+  const [atContact, setAtContact] = useState(false);
   const hintShownRef = useRef(false);
   const {
     messages,
@@ -149,15 +150,69 @@ export function ChatWidget() {
     window.dispatchEvent(new CustomEvent("nuggets:open", { detail: isOpen }));
   }, [isOpen]);
 
+  // Step aside over the contact form.
+  //
+  // The launcher is fixed at bottom-24 right-6, which on a 375px screen lands it squarely on the
+  // Email input and the Message textarea — the two fields a recruiter has to fill to reach John at
+  // all. There is nowhere on a phone to put a floating circle that never collides with anything, so
+  // rather than move it, it retreats where the collision actually costs something. By the contact
+  // section the visitor has stopped asking about him and started writing to him; a chat launcher
+  // has nothing left to offer, and the form does.
+  useEffect(() => {
+    const section = document.getElementById("contact");
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setAtContact(entry.isIntersecting),
+      { rootMargin: "-25% 0px -10% 0px" }
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
+  // The hint waits for the visitor to leave the hero, and not only for a timer.
+  //
+  // It used to fire 2s after load wherever they were, which on a phone and on tablet put a 176px
+  // bubble directly over "View My Work" — the hero's primary CTA — for five seconds of the first
+  // ten. The one moment the visitor is most likely to act on the page was the moment something
+  // else was parked on the button. Gating on a scroll past the fold keeps the invitation and moves
+  // it to a point where nothing is competing with it.
   useEffect(() => {
     if (isOpen || hintShownRef.current) return;
+
+    let showTimer: ReturnType<typeof setTimeout>;
     let hideTimer: ReturnType<typeof setTimeout>;
-    const showTimer = setTimeout(() => {
-      setShowHint(true);
+
+    function pastHero() {
+      return window.scrollY > window.innerHeight * 0.6;
+    }
+
+    function arm() {
+      if (hintShownRef.current) return;
       hintShownRef.current = true;
-      hideTimer = setTimeout(() => setShowHint(false), 5000);
-    }, 2000);
+      window.removeEventListener("scroll", onScroll);
+      showTimer = setTimeout(() => {
+        // Checked again on fire, not only on arm. Scrolling down and back up inside the delay put
+        // the bubble over the hero CTA anyway — the one place it must never land.
+        if (!pastHero()) {
+          hintShownRef.current = false;
+          window.addEventListener("scroll", onScroll, { passive: true });
+          return;
+        }
+        setShowHint(true);
+        hideTimer = setTimeout(() => setShowHint(false), 5000);
+      }, 600);
+    }
+
+    function onScroll() {
+      if (pastHero()) arm();
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
     return () => {
+      window.removeEventListener("scroll", onScroll);
       clearTimeout(showTimer);
       clearTimeout(hideTimer);
     };
@@ -406,8 +461,10 @@ export function ChatWidget() {
       {/* Floating Button */}
       <div
         className={cn(
-          "fixed bottom-24 right-6 z-[70] lg:bottom-6",
-          isOpen && "max-md:hidden"
+          "fixed bottom-24 right-6 z-[70] transition-opacity duration-300 lg:bottom-6",
+          isOpen && "max-md:hidden",
+          // Desktop has room beside the form, so the retreat is a phone/tablet rule only.
+          atContact && "pointer-events-none opacity-0 lg:pointer-events-auto lg:opacity-100"
         )}
       >
         <div className="relative">

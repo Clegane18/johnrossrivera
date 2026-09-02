@@ -97,7 +97,10 @@ export function ExperienceEntry({ experience, now }: Props) {
             onClick={() => setExpanded((v) => !v)}
             aria-expanded={expanded}
             aria-controls={`${experience.id}-detail`}
-            className="mt-3 inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            // 82x17 as measured — the smallest control on the page, and the only way to read the
+            // detail behind any role. min-h-11 gives it the 44px touch floor without changing the
+            // type, and the underline gives it the affordance the bare uppercase label lacked.
+            className="mt-1 inline-flex min-h-11 items-center gap-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             {expanded ? "Show less" : "Show more"}
             <ChevronDown

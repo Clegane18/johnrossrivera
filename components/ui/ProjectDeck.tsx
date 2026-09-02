@@ -308,7 +308,7 @@ export function ProjectDeck({ projects }: Props) {
                           href={`/work/${project.id}`}
                           tabIndex={isActive ? undefined : -1}
                           draggable={false}
-                          className="inline-flex items-center gap-1 rounded-full bg-foreground px-3.5 py-1.5 text-xs font-medium text-background transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                          className="inline-flex min-h-11 items-center gap-1 rounded-full bg-foreground px-4 py-2.5 text-xs font-medium text-background lg:min-h-0 lg:py-1.5 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                         >
                           Case study
                         </Link>
@@ -319,7 +319,7 @@ export function ProjectDeck({ projects }: Props) {
                             rel="noopener noreferrer"
                             tabIndex={isActive ? undefined : -1}
                             draggable={false}
-                            className="inline-flex items-center gap-1 rounded-full border border-border px-3.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                            className="inline-flex min-h-11 items-center gap-1 rounded-full border border-border px-4 py-2.5 text-xs font-medium text-foreground lg:min-h-0 lg:py-1.5 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                           >
                             Live
                             <ArrowUpRight
@@ -346,7 +346,7 @@ export function ProjectDeck({ projects }: Props) {
           {String(count).padStart(2, "0")}
         </span>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center">
           {projects.map((project, index) => (
             <button
               key={project.id}
@@ -354,13 +354,23 @@ export function ProjectDeck({ projects }: Props) {
               onClick={() => go(index)}
               aria-label={`Show ${project.title}`}
               aria-current={index === active}
-              className={cn(
-                "h-1.5 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                index === active
-                  ? "w-6 bg-foreground"
-                  : "w-1.5 bg-border hover:bg-muted-foreground"
-              )}
-            />
+              // The visible dot stays 6px; the BUTTON is 44px tall with the dot centred inside it.
+              // Measured on a real 375px viewport these were 6x6 and 24x6 hit areas — a seventh of
+              // the 44px minimum in both axes, on the only control that moves the carousel on a
+              // phone. Padding the target rather than fattening the dot keeps the design and makes
+              // it reachable.
+              className="group flex h-11 items-center px-1.5 focus-visible:outline-none"
+            >
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "h-1.5 rounded-full transition-all duration-300 group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-background",
+                  index === active
+                    ? "w-6 bg-foreground"
+                    : "w-1.5 bg-border group-hover:bg-muted-foreground"
+                )}
+              />
+            </button>
           ))}
         </div>
 
@@ -369,7 +379,7 @@ export function ProjectDeck({ projects }: Props) {
             type="button"
             onClick={() => go(active - 1)}
             aria-label="Previous project"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
@@ -377,7 +387,7 @@ export function ProjectDeck({ projects }: Props) {
             type="button"
             onClick={() => go(active + 1)}
             aria-label="Next project"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
           </button>

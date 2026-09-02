@@ -27,15 +27,23 @@ export function Projects() {
           </h2>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            {/* The keyboard hint is desktop-only. On a phone — where the deck is swiped — telling
+                the visitor to "use arrow keys" names an input device they do not have, and it was
+                the only copy in the section, so the touch reading was worse than saying nothing. */}
             <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-              {featured.length} featured &middot; use arrow keys or click a card
+              {featured.length} featured
+              <span className="hidden lg:inline">
+                {" "}
+                &middot; use arrow keys or click a card
+              </span>
+              <span className="lg:hidden"> &middot; swipe or tap a card</span>
             </p>
 
             <Link
               href={siteConfig.social.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex w-fit items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-shadow duration-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="flex min-h-11 w-fit items-center gap-1.5 rounded-full border border-border bg-card px-4 text-sm font-medium text-foreground transition-shadow duration-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               View All Work
               <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />

@@ -42,6 +42,12 @@
 
 html {
   scroll-behavior: smooth;
+  /* The navbar is `fixed`, so it is out of flow and an anchor jump parks the target's first line
+     underneath it. Every in-page link on this site is a section anchor, so the offset belongs on
+     the scroll container once rather than as a scroll-mt utility repeated on seven sections. The
+     bar is ~72px tall (py-4 around a 40px control row); the extra clears it and leaves the heading
+     breathing room instead of tucked against the blur edge. */
+  scroll-padding-top: 6rem;
 }
 
 html.dark {
@@ -203,11 +209,37 @@ body {
     .hero-portrait-size {
       width: 260px;
     }
+
+    /* 768–1279 used to stack name → portrait → content in flow, which cost ~600px of height before
+       the role card began. On a 1024×768 iPad in landscape that put the ENTIRE fold — headline,
+       bio, both CTAs, the metrics — below the crease: the first screen was a name and a headshot
+       and nothing that says what the person does. The right half of the stage was simultaneously
+       empty, because the role card is capped at max-w-xs.
+       So the portrait goes to the right half and the content column takes the left, which is the
+       same arrangement lg already uses — just engaged at the width where the space appears rather
+       than 512px later. */
+    /* Two-class selectors on purpose: the elements carry unprefixed `relative` and `justify-center`
+       utilities, and Tailwind's utilities layer outranks this components layer at equal specificity. */
+    .hero-stage .hero-portrait-slot {
+      position: absolute;
+      right: 0;
+      /* Top-anchored, level with where the content column starts — the same 8.5rem the stage
+         reserves for the name overlay. Anchoring it to the stage BOTTOM instead puts it below the
+         fold whenever the content column is taller than one screen, which is the exact failure this
+         whole block exists to fix: it emptied the right half of the first view all over again. */
+      top: 8.5rem;
+      align-items: flex-start;
+      justify-content: flex-end;
+    }
+
+    .hero-stage .hero-content-col {
+      width: min(58%, 26rem);
+    }
   }
 
   @media (min-width: 1024px) {
     .hero-stage {
-      min-height: 640px;
+      min-height: 560px;
       /* Name grows to 164px (≈144px tall at .88) — still in flow, so still needs clearing. */
       padding-top: 10rem;
     }
@@ -217,7 +249,12 @@ body {
     }
 
     .hero-portrait-size {
-      width: 340px;
+      width: 320px;
+    }
+
+    /* Tracks the stage's padding-top at this breakpoint. */
+    .hero-stage .hero-portrait-slot {
+      top: 10rem;
     }
   }
 
@@ -235,6 +272,23 @@ body {
 
     .hero-portrait-size {
       width: 460px;
+    }
+
+    /* Hand the geometry back to the Tailwind `lg:` utilities on the elements themselves — the
+       right-half/left-half split above is only for the band where the row layout has not engaged. */
+    /* Full reset of the 768–1279 right-half rule. These selectors are two classes deep, so they
+       outrank the element's own `lg:inset-x-0 lg:bottom-0` utilities on specificity and every
+       property set above has to be handed back explicitly — leaving `right` at auto alone dropped
+       the portrait onto the left edge, on top of the role card. */
+    .hero-stage .hero-portrait-slot {
+      position: absolute;
+      inset: auto 0 0 0;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .hero-stage .hero-content-col {
+      width: auto;
     }
   }
 

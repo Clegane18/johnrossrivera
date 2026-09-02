@@ -87,7 +87,10 @@ export function MobileDock() {
                 )}
               >
                 <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-                <span className="w-full truncate text-center text-[9px] font-medium leading-none sm:text-[10px]">
+                {/* 9px was below every legibility floor going — WCAG's smallest recommended body
+                    size is 12px and iOS ships nothing under 10. At 10/11px all six labels still fit
+                    a 360px strip without truncating, which was the constraint that drove it down. */}
+                <span className="w-full truncate text-center text-[10px] font-medium leading-none sm:text-[11px]">
                   {item.shortLabel ?? item.label}
                 </span>
               </Link>

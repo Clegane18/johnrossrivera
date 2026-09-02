@@ -118,7 +118,7 @@ export function LiveDemo() {
             <button
               onClick={handlePing}
               disabled={pinging}
-              className="inline-flex h-10 w-fit items-center justify-center gap-2 rounded-full bg-foreground px-6 text-sm font-semibold text-background transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-50"
+              className="inline-flex h-11 w-fit items-center justify-center gap-2 rounded-full bg-foreground px-6 text-sm font-semibold text-background transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-50"
             >
               {pinging ? (
                 <>
@@ -194,7 +194,7 @@ export function LiveDemo() {
                   onClick={handleEcho}
                   disabled={sending}
                   aria-label="Send to the API"
-                  className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-foreground text-background transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-50"
+                  className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-foreground text-background transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-50"
                 >
                   {sending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />

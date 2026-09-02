@@ -56,8 +56,11 @@ export function Hero() {
             className="hero-name-size pointer-events-none absolute inset-x-0 top-0 z-10 select-none text-center font-hero font-black uppercase"
           >
             <span className="text-outline">{outlinedName}</span>
+            {/* The gap scales with the type. ml-4 is a flat 16px, which reads as a word space at
+                the 48px mobile size and closes to nothing at 198px — at 1024 and up the two words
+                ran together as "JOHNROSS". An em is the same optical gap at every size. */}
             {filledName && (
-              <span className="ml-4 text-foreground">{filledName}</span>
+              <span className="ml-[0.12em] text-foreground">{filledName}</span>
             )}
           </motion.h1>
 
@@ -66,7 +69,7 @@ export function Hero() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.12, ease: smoothEase }}
-            className="pointer-events-none relative z-20 flex justify-center pb-4 md:pb-0 lg:absolute lg:inset-x-0 lg:bottom-0"
+            className="hero-portrait-slot pointer-events-none relative z-20 flex justify-center pb-4 md:pb-0 lg:absolute lg:inset-x-0 lg:bottom-0"
           >
             {/* Two portraits, not one swapped via useTheme(). The theme-init script in
                 app/layout.tsx already resolves light/dark and sets the `dark` class on <html>
@@ -82,7 +85,7 @@ export function Hero() {
               alt={siteConfig.about.imageAlt}
               width={448}
               height={557}
-              sizes="(max-width: 639px) 240px, (max-width: 767px) 280px, (max-width: 1023px) 260px, (max-width: 1279px) 340px, 460px"
+              sizes="(max-width: 639px) 240px, (max-width: 767px) 280px, (max-width: 1023px) 260px, (max-width: 1279px) 320px, 460px"
               className="hero-portrait-size hero-portrait-light h-auto object-contain"
             />
             <Image
@@ -90,20 +93,22 @@ export function Hero() {
               alt={siteConfig.about.imageAlt}
               width={448}
               height={557}
-              sizes="(max-width: 639px) 240px, (max-width: 767px) 280px, (max-width: 1023px) 260px, (max-width: 1279px) 340px, 460px"
+              sizes="(max-width: 639px) 240px, (max-width: 767px) 280px, (max-width: 1023px) 260px, (max-width: 1279px) 320px, 460px"
               className="hero-portrait-size hero-portrait-dark h-auto object-contain"
             />
           </motion.div>
 
           {/* Stacked until lg, NOT md. NOTE `lg` is 1280px here, not Tailwind's default 1024 — see
-              tailwind.config.ts. So the broken window was 768px–1279px, which is every tablet and a
-              good many laptops. Across it this was a three-across row while the absolute
+              tailwind.config.ts. So the band to watch is 768px–1279px, which is every tablet and a
+              good many laptops. This was once a three-across row there while the absolute
               bottom-anchored layout had not yet engaged, so all three blocks competed for one flow
               row; flex items shrink by default and the metrics block is w-full, so the role card
-              collapsed to ~150px and its heading broke onto three lines. Nothing in that range needs
-              a row — there is ample height to stack. shrink-0 below keeps the card and the socials
-              at their intended widths once the row DOES engage at 1280. */}
-          <div className="relative z-30 flex flex-col gap-4 sm:gap-6 lg:absolute lg:inset-x-0 lg:bottom-8 lg:flex-row lg:items-end lg:justify-between xl:bottom-10">
+              collapsed to ~150px and its heading broke onto three lines. Stacking fixed that but
+              stacked them UNDER a full-width portrait, which pushed the whole column off a 768px-tall
+              screen — so .hero-content-col in globals.css now takes the left half of the band and
+              the portrait takes the right. shrink-0 below keeps the card and the socials at their
+              intended widths once the row DOES engage at 1280. */}
+          <div className="hero-content-col relative z-30 flex flex-col gap-4 sm:gap-6 lg:absolute lg:inset-x-0 lg:bottom-8 lg:flex-row lg:items-end lg:justify-between xl:bottom-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -176,7 +181,7 @@ export function Hero() {
                       href={item.href}
                       target={item.external ? "_blank" : undefined}
                       rel={item.external ? "noopener noreferrer" : undefined}
-                      className="flex items-center gap-2.5 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm transition-shadow duration-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                      className="flex min-h-11 items-center gap-2.5 rounded-full border border-border bg-card px-4 text-sm font-medium text-foreground shadow-sm transition-shadow duration-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       <Icon className="h-4 w-4" />
                       {item.label}
