@@ -31,7 +31,10 @@ function hlText(s: string, k: number): ReactNode[] {
   while ((m = HL_RE.exec(s)) !== null) {
     if (m.index > last) out.push(s.slice(last, m.index));
     out.push(
-      <span key={k++} className="font-semibold text-foreground">
+      // text-current, not text-foreground: the page token is near-black in light mode,
+      // while the bubble sets its own colour. Inheriting the bubble's colour keeps the
+      // highlight readable whatever surface it lands on; font-semibold carries the emphasis.
+      <span key={k++} className="font-semibold text-current">
         {m[0]}
       </span>
     );
@@ -67,7 +70,7 @@ function renderSegment(text: string, k: number): ReactNode[] {
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-foreground underline underline-offset-2 transition-colors hover:text-muted-foreground"
+        className="text-current underline underline-offset-2 transition-opacity hover:opacity-70"
       >
         {label}
       </a>
