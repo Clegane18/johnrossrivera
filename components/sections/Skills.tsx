@@ -110,7 +110,14 @@ export function Skills() {
         <ul
           ref={gridRef}
           data-reveal-group={gridVisible ? "visible" : "hidden"}
-          className="grid gap-4 sm:grid-cols-2"
+          // items-start, so a card is as tall as its own content.
+          //
+          // The cards carry h-full, which in a grid means every card in a row matches the tallest.
+          // Engineering Leverage carries a seven-line paragraph and Testing & Tooling carries four
+          // chips, so the pair rendered as a filled card beside ~600px of empty white — the single
+          // largest void on the page at tablet and desktop. Ragged card bottoms read as a list of
+          // different-sized things, which is what this is.
+          className="grid items-start gap-4 sm:grid-cols-2"
         >
           {skills.map((skill, i) => (
             <li
@@ -119,7 +126,7 @@ export function Skills() {
                 { "--reveal-delay": `${i * STAGGER_STEP_S}s` } as CSSProperties
               }
             >
-              <div className="h-full rounded-2xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
                 <div className="mb-4 inline-flex items-center gap-2">
                   {(() => {
                     const CategoryIcon =

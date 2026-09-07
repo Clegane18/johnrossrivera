@@ -139,7 +139,7 @@ function CarouselInner({ images, mobileImages, title }: ProjectCarouselProps) {
             onClick={handlePrev}
             aria-label="Previous screenshot"
             className={cn(
-              "absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-1.5 text-white backdrop-blur-sm transition-opacity duration-200 hover:bg-black/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white",
+              "absolute left-2 top-1/2 z-10 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-opacity duration-200 hover:bg-black/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white",
               "sm:opacity-0 sm:focus-visible:opacity-100 sm:group-hover:opacity-100"
             )}
           >
@@ -151,7 +151,7 @@ function CarouselInner({ images, mobileImages, title }: ProjectCarouselProps) {
             onClick={handleNext}
             aria-label="Next screenshot"
             className={cn(
-              "absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-1.5 text-white backdrop-blur-sm transition-opacity duration-200 hover:bg-black/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white",
+              "absolute right-2 top-1/2 z-10 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-opacity duration-200 hover:bg-black/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white",
               "sm:opacity-0 sm:focus-visible:opacity-100 sm:group-hover:opacity-100"
             )}
           >
@@ -234,7 +234,7 @@ function CarouselInner({ images, mobileImages, title }: ProjectCarouselProps) {
         onClick={() => setLightboxOpen(true)}
         aria-label="View full image"
         className={cn(
-          "absolute right-2 top-2 z-10 rounded-full bg-black/50 p-1.5 text-white backdrop-blur-sm transition-all duration-200 hover:bg-black/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white",
+          "absolute right-2 top-2 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-all duration-200 hover:bg-black/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white",
           "sm:opacity-0 sm:focus-visible:opacity-100 sm:group-hover:opacity-100"
         )}
       >

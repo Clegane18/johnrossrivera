@@ -2,10 +2,17 @@ import { useState, useCallback, useRef } from "react";
 import { chatFallback } from "@/lib/utils/chat-fallback";
 import type { ChatFallback, ChatMessage } from "@/types";
 
+// The first thing anyone reads in the panel, and the line that sets what this is.
+//
+// It used to open "Woof! I'm Nuggets — John's very own dog assistant... (Virtual tummy scratches
+// also accepted)". The visitor being greeted is usually a recruiter, and that greeting made an
+// assistant grounded on real project data read as a novelty. It now says what it is and what it
+// knows, which is also the more interesting claim: the answers come from the same files the page
+// renders, so they cannot contradict what the visitor just scrolled past.
 const WELCOME_MESSAGE: ChatMessage = {
   role: "assistant",
   content:
-    "Woof! I'm Nuggets 🐾 — John's very own dog assistant. Ask me anything about his experience, projects, or skills — I know everything about my human! (Virtual tummy scratches also accepted 🐾)",
+    "I'm Nuggets, the assistant for John Ross Rivera's portfolio. Ask about his experience, his projects, or how something was built — I answer from the same project data this site is built on.",
 };
 
 export function useChat() {

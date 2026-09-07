@@ -21,7 +21,11 @@ export function HeroMetrics() {
           // accessibility floor, and a bare number is a cramped thing to tap.
           className="group flex flex-col gap-1 bg-background p-4 transition-colors duration-200 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:p-5"
         >
-          <dt className="order-2 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+          {/* Tracking tightens as the type grows. The large-display scale in globals.css takes this
+              label from 10px to 12px above 1280, and at 0.16em "REGISTERED USERS" then overflowed a
+              176px tile and wrapped while "KOL PARTNERS" did not — four tiles, two of them two-line.
+              Less letter-spacing buys the width back without giving up the size. */}
+          <dt className="order-2 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground lg:tracking-[0.07em]">
             {metric.label}
           </dt>
           <dd className="order-1 flex items-start gap-1 font-hero text-2xl font-black leading-none text-foreground sm:text-3xl">

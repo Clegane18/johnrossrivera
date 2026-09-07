@@ -64,24 +64,33 @@ export function Contact() {
             </p>
 
             <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card">
+              {/* Actionable, not decorative. The address and the number were plain <span>s beside
+                  a mail icon and a phone icon, so on a phone — where tapping a number to dial it is
+                  the expected behaviour — a recruiter had to select and copy them by hand. */}
+              <a
+                href={`mailto:${siteConfig.email}`}
+                className="flex min-h-11 items-center gap-3 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border bg-card">
                   <Mail className="h-4 w-4 text-foreground" />
-                </div>
-                <span>{siteConfig.email}</span>
-              </div>
+                </span>
+                {siteConfig.email}
+              </a>
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card">
                   <MapPin className="h-4 w-4 text-foreground" />
                 </div>
                 <span>{siteConfig.about.location}</span>
               </div>
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card">
+              <a
+                href={`tel:${siteConfig.phone.replace(/\s+/g, "")}`}
+                className="flex min-h-11 items-center gap-3 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border bg-card">
                   <Phone className="h-4 w-4 text-foreground" />
-                </div>
-                <span>{siteConfig.phone}</span>
-              </div>
+                </span>
+                {siteConfig.phone}
+              </a>
             </div>
 
             <div className="flex gap-4">
@@ -89,7 +98,7 @@ export function Contact() {
                 href={siteConfig.social.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="flex min-h-11 items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 <svg
                   className="h-4 w-4"
@@ -105,7 +114,7 @@ export function Contact() {
                 href={siteConfig.social.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="flex min-h-11 items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 <svg
                   className="h-4 w-4"

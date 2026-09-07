@@ -29,15 +29,38 @@ export const siteConfig = {
   // numbers that ARE his own output (200+ endpoints, 61 data models, 47 pages shipped solo), so the
   // borrowed-scale number no longer has to carry the claim alone. Each tile links to the case study
   // that substantiates it — a number a recruiter can check beats a bigger one they cannot.
+  // One number for the scale worked at, three for the work done.
+  //
+  // The previous set was four of the CLIENTS' business numbers: 74 vehicles is a haulier's fleet
+  // size, 1,000+ KOL partners is a marketing programme's headcount, and neither says anything about
+  // the engineer. Scale is still worth stating — it is what separates this from a bootcamp
+  // portfolio — so one tile keeps it, phrased as work done for those users rather than ownership of
+  // them. The other three are output: endpoints, pages, tests.
+  //
+  // Labels are deliberately short and parallel (all past-tense verbs, 12-18 characters). The strip
+  // is a four-across row at lg, so a label long enough to wrap leaves one tile two lines tall beside
+  // three that are not.
   heroMetrics: [
     {
       value: "917K",
-      label: "registered users",
+      label: "users served",
       href: "/work/rola-access-platform",
     },
-    { value: "1,000+", label: "KOL partners", href: "/work/kol-dashboard" },
-    { value: "74", label: "vehicles managed", href: "/work/rr-remo-trucking" },
-    { value: "5", label: "projects shipped", href: "#projects" },
+    {
+      value: "200+",
+      label: "endpoints built",
+      href: "/work/rola-access-platform",
+    },
+    {
+      value: "47",
+      // "shipped solo" would be the stronger claim, but at 18 characters it wrapped to two lines
+      // in a 176px tile while the other three stayed on one. The card directly above already opens
+      // "Sole developer of a 47-page competition admin console", so the word is not lost — it is
+      // said once, in a sentence, instead of twice with a ragged strip as the price.
+      label: "pages shipped",
+      href: "/work/rola-access-platform",
+    },
+    { value: "523", label: "tests written", href: "/work/provenly" },
   ],
   heroTagline: "Systems over shortcuts.",
   heroTaglineTranslation: "Deliberate architecture. Reliable by default.",
@@ -99,7 +122,12 @@ export const siteConfig = {
     resume: "/john-ross-rivera-resume.pdf",
   },
   chat: {
-    name: "Nuggets 🐾",
+    // No paw emoji. The name and the portrait are the character here; an emoji stapled to the name
+    // in the panel header was the thing that made an assistant grounded on real project data read
+    // as a novelty. `role` gives the header a second line that says what the tool IS, which is what
+    // the fake pulsing "Online" dot used to occupy.
+    name: "Nuggets",
+    role: "Portfolio assistant",
     avatarPath: "/images/nuggets.webp",
     // "How I built this" — surfaced in the widget so the chat reads as an engineering demo, not a toy.
     techNote: {

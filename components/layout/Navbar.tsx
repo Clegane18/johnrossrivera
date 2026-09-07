@@ -100,7 +100,7 @@ export function Navbar() {
               onClick={() =>
                 window.dispatchEvent(new Event(REQUEST_OPEN_EVENT))
               }
-              className="hidden items-center gap-1.5 px-3.5 py-2.5 text-sm text-foreground transition-colors duration-200 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring lg:inline-flex"
+              className="hidden min-h-11 items-center gap-1.5 px-3.5 text-sm text-foreground transition-colors duration-200 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring lg:inline-flex"
               aria-label="Ask anything"
             >
               <Search className="h-4 w-4" aria-hidden="true" />
@@ -131,7 +131,7 @@ export function Navbar() {
               type="button"
               onClick={handleThemeToggle}
               data-sound-self
-              className="inline-flex items-center px-3.5 py-2.5 text-foreground transition-colors duration-200 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+              className="inline-flex min-h-11 items-center px-3.5 text-foreground transition-colors duration-200 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
               aria-label={
                 isReady && theme === "dark"
                   ? "Switch to light mode"
@@ -157,7 +157,7 @@ export function Navbar() {
                 toggleSound();
               }}
               data-sound-self
-              className="inline-flex items-center px-3.5 py-2.5 text-foreground transition-colors duration-200 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+              className="inline-flex min-h-11 items-center px-3.5 text-foreground transition-colors duration-200 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
               aria-pressed={soundReady ? soundEnabled : undefined}
               aria-label={
                 soundReady && soundEnabled
@@ -178,7 +178,7 @@ export function Navbar() {
             href={siteConfig.links.resume}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold text-foreground transition-colors duration-300 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-card px-5 text-sm font-semibold text-foreground transition-colors duration-300 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             {siteConfig.navbar.resumeCtaLabel}
           </a>
@@ -187,7 +187,7 @@ export function Navbar() {
               top bar. */}
           <Link
             href="#contact"
-            className="hidden items-center gap-1.5 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-background transition-all duration-300 hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background lg:inline-flex"
+            className="hidden min-h-11 items-center gap-1.5 rounded-full bg-foreground px-5 text-sm font-semibold text-background transition-all duration-300 hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background lg:inline-flex"
           >
             {siteConfig.navbar.contactCtaLabel}
             <svg

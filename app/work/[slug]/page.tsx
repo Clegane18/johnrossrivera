@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, ExternalLink } from "lucide-react";
 import { projects } from "@/lib/data/projects";
 import { ProjectCarousel } from "@/components/ui/ProjectCarousel";
 
@@ -59,7 +59,7 @@ export default function CaseStudyPage({
       <div className="section-container max-w-4xl">
         <Link
           href="/#projects"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           Back to Projects
@@ -71,7 +71,16 @@ export default function CaseStudyPage({
             {project.title}
           </h1>
 
-          <div className="mt-4 flex flex-wrap gap-1.5">
+          {/* The page used to run title → tech chips → six big numbers, so the first thing a reader
+              was asked to absorb was "523" with no idea yet what the project was. `summary` is the
+              one-line answer and was already in the data, used by the deck card and nowhere here. */}
+          {project.summary && (
+            <p className="mt-4 max-w-[62ch] text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {project.summary}
+            </p>
+          )}
+
+          <div className="mt-6 flex flex-wrap gap-1.5">
             {project.tech.map((t) => (
               <span
                 key={t}
@@ -91,7 +100,7 @@ export default function CaseStudyPage({
                   href={project.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   <ExternalLink className="h-4 w-4" aria-hidden="true" />
                   {project.liveAuthGated
@@ -106,7 +115,7 @@ export default function CaseStudyPage({
                       href={r.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                      className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       <GithubIcon />
                       {r.label}
@@ -117,7 +126,7 @@ export default function CaseStudyPage({
                       href={project.repoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                      className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       <GithubIcon />
                       Source
@@ -152,7 +161,7 @@ export default function CaseStudyPage({
             <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
               The Problem
             </h2>
-            <p className="mt-3 text-base leading-relaxed text-foreground">
+            <p className="mt-3 max-w-[68ch] text-base leading-relaxed text-foreground">
               {project.problem}
             </p>
           </section>
@@ -164,7 +173,7 @@ export default function CaseStudyPage({
             <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
               My Role
             </h2>
-            <p className="mt-3 text-base leading-relaxed text-foreground">
+            <p className="mt-3 max-w-[68ch] text-base leading-relaxed text-foreground">
               {project.role}
             </p>
           </section>
@@ -209,7 +218,10 @@ export default function CaseStudyPage({
             <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
               Key Decisions & Trade-offs
             </h2>
-            <ul className="mt-4 flex flex-col gap-3">
+            {/* 68ch. At 1280 these ran the full 896px container — about 95 characters a line, well
+                past the 45–75 where the eye still finds the next line reliably, on the densest
+                paragraphs of the whole site. */}
+            <ul className="mt-4 flex max-w-[68ch] flex-col gap-3">
               {project.decisions.map((d) => (
                 <li key={d} className="flex gap-3">
                   <span
@@ -259,6 +271,31 @@ export default function CaseStudyPage({
             </div>
           </section>
         )}
+
+        {/* The end of a case study was a dead end: a recruiter who read the whole thing — the most
+            engaged visitor this site gets — hit the last screenshot and had nothing to do but press
+            Back. The two things worth offering there are the next piece of work and a way to make
+            contact. */}
+        <nav
+          aria-label="Continue"
+          className="mt-16 flex flex-col gap-4 border-t border-border pt-8 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <Link
+            href="/#projects"
+            className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            All projects
+          </Link>
+
+          <Link
+            href="/#contact"
+            className="inline-flex min-h-11 w-fit items-center gap-1.5 rounded-full bg-foreground px-6 text-sm font-semibold text-background transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            Get in touch
+            <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        </nav>
       </div>
     </article>
   );
