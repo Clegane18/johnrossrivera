@@ -2,17 +2,25 @@ export const siteConfig = {
   name: "John Ross Rivera",
   title: "John Ross Rivera - Full-Stack Software Engineer",
   description:
-    "Personal portfolio of John Ross Rivera, a full-stack software engineer shipping production systems end to end — TypeScript, React and Next.js on the front, NestJS APIs and MySQL behind them.",
+    "Personal portfolio of John Ross Rivera, a full-stack software engineer shipping production systems end to end: TypeScript, React and Next.js on the front, NestJS APIs and MySQL behind them.",
   url: "https://johnrossrivera.vercel.app",
   email: "johnrossrivera20@gmail.com",
   phone: "+63 921 670 6170",
   role: "Full-Stack Software Engineer",
-  // Leads with countable ownership, not with "I ship production systems end to end" — that opener
-  // is true of nearly every candidate and spent the 30-second skim on a claim with no number behind
-  // it. This mirrors the CV's own summary line. 257 chars: the card is ~20rem wide on desktop, and
-  // ~280 is where it starts to overflow, so keep any rewrite under that.
+  // One copy, read by BOTH the navbar label and the hero role card. It used to sit under `navbar`,
+  // which framed a hiring fact as chrome and left the hero unable to use it without a second copy.
+  // The hero needs it because the navbar label is `hidden lg:flex`, and lg is 1280 here, so on
+  // every phone and tablet the navbar states no availability at all.
+  availability: "Open to full-time & freelance",
+  // Held to ~18 words. Eye-tracking puts the first-screen scan at roughly 7 seconds, which is
+  // 25-30 words for the WHOLE card, and this sentence shares that budget with the role heading,
+  // two CTAs and the availability line beneath them. The previous version spent 40 words, and
+  // most of them restating numbers that heroMetrics already renders as tiles directly alongside
+  // it, so the scan paid twice for one fact and the stack was never stated at all.
+  // What is left is the part no tile can carry: the seniority of the ownership.
+  // The card is ~20rem wide on desktop and overflows past ~280 chars, so that is still the ceiling.
   heroDescription:
-    "Sole developer of a 47-page competition admin console and primary developer of the NestJS backend behind it — 200+ endpoints, 61 data models, two payment rails. TypeScript front to back. Open to full-time full-stack or frontend roles, and to freelance work.",
+    "Sole developer of a live competition platform's admin console, and primary developer of the NestJS backend behind it.",
   heroPrimaryCta: {
     label: "View My Work",
     href: "#projects",
@@ -62,13 +70,30 @@ export const siteConfig = {
     },
     { value: "523", label: "tests written", href: "/work/provenly" },
   ],
+  // The stack row that sits above the proof strip. A recruiter filtering for "React + NestJS" could
+  // previously only confirm the stack by scrolling to the Skills section, which is the one question
+  // the fold was silent on while spending 40 words on numbers the tiles were already showing.
+  //
+  // Six, not sixteen. Every source on portfolio heroes makes the same point about long stack lists:
+  // past roughly eight, none of the entries reads as credible, because the list stops looking
+  // chosen. These six are the stack John is applying with, in the order lib/data/skills.ts already
+  // puts them.
+  //
+  // It was briefly cut to five, when the row carried a "Stack" eyebrow label and a sixth entry
+  // wrapped it to two lines. That label is gone and the row is capsules now, so the constraint went
+  // with it and Prisma is back: MySQL alone states the database but not how the app talks to it.
+  //
+  // Deliberately a SUBSET of lib/data/skills.ts rather than its own list. A hero that features a
+  // technology the Skills section omits is the same drift heroMetrics avoids by linking each tile
+  // to its case study, and config/site.test.ts fails if this stops being a subset.
+  heroStack: ["TypeScript", "React", "Next.js", "NestJS", "MySQL", "Prisma"],
   heroTagline: "Systems over shortcuts.",
   heroTaglineTranslation: "Deliberate architecture. Reliable by default.",
   about: {
     // Trimmed 591 -> ~190 chars for the minimalist pass. The two things a recruiter must still take
     // away are kept deliberately: WHAT I build (whole features, front to back) and PROOF OF SCALE
     // (900k+). Everything cut was elaboration on those two points, not additional evidence.
-    bio: "I build whole features, not halves — the schema and the API, the screens on top of them, and the test coverage over both. TypeScript, React/Next.js and NestJS are my defaults. I've shipped production systems serving 900k+ users.",
+    bio: "I build whole features, not halves: the schema and the API, the screens on top of them, and the test coverage over both. TypeScript, React/Next.js and NestJS are my defaults. I've shipped production systems serving 900k+ users.",
     // Full locality, not just "Philippines". lib/data/profile.ts reads this field rather than
     // keeping its own copy, so the page and the chat can no longer state two different locations.
     location: "Bacoor, Cavite, Philippines",
@@ -103,17 +128,13 @@ export const siteConfig = {
     contact: "/Get In Touch",
   },
   navbar: {
-    // 41 chars wrapped onto two lines in the navbar. Shortened to hold one line at every
-    // breakpoint — the "Availability" label above it now carries the context the long phrase was
-    // spending words on.
-    availabilityText: "Open to full-time & freelance",
     contactCtaLabel: "Let's Talk",
     resumeCtaLabel: "Resume",
     showCounters: false,
   },
   contact: {
     intro:
-      "I'm actively looking for full-stack or frontend roles with global teams — remote, hybrid, or relocation — and I can start after a 30-day notice period. I also take on freelance and contract work: email me and I'll scope it with you. I respond within 24 hours.",
+      "I'm actively looking for full-stack or frontend roles with global teams (remote, hybrid, or relocation), and I can start after a 30-day notice period. I also take on freelance and contract work: email me and I'll scope it with you. I respond within 24 hours.",
   },
   footer: {
     copyrightText: "All rights reserved.",
@@ -134,7 +155,7 @@ export const siteConfig = {
       heading: "How Nuggets works",
       points: [
         "Model: Llama 3.3 70B via Groq, streamed token-by-token over a ReadableStream.",
-        "Grounded on real portfolio data — the system prompt is derived from the same project/experience files the site renders, so answers can't contradict the page.",
+        "Grounded on real portfolio data: the system prompt is derived from the same project/experience files the site renders, so answers can't contradict the page.",
         "Guardrails: Zod-validated requests, a strict factual prompt, and a no-fabrication rule.",
         "Cost & abuse control: best-effort per-IP throttling (~20 req/hour, per instance) and a 400-token response cap.",
       ],

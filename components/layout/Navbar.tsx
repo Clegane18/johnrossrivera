@@ -49,7 +49,7 @@ export function Navbar() {
             Availability
           </span>
           <span className="whitespace-nowrap text-xs font-medium text-foreground">
-            {siteConfig.navbar.availabilityText}
+            {siteConfig.availability}
           </span>
         </div>
 

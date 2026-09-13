@@ -119,7 +119,7 @@ export function Hero() {
               <p className="mb-1 font-display text-lg font-bold text-foreground sm:text-xl md:text-2xl">
                 {siteConfig.role}
               </p>
-              <p className="mb-5 text-sm leading-relaxed text-muted-foreground sm:mb-6">
+              <p className="mb-4 text-sm leading-relaxed text-muted-foreground sm:mb-5">
                 {siteConfig.heroDescription}
               </p>
               <div className="flex flex-col gap-2.5">
@@ -152,6 +152,27 @@ export function Hero() {
                   {siteConfig.heroSecondaryCta.label}
                 </a>
               </div>
+
+              {/* Availability and location as a quiet metadata line, NOT a status pill. A rounded
+                  chip with a pulsing green dot is the same tell the navbar label already rejected
+                  (see the comment in components/layout/Navbar.tsx): it performs "live status"
+                  while indicating nothing, and it is the single element of a portfolio hero that
+                  reads as generated rather than written. Plain small type in the card's own muted
+                  colour states the same two facts and asks for no credit for doing so.
+
+                  It belongs here rather than only in the navbar because that label is
+                  `hidden lg:flex` at a 1280px lg, so a recruiter on a phone or an iPad currently
+                  sees no availability anywhere in the fold. Both values read from config, so the
+                  two places can no longer disagree. */}
+              <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+                {/* The availability half is lg:hidden because the navbar states it from lg up, and
+                    the two sit one screen apart: rendering both put the same six words on the fold
+                    twice, which reads as a template filling a slot. Below lg the navbar label is
+                    itself hidden, so here is the only place either fact appears. The result is
+                    exactly one copy of each at every width. */}
+                <span className="lg:hidden">{siteConfig.availability} · </span>
+                {siteConfig.about.location}
+              </p>
             </motion.div>
 
             {/* Proof strip: the numbers a recruiter scans for, each linked to the work behind it. */}
@@ -162,6 +183,53 @@ export function Hero() {
               transition={{ duration: 0.7, delay: 0.25, ease: smoothEase }}
               className="w-full"
             >
+              {/* The stack as capsules, in the same family as the GitHub/LinkedIn/Email buttons in
+                  the right column: same rounded-full, same border, same bg-card, same shadow-sm.
+                  Three earlier attempts failed for one reason each and all are worth not repeating.
+
+                  As pills INSIDE the metrics card they carried bg-card/95, and an alpha modifier on
+                  this project's colour tokens compiles to NO CSS at all (tailwind.config.ts maps
+                  them to var(--card), and globals.css defines that as a hex, which Tailwind cannot
+                  add an alpha to). So they had no background whatever and the portrait showed
+                  straight through them. bg-card, solid, is the class that actually renders.
+
+                  As a bare text band they read as raw text rather than content. Capsules give the
+                  eye a shape to count, which is what a stack list is for.
+
+                  No icons: skillIconMap in Skills.tsx maps React and Next.js both to Layers, and
+                  MySQL and Prisma both to Database, so a row of these would show the same glyph
+                  twice in a row. Text-only keeps them honest.
+
+                  ABOVE the proof strip rather than below it, but NOT because below overflows: at
+                  lg this whole column is absolutely positioned at bottom-8, so its bottom edge is
+                  pinned and the order of the two children cannot change where the block ends. At
+                  1440x900 both arrangements sit entirely inside the fold and the choice is free.
+
+                  It only matters on a short viewport. At 1280x800 the pinned bottom lands at 821px
+                  against an 800px fold, so 21px is clipped from whichever child is LAST, and the
+                  two are not equally cheap to clip. Losing 21px off the metrics card takes its
+                  bottom padding and leaves every number and label legible; losing 21px off a 37px
+                  capsule row cuts the capsules in half. So the strip that survives clipping goes
+                  last, and the stack goes on top.
+
+                  Not in the right-hand column either, which was the other candidate and has the
+                  room for it (that column is 178px tall in a stage that allows 443px). Stacked
+                  under GitHub/LinkedIn/Email it produced nine identical capsules in one rail, three
+                  of them links and six of them inert labels, with nothing to tell them apart. A
+                  visitor trying to click "TypeScript" is a worse outcome than an unused 190px. */}
+              <ul
+                aria-label="Primary stack"
+                className="mb-3 flex flex-wrap gap-2"
+              >
+                {siteConfig.heroStack.map((tech) => (
+                  <li
+                    key={tech}
+                    className="inline-flex items-center rounded-full border border-border bg-card px-4 py-2 font-mono text-[11px] font-medium text-foreground shadow-sm"
+                  >
+                    {tech}
+                  </li>
+                ))}
+              </ul>
               <HeroMetrics />
             </motion.div>
 
