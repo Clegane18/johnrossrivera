@@ -108,10 +108,10 @@ export default function RootLayout({
         <Script id="theme-init" strategy="beforeInteractive">
           {`(() => {
             try {
-              const stored = localStorage.getItem('portfolio-theme');
-              const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-              const shouldUseDark = stored ? stored === 'dark' : prefersDark;
-              if (shouldUseDark) {
+              // Light is the default. Dark is opt-in and only ever comes from a stored choice:
+              // the OS preference deliberately does NOT decide this, so a first-time visitor on a
+              // dark-set machine still lands on light.
+              if (localStorage.getItem('portfolio-theme') === 'dark') {
                 document.documentElement.classList.add('dark');
               }
             } catch {}

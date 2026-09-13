@@ -22,16 +22,6 @@ const REVEAL_MS = 420;
 // ramps UP from zero, which at this size reads as the animation hesitating before it commits.
 const REVEAL_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
 
-function getSystemTheme(): Theme {
-  if (typeof window === "undefined") {
-    return "light";
-  }
-
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-}
-
 export function useTheme() {
   const [theme, setTheme] = useState<Theme>("light");
   const [isReady, setIsReady] = useState(false);
@@ -39,10 +29,10 @@ export function useTheme() {
   useEffect(() => {
     const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
 
+    // Anything other than a stored "dark" falls back to the light default, matching the
+    // beforeInteractive script in app/layout.tsx. These two must agree or the first paint flashes.
     if (storedTheme === "light" || storedTheme === "dark") {
       setTheme(storedTheme);
-    } else {
-      setTheme(getSystemTheme());
     }
 
     setIsReady(true);
