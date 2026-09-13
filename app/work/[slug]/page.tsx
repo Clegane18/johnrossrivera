@@ -39,7 +39,7 @@ export function generateMetadata({
   if (!project) return { title: "Case study not found" };
 
   return {
-    title: `${project.title} — Case Study`,
+    title: `${project.title} - Case Study`,
     description: project.problem ?? project.description,
     alternates: { canonical: `/work/${project.id}` },
   };

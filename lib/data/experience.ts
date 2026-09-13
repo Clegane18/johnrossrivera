@@ -15,9 +15,9 @@ export const experiences: Experience[] = [
     startDate: "May 2026",
     endDate: "Jun 2026",
     description: [
-      "Built a production-grade company portfolio and AI logistics platform for a Philippine trucking company operating 74 vehicles, with enterprise clients including Zuellig, Lazada, Jollibee, and Shopee Philippines — the portfolio site I built was part of the pitch that helped RR Remo win Zuellig, a major Philippine distributor, as a client.",
+      "Built a production-grade company portfolio and AI logistics platform for a Philippine trucking company operating 74 vehicles, with enterprise clients including Zuellig, Lazada, Jollibee, and Shopee Philippines. The portfolio site I built was part of the pitch that helped RR Remo win Zuellig, a major Philippine distributor, as a client.",
       "Integrated 'Traki', a streaming AI customer assistant backed by Groq (LLaMA 3.1 8B), delivering token-by-token streaming via ReadableStream with multi-turn conversation history and a strict factual system prompt to prevent hallucination.",
-      "Implemented a full SEO stack — schema.org LocalBusiness JSON-LD, Open Graph, Twitter Card, dynamic sitemap.ts, and robots.ts — alongside a validated contact API route wired to Resend for transactional email.",
+      "Implemented a full SEO stack (schema.org LocalBusiness JSON-LD, Open Graph, Twitter Card, dynamic sitemap.ts, and robots.ts) alongside a validated contact API route wired to Resend for transactional email.",
       "Enforced Server Components by default across the App Router, applying 'use client' only to three interactive components to minimise client-side JavaScript bundle.",
     ],
     tech: [
@@ -68,20 +68,20 @@ export const experiences: Experience[] = [
     workMode: "Remote",
     company: "Crystal Vision",
     highlights: [
-      "Sole developer of the competition admin console — 34 modules, 47 pages — over a NestJS backend of 37 modules, 200+ REST endpoints and 61 data models.",
+      "Sole developer of the competition admin console (34 modules, 47 pages) over a NestJS backend of 37 modules, 200+ REST endpoints and 61 data models.",
       "Sole builder of the Laravel 12 KOL payout portal, and author of the team's agentic Claude Code harness (8 subagents).",
     ],
     role: "Full-Stack Software Engineer",
     startDate: "Aug 2025",
     endDate: "Present",
     description: [
-      "Let operations staff run the entire competition lifecycle — judging, moderation, payments, analytics — without engineering involvement, as sole developer of the admin console (34 modules, 47 pages; Next.js 16, React 19, TypeScript, RTK Query).",
-      "Primary developer of the NestJS 11 backend powering both the admin console and the mobile app — 37 modules, 200+ REST endpoints, 61 data models — on Node.js and MySQL (Sequelize) with JWT and Passport security, DTO validation, throttling, and indexed cursor pagination.",
+      "Let operations staff run the entire competition lifecycle (judging, moderation, payments, analytics) without engineering involvement, as sole developer of the admin console (34 modules, 47 pages; Next.js 16, React 19, TypeScript, RTK Query).",
+      "Primary developer of the NestJS 11 backend powering both the admin console and the mobile app (37 modules, 200+ REST endpoints, 61 data models) on Node.js and MySQL (Sequelize), with JWT and Passport security, DTO validation, throttling, and indexed cursor pagination.",
       "Enabled the platform to accept both crypto and fiat entry payments without double-charging users, integrating 2 payment rails: on-chain USDC on Polygon and Xendit.",
       "Protected contest-result integrity against vote manipulation and race conditions under load with a concurrency-safe voting engine using per-user and per-IP rate limiting.",
       "Gave the business self-serve visibility into users, revenue, and engagement through 9+ analytics dashboards with CSV export.",
       "Gave the company one system to run its entire KOL/affiliate program: a Laravel 12 portal built solo with a schema designed from scratch (16 models, 23 migrations), a payout state machine with role-based approval across 4 access levels, and a reusable masking layer covering 25 unit tests that keeps emails, names, and wallet addresses out of the UI, logs, and exports.",
-      "Built an agentic Claude Code development harness — 8 subagents for code review, test generation, and debugging, plus secret-scanning and pre-commit guardrails that block secret leaks and unsafe DB writes before they reach production.",
+      "Built an agentic Claude Code development harness: 8 subagents for code review, test generation, and debugging, plus secret-scanning and pre-commit guardrails that block secret leaks and unsafe DB writes before they reach production.",
     ],
     tech: [
       "NestJS 11",

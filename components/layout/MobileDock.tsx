@@ -75,7 +75,7 @@ export function MobileDock() {
                 // visible text already IS their accessible name.
                 aria-label={
                   item.shortLabel
-                    ? `${item.shortLabel} — ${item.label}`
+                    ? `${item.shortLabel}: ${item.label}`
                     : undefined
                 }
                 className={cn(

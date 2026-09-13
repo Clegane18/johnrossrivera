@@ -12,7 +12,7 @@ import type { ChatFallback, ChatMessage } from "@/types";
 const WELCOME_MESSAGE: ChatMessage = {
   role: "assistant",
   content:
-    "I'm Nuggets, the assistant for John Ross Rivera's portfolio. Ask about his experience, his projects, or how something was built — I answer from the same project data this site is built on.",
+    "I'm Nuggets, the assistant for John Ross Rivera's portfolio. Ask about his experience, his projects, or how something was built. I answer from the same project data this site is built on.",
 };
 
 export function useChat() {

@@ -502,9 +502,15 @@ export function ChatWidget() {
                 animate={{ opacity: 1, x: 0, scale: 1 }}
                 exit={{ opacity: 0, x: 12, scale: 0.88 }}
                 transition={{ type: "spring", stiffness: 380, damping: 22 }}
-                className="absolute bottom-2 right-16 w-52 rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-xs font-medium leading-snug text-zinc-700 shadow-[0_8px_24px_rgba(0,0,0,0.18)] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
+                /* right-full, NOT a fixed right-16. The launcher is two different widths: a bare
+                   56px circle over the hero, and a ~176px labelled pill everywhere else (see the
+                   sm:pr-5 and the "Ask Nuggets" label below). right-16 is 64px, which cleared the
+                   circle by 8px and landed 112px INSIDE the pill, so the hint painted across the
+                   label. right-full pins the bubble's right edge to the launcher's left edge
+                   whatever that width happens to be, and mr-3 is the gap the arrow sits in. */
+                className="absolute bottom-2 right-full mr-3 w-52 rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-xs font-medium leading-snug text-zinc-700 shadow-[0_8px_24px_rgba(0,0,0,0.18)] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
               >
-                Ask Nuggets about John&rsquo;s work &mdash; it answers from this
+                Ask Nuggets about John&rsquo;s work. It answers from this
                 site&rsquo;s project data.
                 <span className="absolute right-[-6px] top-1/2 -translate-y-1/2 border-4 border-transparent border-l-white dark:border-l-zinc-900" />
               </motion.div>

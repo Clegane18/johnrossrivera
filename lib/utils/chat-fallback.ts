@@ -36,7 +36,7 @@ export function chatFallback(
     return {
       message:
         serverMessage ??
-        "Nuggets has hit its message limit for now. It resets shortly — or reach John directly below.",
+        "Nuggets has hit its message limit for now. It resets shortly, or reach John directly below.",
       canRetry: true,
       showContact: true,
     };
@@ -63,7 +63,7 @@ export function chatFallback(
   // shown a validation error from the API.
   return {
     message:
-      "That message didn't quite come through — it may be too long. Mind trying a shorter one?",
+      "That message didn't quite come through. It may be too long. Mind trying a shorter one?",
     canRetry: true,
     showContact: false,
   };

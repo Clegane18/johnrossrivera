@@ -68,7 +68,7 @@ export function ImageLightbox({
       onClick={onClose}
       role="dialog"
       aria-modal="true"
-      aria-label={`${title} — full view`}
+      aria-label={`${title}, full view`}
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/75 via-black/35 to-transparent" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
@@ -112,7 +112,7 @@ export function ImageLightbox({
           >
             <Image
               src={images[index]}
-              alt={`${title} — screenshot ${index + 1}`}
+              alt={`${title}, screenshot ${index + 1}`}
               fill
               sizes="100vw"
               className="object-contain"

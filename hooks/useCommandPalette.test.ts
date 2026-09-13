@@ -13,7 +13,7 @@ describe("getShortcutModifier", () => {
     }
   });
 
-  it("shows Ctrl everywhere else — a Windows visitor has no ⌘ key", () => {
+  it("shows Ctrl everywhere else: a Windows visitor has no ⌘ key", () => {
     for (const platform of ["Win32", "Linux x86_64", ""]) {
       expect(getShortcutModifier(platform)).toBe("Ctrl");
     }

@@ -20,7 +20,7 @@ export default function Error({
             Unexpected Error
           </h1>
           <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base">
-            A hiccup on this page — it&apos;s not you. Try again, or head back
+            A hiccup on this page. It&apos;s not you. Try again, or head back
             to the homepage.
           </p>
 

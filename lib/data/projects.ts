@@ -25,16 +25,16 @@ export const projects: Project[] = [
     summary:
       "Sole developer of a 47-page admin console over a 200+ endpoint NestJS backend, on a platform with 917,026 registered users.",
     description:
-      "The admin console and backend for a live song competition with 917,026 registered users. Sole developer of the console (34 modules, 47 pages) and primary developer of the NestJS backend behind both it and the mobile app — 37 modules, 200+ REST endpoints, 61 data models — including the payment stack and a concurrency-safe voting engine.",
+      "The admin console and backend for a live song competition with 917,026 registered users. Sole developer of the console (34 modules, 47 pages) and primary developer of the NestJS backend behind both it and the mobile app: 37 modules, 200+ REST endpoints, 61 data models, including the payment stack and a concurrency-safe voting engine.",
     problem:
       "A legacy admin portal couldn't safely run a live competition at ~900k-user scale: operations staff needed to drive judging, moderation, payments and analytics without engineering involvement, judge and admin responsibilities shared one surface, contest results were exposed to vote manipulation and race conditions, and large lists degraded under load.",
     role: "Sole developer of the admin console (34 modules, 47 pages; Next.js/React) and primary developer of the NestJS backend serving both the console and the mobile app (37 modules, 200+ REST endpoints, 61 data models).",
     decisions: [
-      "Two payment rails — on-chain USDC on Polygon and Xendit for fiat — reconciled so a user is never double-charged for a single entry.",
+      "Two payment rails, on-chain USDC on Polygon and Xendit for fiat, reconciled so a user is never double-charged for a single entry.",
       "A concurrency-safe voting engine with per-user and per-IP rate limiting, so contest results hold against manipulation and race conditions under load.",
-      "Guard-based RBAC isolating judge scoring from admin management — least privilege enforced per view.",
+      "Guard-based RBAC isolating judge scoring from admin management, with least privilege enforced per view.",
       "Cursor-based pagination so large datasets page without offset-scan degradation.",
-      "Field-scoped API responses — each view receives only the fields it needs, minimising payload.",
+      "Field-scoped API responses: each view receives only the fields it needs, minimising payload.",
       "9+ self-serve analytics dashboards with CSV export, so the business reads its own users, revenue and engagement without an engineer in the loop.",
     ],
     // Four tiles, and the user count is deliberately no longer alone: "registered users" is the
@@ -70,15 +70,15 @@ export const projects: Project[] = [
     id: "kol-dashboard",
     title: "KOL Dashboard",
     summary:
-      "Sole builder of a Laravel affiliate/payout portal — commission approvals that stay consistent under concurrent transactions.",
+      "Sole builder of a Laravel affiliate/payout portal with commission approvals that stay consistent under concurrent transactions.",
     description:
       "The company's entire KOL/affiliate program in one system, serving 1,000+ partners and tracking 5,000 referral-driven signups. Built solo on Laravel 12 with a schema designed from scratch (16 models, 23 migrations): a payout state machine with role-based approval across 4 access levels, OTP-hardened auth, and a reusable masking layer that keeps emails, names and wallet addresses out of the UI, logs and exports.",
     problem:
-      "Finance was reconciling affiliate commissions and payouts by hand, KOL partners had no transparent view of their earnings, and sensitive partner data — emails, names, wallet addresses — leaked into dashboards, logs and CSV exports.",
-    role: "Sole builder — designed the schema from scratch and owned the Laravel service layer, the payout state machine, auth hardening, the PII masking layer, and the operations dashboard UI.",
+      "Finance was reconciling affiliate commissions and payouts by hand, KOL partners had no transparent view of their earnings, and sensitive partner data (emails, names, wallet addresses) leaked into dashboards, logs and CSV exports.",
+    role: "Sole builder. Designed the schema from scratch and owned the Laravel service layer, the payout state machine, auth hardening, the PII masking layer, and the operations dashboard UI.",
     decisions: [
       "A payout state machine with explicit, auditable transitions and role-based approval across 4 access levels, so commission approvals stop being a manual reconciliation.",
-      "A reusable masking layer covering the UI, logs and exports, locked down by 25 unit tests — PII protection that a new export cannot silently bypass.",
+      "A reusable masking layer covering the UI, logs and exports, locked down by 25 unit tests. PII protection that a new export cannot silently bypass.",
       "Service-layer architecture isolating referral, earnings, and notification workflows to prevent data-consistency issues under concurrency.",
       "OTP-hardened auth: brute-force protection, rate-limited resend, and expiry enforcement.",
     ],
@@ -107,12 +107,12 @@ export const projects: Project[] = [
     id: "smart-lift-ai",
     title: "Smart-lift AI",
     summary:
-      "Rule-driven training engines — plateau detection, macro adjustment, workout generation.",
+      "Rule-driven training engines: plateau detection, macro adjustment, workout generation.",
     description:
-      "A personal production training system (10 active users) whose NestJS backend runs rule-driven engines for plateau detection, macro auto-adjustment, and equipment-aware workout generation — all scoped per user.",
+      "A personal production training system (10 active users) whose NestJS backend runs rule-driven engines for plateau detection, macro auto-adjustment, and equipment-aware workout generation, all scoped per user.",
     problem:
-      "General fitness apps don't adapt to the individual — plateaus go undetected and macros drift as training changes.",
-    role: "Full-stack — designed the NestJS rule engines and the Next.js client end to end.",
+      "General fitness apps don't adapt to the individual, so plateaus go undetected and macros drift as training changes.",
+    role: "Full-stack. Designed the NestJS rule engines and the Next.js client end to end.",
     decisions: [
       "Rule-driven engines for plateau detection, macro auto-adjustment, and equipment-aware workout generation, scoped per user.",
       "Aggregated analytics across strength, body weight, and caloric intake over the full training cycle.",
@@ -162,22 +162,22 @@ export const projects: Project[] = [
     id: "provenly",
     title: "provenly",
     summary:
-      "Open-source gate layer for Claude Code — blocks a turn that claims the tests passed when the ledger says nothing ran.",
+      "Open-source gate layer for Claude Code. Blocks a turn that claims the tests passed when the ledger says nothing ran.",
     description:
-      "An MIT-licensed harness that installs into any repository and makes an AI agent's claims checkable. A per-turn ledger records which source files were edited and which verification commands actually ran, with each one's exit code; a Stop gate refuses a turn that edited source and verified nothing, or that asserts a green gate the ledger cannot support. Above the gates sit a plan pipeline and supervised task loop, advisory locks for two sessions sharing one checkout, and three reporters that price what the harness costs and grade the subagents whose only output is a report. 31 hook scripts, 5 role-separated agents, 8 skills and a 602-line installer — zero npm dependencies, 523 tests on Node's built-in runner, on macOS, Linux and Windows.",
+      "An MIT-licensed harness that installs into any repository and makes an AI agent's claims checkable. A per-turn ledger records which source files were edited and which verification commands actually ran, with each one's exit code; a Stop gate refuses a turn that edited source and verified nothing, or that asserts a green gate the ledger cannot support. Above the gates sit a plan pipeline and supervised task loop, advisory locks for two sessions sharing one checkout, and three reporters that price what the harness costs and grade the subagents whose only output is a report. 31 hook scripts, 5 role-separated agents, 8 skills and a 602-line installer, with zero npm dependencies, 523 tests on Node's built-in runner, on macOS, Linux and Windows.",
     problem:
-      "An agent that writes code will eventually tell you it verified the code, sometimes having run nothing — not maliciously, but because 'the change looks right' and 'the change is checked' feel identical from the inside. A false green is worse than a reported red: a red gate gets fixed, a false green gets shipped. Instructions cannot close it, because a CLAUDE.md rule saying 'always run the tests' holds most of the time, which is the worst possible reliability — high enough to trust, low enough to burn you.",
-    role: "Sole author — the evidence ledger and Stop gates, the five PreToolUse guards, the agent role separation, the plan pipeline and supervised task loop, the agent locks, the cost and agent-grading reporters, the installer, the docs, and the 523-test suite.",
+      "An agent that writes code will eventually tell you it verified the code, sometimes having run nothing, not maliciously, but because 'the change looks right' and 'the change is checked' feel identical from the inside. A false green is worse than a reported red: a red gate gets fixed, a false green gets shipped. Instructions cannot close it, because a CLAUDE.md rule saying 'always run the tests' holds most of the time, which is the worst possible reliability: high enough to trust, low enough to burn you.",
+    role: "Sole author: the evidence ledger and Stop gates, the five PreToolUse guards, the agent role separation, the plan pipeline and supervised task loop, the agent locks, the cost and agent-grading reporters, the installer, the docs, and the 523-test suite.",
     decisions: [
       "The fix lives outside the model. Hooks record what actually ran and a Stop gate compares the turn's claims against that record, so 'verified' stops being something the agent can assert about itself.",
-      "Claims are classified by use versus mention. A naive matcher for 'all tests pass' fired 29 times in one session on pasted command output and on the tables documenting the matcher itself — the 29th on the table listing the first 28. Commands are classified by the binary invoked per command segment, so grepping for a verify command in the docs never counts as having run it.",
+      "Claims are classified by use versus mention. A naive matcher for 'all tests pass' fired 29 times in one session on pasted command output and on the tables documenting the matcher itself, and the 29th on the table listing the first 28. Commands are classified by the binary invoked per command segment, so grepping for a verify command in the docs never counts as having run it.",
       "The repair loop escalates on stuck failures, not on retries. Each iteration fingerprints the failure set with line and column numbers stripped; a changed fingerprint resets the counter, an unchanged one escalates and names what was already tried. Counting retries punishes a loop that is converging and rewards one that thrashes.",
-      "The writer owns the format: the ledger writer exports its own reader, so a consumer cannot drift onto a field the writer never emits. Agreement is structural rather than merely tested — the worst bug here is a gate that silently stops working while its unit tests keep passing.",
+      "The writer owns the format: the ledger writer exports its own reader, so a consumer cannot drift onto a field the writer never emits. Agreement is structural rather than merely tested: the worst bug here is a gate that silently stops working while its unit tests keep passing.",
       "'Registered' and 'firing' are different states. A heartbeat records which hooks actually fired and the selftest fails on anything registered but never seen, because a guard that never runs looks exactly like a guard with nothing to do.",
-      "Model-authored strings get no shell. The plan verifier runs the command attached to each plan step, and a plan is a document a model wrote — so it executes an argument vector instead of a shell string, and ';', '&&' and '|' become inert literal arguments by construction. An earlier fix stripped metacharacters by regex and immediately refused legitimate checks. Nothing has to recognise an attack, so nothing can fail to; the commands you committed to the config still get a shell, because the boundary is provenance, not uniformity.",
-      "A check that cannot fail is not a gate. A step verified by grepping for the token that same step writes passes the instant the text is typed — on one real plan, 11 of 16 checks were that shape. So every check is graded real, self, exists or none, and a linter scores every plan and diffs two scorings, because a number you can re-take and difference is an instrument where a number written down once is only a measurement.",
+      "Model-authored strings get no shell. The plan verifier runs the command attached to each plan step, and a plan is a document a model wrote, so it executes an argument vector instead of a shell string, and ';', '&&' and '|' become inert literal arguments by construction. An earlier fix stripped metacharacters by regex and immediately refused legitimate checks. Nothing has to recognise an attack, so nothing can fail to; the commands you committed to the config still get a shell, because the boundary is provenance, not uniformity.",
+      "A check that cannot fail is not a gate. A step verified by grepping for the token that same step writes passes the instant the text is typed. On one real plan, 11 of 16 checks were that shape. So every check is graded real, self, exists or none, and a linter scores every plan and diffs two scorings, because a number you can re-take and difference is an instrument where a number written down once is only a measurement.",
       "The graders get graded. A tester reporting PASS and an auditor reporting a score out of 100 are self-assessments no mechanism had ever checked, so the claim checker was pointed at the subagents' own transcripts. Across 71 real runs it found five audit reports whose rubric rows did not sum to the confidence score in their own header. It stays advisory: it reports on history, and history cannot be fixed by failing a build.",
-      "Failure direction is chosen per actor and written down. A write guard fails closed for an agent under a rule, because a guard that fails open produces confidence it has not earned; for everyone else it fails open, because the alternative blocks every write in the session over a bug in one file. Every gate also stands aside after a bounded number of blocks — a gate that can trap a session gets switched off, and a switched-off gate protects nothing.",
+      "Failure direction is chosen per actor and written down. A write guard fails closed for an agent under a rule, because a guard that fails open produces confidence it has not earned; for everyone else it fails open, because the alternative blocks every write in the session over a bug in one file. Every gate also stands aside after a bounded number of blocks. A gate that can trap a session gets switched off, and a switched-off gate protects nothing.",
     ],
     impact: [
       { metric: "523", label: "tests, on Node's built-in runner" },
@@ -278,13 +278,13 @@ export const projects: Project[] = [
     summary:
       "Logistics platform with a streaming AI assistant built against hallucination.",
     description:
-      "A production Next.js portfolio and AI logistics platform for a Philippine trucking company (74 vehicles) whose enterprise clients include Zuellig, Lazada, Jollibee, and Shopee — featuring 'Traki', a streaming Groq-backed assistant with a strict anti-hallucination prompt.",
+      "A production Next.js portfolio and AI logistics platform for a Philippine trucking company (74 vehicles) whose enterprise clients include Zuellig, Lazada, Jollibee, and Shopee, featuring 'Traki', a streaming Groq-backed assistant with a strict anti-hallucination prompt.",
     problem:
-      "A growing trucking company needed a credible web presence and an AI assistant that answers customer questions accurately — without hallucinating logistics details.",
-    role: "Full-stack (freelance) — owned the Next.js App Router build, the streaming AI assistant, and the SEO + contact stack.",
+      "A growing trucking company needed a credible web presence and an AI assistant that answers customer questions accurately, without hallucinating logistics details.",
+    role: "Full-stack (freelance). Owned the Next.js App Router build, the streaming AI assistant, and the SEO + contact stack.",
     decisions: [
       "'Traki' streaming assistant on Groq (LLaMA 3.1 8B) via ReadableStream, with a strict factual system prompt to prevent hallucination.",
-      "Server Components by default — 'use client' on only three interactive components to minimise client JS.",
+      "Server Components by default, with 'use client' on only three interactive components to minimise client JS.",
       "Full SEO stack: schema.org LocalBusiness JSON-LD, Open Graph, Twitter Card, dynamic sitemap.ts and robots.ts.",
     ],
     // "enterprise client won" claimed the win itself on a two-month freelance build, and John's own
@@ -297,7 +297,7 @@ export const projects: Project[] = [
     clients: [
       {
         name: "Zuellig",
-        note: "Major PH distributor — the site John built was part of the winning pitch.",
+        note: "Major PH distributor. The site John built was part of the winning pitch.",
       },
       { name: "Lazada" },
       { name: "Jollibee" },

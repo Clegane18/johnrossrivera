@@ -123,7 +123,7 @@ function CarouselInner({ images, mobileImages, title }: ProjectCarouselProps) {
         >
           <Image
             src={activeImages[safeIndex]}
-            alt={`${title} — ${viewMode} screenshot ${safeIndex + 1}`}
+            alt={`${title}, ${viewMode} screenshot ${safeIndex + 1}`}
             fill
             sizes="(max-width: 639px) calc(100vw - 32px), (max-width: 767px) calc(100vw - 48px), calc(50vw - 40px)"
             className="object-contain"

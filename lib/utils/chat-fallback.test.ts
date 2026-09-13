@@ -20,7 +20,7 @@ describe("chatFallback", () => {
     }
   });
 
-  it("does NOT push email for a rejected message (400) — the chat still works", () => {
+  it("does NOT push email for a rejected message (400), the chat still works", () => {
     const f = chatFallback(400);
 
     expect(f.showContact).toBe(false);

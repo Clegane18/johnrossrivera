@@ -54,7 +54,7 @@ export function ExperienceEntry({ experience, now }: Props) {
         {experience.role}
       </p>
       <p className="mt-0.5 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-        {experience.startDate} &mdash; {experience.endDate}
+        {experience.startDate} &ndash; {experience.endDate}
       </p>
 
       <ul className="mt-3 flex flex-col gap-1.5">

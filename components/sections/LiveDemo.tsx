@@ -94,7 +94,7 @@ export function LiveDemo() {
           </h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
             Not a screenshot. These buttons hit a real Next.js API route running
-            server-side — a health check and a Zod-validated endpoint. Try to
+            server-side: a health check and a Zod-validated endpoint. Try to
             break the validation.
           </p>
         </Reveal>
