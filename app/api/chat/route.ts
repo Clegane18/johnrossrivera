@@ -73,7 +73,12 @@ export async function POST(request: Request): Promise<Response> {
 
   try {
     const stream = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      // llama-3.3-70b-versatile was withdrawn from this Groq account (404 model_not_found → every
+      // chat 500'd). gpt-oss-120b is a reasoning model: its reasoning tokens count against
+      // max_tokens, so effort is kept low to leave the 400-token budget for the actual answer.
+      // Reasoning arrives in a separate delta field, never in `content`, so it is not streamed out.
+      model: "openai/gpt-oss-120b",
+      reasoning_effort: "low",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         ...result.data.messages,
