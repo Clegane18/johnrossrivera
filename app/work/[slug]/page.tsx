@@ -71,6 +71,12 @@ export default function CaseStudyPage({
             {project.title}
           </h1>
 
+          {project.label && (
+            <span className="mt-3 inline-block rounded-full border border-border px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+              {project.label}
+            </span>
+          )}
+
           {/* The page used to run title → tech chips → six big numbers, so the first thing a reader
               was asked to absorb was "523" with no idea yet what the project was. `summary` is the
               one-line answer and was already in the data, used by the deck card and nowhere here. */}
@@ -216,7 +222,7 @@ export default function CaseStudyPage({
         {project.decisions && project.decisions.length > 0 && (
           <section className="mt-10">
             <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              Key Decisions & Trade-offs
+              {project.decisionsHeading ?? "Key Decisions & Trade-offs"}
             </h2>
             {/* 68ch. At 1280 these ran the full 896px container — about 95 characters a line, well
                 past the 45–75 where the eye still finds the next line reliably, on the densest

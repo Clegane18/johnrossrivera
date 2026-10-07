@@ -126,7 +126,7 @@ Tech: ${e.tech.join(", ")}`;
 function renderProjectFacts(): string {
   const blocks = projects.map((proj) => {
     const lines: string[] = [
-      `### ${proj.title}${proj.featured ? " (Featured)" : ""}`,
+      `### ${proj.title}${proj.featured ? " (Featured)" : ""}${proj.label ? ` (${proj.label})` : ""}`,
       proj.description,
     ];
 

@@ -277,6 +277,11 @@ export function ProjectDeck({ projects }: Props) {
                     )}
                   >
                     {project.title}
+                    {project.label && (
+                      <span className="ml-2 inline-block rounded-full border border-border px-2 py-0.5 align-middle font-mono text-[10px] font-normal uppercase tracking-wider text-muted-foreground">
+                        {project.label}
+                      </span>
+                    )}
                   </h3>
 
                   {/* Everything below the title belongs to the SELECTED card only — this is the

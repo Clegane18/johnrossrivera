@@ -16,12 +16,19 @@ export interface ProjectImpact {
 export interface Project extends ProjectCardCopy, PageHideable {
   id: string;
   title: string;
+  // A short status pill beside the title, e.g. "Prototype". Says plainly that a build is not a
+  // client's production system, on the card, the case study and in the chat.
+  label?: string;
   description: string;
   tech: string[];
   // Case-study fields (optional — only featured projects fill these; description is the fallback).
   problem?: string;
   role?: string;
   decisions?: string[];
+  // The case study titles `decisions` "Key Decisions & Trade-offs", which is the right frame for a
+  // recruiter. Entries written for a small business owner list what the build does for them instead,
+  // and need a heading that says so.
+  decisionsHeading?: string;
   impact?: ProjectImpact[];
   clients?: ProjectClient[];
   architectureSvg?: string;

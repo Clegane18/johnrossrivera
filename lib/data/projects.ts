@@ -16,6 +16,55 @@ function seqPrefixed(id: string, prefix: string, count: number): string[] {
 }
 
 export const projects: Project[] = [
+  // Coffeegusto and Pedia Dental are written to read for a small business owner and a recruiter
+  // alike: plain words, no metrics nobody can check, and bullets about what the build does.
+  // First in the array on purpose, so Coffeegusto is the card the deck opens on.
+  {
+    id: "coffeegusto",
+    title: "Coffeegusto",
+    label: "Prototype",
+    summary:
+      "Customers order and pay from their phone, so orders stop piling up in chat.",
+    description:
+      "A brand site and ordering app for a coffee shop, built as a prototype for a proposal. Customers browse the menu, choose a pickup branch, pay with GCash, and earn a stamp toward a free drink. The same setup fits any shop that takes orders.",
+    problem:
+      "Taking orders over chat eats the whole day. Every customer asks what is available, how much it costs, and when it will be ready. The owner answers each one by hand.",
+    role: "Built the whole prototype: menu, item options, branch picker, checkout with GCash, and a digital stamp card.",
+    decisionsHeading: "What it does",
+    decisions: [
+      "Customers see every item with a photo and a price, and choose sugar, ice and add-ons on their own.",
+      "They pick a branch and a pickup time, then pay with GCash or at the counter. The order comes in complete.",
+      "A digital stamp card brings them back. Ten orders earn a free drink.",
+    ],
+    tech: ["Next.js", "Vercel"],
+    liveUrl: "https://coffee-gusto-eight.vercel.app/",
+    images: seqPrefixed("coffeegusto", "d-", 6),
+    mobileImages: seqPrefixed("coffeegusto", "m-", 6),
+    featured: true,
+  },
+  {
+    id: "pedia-dental",
+    title: "Pedia Dental",
+    label: "Prototype",
+    summary:
+      "Parents book and confirm visits online, so the clinic spends less time on calls and messages.",
+    description:
+      "A booking and patient system for a small children's dental clinic, built as a prototype with sample data. Parents send booking requests and confirm visits from their phone. The front desk sees requests, the day's schedule and who is waiting, all in one place.",
+    problem:
+      "A small clinic runs on calls and chat messages. Booking, reminding and confirming each visit takes a lot of back and forth, and it is easy to lose track of who is coming in.",
+    role: "Built the prototype end to end: a parent portal, front desk scheduling by chair, and a clinic dashboard, each with its own login.",
+    decisionsHeading: "What it does",
+    decisions: [
+      "Parents request a visit and confirm appointments online.",
+      "The front desk sees new requests, today's schedule and who is waiting, on one screen.",
+      "Each role sees only what it needs: parents, front desk, dentists and admin.",
+    ],
+    tech: ["Next.js", "Vercel"],
+    liveUrl: "https://primoral.vercel.app/login",
+    images: seqPrefixed("pedia-dental", "d-", 4),
+    mobileImages: seqPrefixed("pedia-dental", "m-", 4),
+    featured: true,
+  },
   {
     // The slug stays `rola-access-platform` even though the title is now the resume's name for the
     // system. The id is the /work/[slug] URL and the hero metric's href; renaming it would 404 every
