@@ -267,12 +267,20 @@ describe("compensation source data", () => {
   });
 
   // Groq's free tier refuses (HTTP 413) any request over 8,000 tokens per minute, and a request is
-  // this prompt + up to 6 history messages + the 400-token reply budget. At ~4.3 characters per
-  // token, 26,500 characters is ~6,100 tokens, which leaves room for that history. Measured
-  // 2026-11-03: 26,143. If this fails, trim what goes INTO the prompt (see brief() in
-  // system-prompt.ts) rather than raising the number, or the live chat starts failing again.
-  it("stays inside the token budget a free-tier Groq request allows", () => {
-    expect(buildSystemPrompt().length).toBeLessThan(26_500);
+  // the system prompt + up to 6 history messages + the 400-token reply budget. The route sends the
+  // FOCUSED prompt (buildSystemPrompt(focusText)), never the full one, so that is what is budgeted:
+  // at ~4.3 characters per token, 20,000 characters is ~4,700 tokens, leaving ~2,900 for history
+  // and the reply. Measured 2026-11-03 with tours and drafts added: 16,662 to 19,212 (two projects
+  // in focus is the largest). If this fails, trim what goes INTO the prompt, not the number.
+  it("keeps every focused prompt inside the token budget a free-tier Groq request allows", () => {
+    for (const q of [
+      "What's his strongest project?",
+      "Tell me about provenly and the KOL dashboard",
+      "Walk me through his experience",
+      "Send an email to John about a NestJS role",
+    ]) {
+      expect(buildSystemPrompt(q).length).toBeLessThan(20_000);
+    }
   });
 
   it("shortens a long decision to its opening sentence for the prompt", () => {

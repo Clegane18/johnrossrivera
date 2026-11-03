@@ -180,6 +180,8 @@ export const siteConfig = {
         "Model: gpt-oss-120b via Groq, streamed token-by-token over a ReadableStream.",
         "Grounded on real portfolio data: the system prompt is derived from the same project/experience files the site renders, so answers can't contradict the page.",
         "Agentic: after answering, it can move the page to the proof, turning the project deck or scrolling to a section. It can only name targets on an allow-list, and anything else is dropped.",
+        "Guided tours: ask it to walk you through John's work or experience and it plans the route; you step through it with Next and Back.",
+        "Drafts: ask it to write to John and it drafts the email for you to edit. Nothing is sent until you press Send.",
         "Guardrails: Zod-validated requests, a strict factual prompt, and a no-fabrication rule.",
         "Cost & abuse control: best-effort per-IP throttling (~20 req/hour, per instance) and a 400-token response cap.",
       ],

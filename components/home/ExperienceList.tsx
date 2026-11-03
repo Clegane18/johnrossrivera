@@ -1,58 +1,35 @@
 "use client";
 
 import { SectionHead } from "@/components/home/SectionHead";
-import { siteConfig } from "@/config/site";
-import { experiences } from "@/lib/data/experience";
+import { flash } from "@/components/layout/AgentRouter";
+import { SHOW_EXPERIENCE_EVENT } from "@/lib/ai/page-actions";
+import { experienceRows as rows } from "@/lib/data/experience-rows";
 import { cn } from "@/lib/utils/cn";
 import { Plus } from "lucide-react";
-import { useState } from "react";
-
-type Row = {
-  id: string;
-  year: string;
-  title: string;
-  org: string;
-  meta: string;
-  points: string[];
-  tech: string[];
-};
-
-function sortKey(date: string): number {
-  if (date === "Present") return Number.POSITIVE_INFINITY;
-  const parsed = Date.parse(`1 ${date}`);
-  return Number.isNaN(parsed) ? 0 : parsed;
-}
-
-// Current role first, then by end date, newest first. Education closes the list.
-const rows: Row[] = [
-  ...experiences
-    .filter((e) => !e.hiddenOnPage)
-    .sort((a, b) => sortKey(b.endDate) - sortKey(a.endDate))
-    .map((e) => ({
-      id: e.id,
-      year: e.endDate === "Present" ? "Now" : e.startDate.split(" ").pop() ?? "",
-      title: e.role,
-      org: e.company,
-      meta: [e.employmentType, e.workMode, `${e.startDate} to ${e.endDate === "Present" ? "now" : e.endDate}`]
-        .filter(Boolean)
-        .join(" · "),
-      points: e.highlights ?? e.description,
-      tech: e.tech,
-    })),
-  {
-    id: "education",
-    year: siteConfig.education.years.split(" ")[0],
-    title: siteConfig.education.degree.split(",")[0],
-    org: siteConfig.education.school,
-    meta: siteConfig.education.years.replace(" - ", " to "),
-    points: [siteConfig.education.degree, `Coursework: ${siteConfig.education.coursework.join(", ")}.`],
-    tech: [],
-  },
-];
+import { useEffect, useState } from "react";
 
 export function ExperienceList() {
   const [open, setOpen] = useState<Set<string>>(() => new Set([rows[0].id]));
   const allOpen = open.size === rows.length;
+
+  // Nuggets' experience tour (and "show experience:ID"): open that row, bring it to the middle of
+  // the screen once it has expanded, and outline it.
+  useEffect(() => {
+    function onShow(event: Event) {
+      const id = (event as CustomEvent<string>).detail;
+      if (!rows.some((r) => r.id === id)) return;
+      setOpen((current) => new Set(current).add(id));
+      window.setTimeout(() => {
+        const row = document.getElementById(`xp-row-${id}`);
+        if (!row) return;
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        row.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+        flash(row);
+      }, 320);
+    }
+    window.addEventListener(SHOW_EXPERIENCE_EVENT, onShow);
+    return () => window.removeEventListener(SHOW_EXPERIENCE_EVENT, onShow);
+  }, []);
 
   function toggle(id: string) {
     setOpen((current) => {
@@ -82,7 +59,7 @@ export function ExperienceList() {
         {rows.map((row) => {
           const isOpen = open.has(row.id);
           return (
-            <div key={row.id} className="border-b border-border">
+            <div key={row.id} id={`xp-row-${row.id}`} className="border-b border-border">
               <button
                 type="button"
                 aria-expanded={isOpen}

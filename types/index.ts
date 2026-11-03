@@ -119,13 +119,30 @@ export interface ContactFormData {
  */
 export type PageAction =
   | { kind: "section"; id: string }
-  | { kind: "project"; id: string };
+  | { kind: "project"; id: string }
+  | { kind: "experience"; id: string };
+
+/** One stop on a guided tour: a project card in the deck, or a row in Experience. */
+export interface TourStep {
+  kind: "project" | "experience";
+  id: string;
+}
+
+/** A walkthrough Nuggets proposes. The visitor moves through it with Next / Back. */
+export interface Tour {
+  title: string;
+  steps: TourStep[];
+}
 
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
   /** Page actions this answer ran. Shown as chips under the reply; never sent back to the API. */
   actions?: PageAction[];
+  /** A tour this answer started. UI state only, like `actions`. */
+  tour?: Tour;
+  /** A message the visitor asked Nuggets to draft to John. Sent only when the visitor presses Send. */
+  draft?: string;
 }
 
 // Homepage card copy for a project.

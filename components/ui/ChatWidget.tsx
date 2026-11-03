@@ -19,7 +19,19 @@ import {
 } from "@/hooks/useCommandPalette";
 import { useSound } from "@/hooks/useSound";
 import { siteConfig } from "@/config/site";
-import { AGENT_EVENT, actionLabel } from "@/lib/ai/page-actions";
+import {
+  AGENT_EVENT,
+  TOUR_EVENT,
+  TOUR_STEP_EVENT,
+  actionLabel,
+} from "@/lib/ai/page-actions";
+import type { Tour } from "@/types";
+import { DraftCard } from "./DraftCard";
+import { TourBar } from "./TourBar";
+
+// How long the panel stays open after a tour is proposed, so the visitor sees Nuggets' one-line
+// intro before the panel steps aside for the tour bar.
+const TOUR_HANDOFF_MS = 700;
 
 // ── Message render helpers ──────────────────────────────────────────────────
 const BOLD_RE = /\*\*(.+?)\*\*/g;
@@ -136,6 +148,10 @@ export function ChatWidget() {
   const [atContact, setAtContact] = useState(false);
   const [atHero, setAtHero] = useState(true);
   const hintShownRef = useRef(false);
+  // The running tour and where the visitor is in it. Kept while the chat is open ("Ask about
+  // this"), so closing the chat puts them back on the same stop.
+  const [tourState, setTourState] = useState<{ tour: Tour; index: number } | null>(null);
+  const tourVisible = tourState !== null && !isOpen;
   const {
     messages,
     input,
@@ -157,8 +173,38 @@ export function ChatWidget() {
   }, [messages, typedContent]);
 
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent("nuggets:open", { detail: isOpen }));
-  }, [isOpen]);
+    // The tour bar takes the same corner, so the page's own floating controls step aside for it too.
+    window.dispatchEvent(new CustomEvent("nuggets:open", { detail: isOpen || tourVisible }));
+  }, [isOpen, tourVisible]);
+
+  const goToStep = useCallback((tour: Tour, index: number) => {
+    const clamped = Math.max(0, Math.min(index, tour.steps.length));
+    setTourState({ tour, index: clamped });
+    const step = tour.steps[clamped];
+    if (step) window.dispatchEvent(new CustomEvent(TOUR_STEP_EVENT, { detail: step }));
+  }, []);
+
+  const startTour = useCallback(
+    (tour: Tour, index = 0) => {
+      setIsOpen(false);
+      goToStep(tour, index);
+    },
+    [goToStep]
+  );
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    function onTour(event: Event) {
+      const tour = (event as CustomEvent<Tour>).detail;
+      if (!tour?.steps?.length) return;
+      timer = setTimeout(() => startTour(tour), TOUR_HANDOFF_MS);
+    }
+    window.addEventListener(TOUR_EVENT, onTour);
+    return () => {
+      window.removeEventListener(TOUR_EVENT, onTour);
+      clearTimeout(timer);
+    };
+  }, [startTour]);
 
   // Below md the panel is full screen (inset-0), so a page action would happen behind it. Close the
   // panel there and let the visitor watch; the answer and its chip stay in the history.
@@ -455,6 +501,21 @@ export function ChatWidget() {
                             {actionLabel(action)}
                           </button>
                         ))}
+                        {msg.tour && !isActiveAssistant && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const same = tourState?.tour === msg.tour;
+                              startTour(msg.tour!, same ? tourState!.index : 0);
+                            }}
+                            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:border-muted-foreground hover:text-foreground"
+                          >
+                            <span aria-hidden="true">↳</span>
+                            {tourState?.tour === msg.tour ? "Resume tour" : "Start tour"}:{" "}
+                            {msg.tour.title}
+                          </button>
+                        )}
+                        {msg.draft && !isActiveAssistant && <DraftCard draft={msg.draft} />}
                       </div>
                     )}
                   </div>
@@ -527,6 +588,7 @@ export function ChatWidget() {
         className={cn(
           "fixed bottom-24 right-6 z-[70] transition-opacity duration-300 lg:bottom-6",
           isOpen && "max-md:hidden",
+          tourVisible && "hidden",
           // Desktop has room beside the form, so the retreat is a phone/tablet rule only.
           atContact && "pointer-events-none opacity-0 lg:pointer-events-auto lg:opacity-100"
         )}
@@ -618,6 +680,26 @@ export function ChatWidget() {
           </motion.button>
         </div>
       </div>
+      <AnimatePresence>
+        {tourVisible && (
+          <TourBar
+            tour={tourState.tour}
+            index={tourState.index}
+            onStep={(i) => goToStep(tourState.tour, i)}
+            onExit={() => setTourState(null)}
+            onAsk={(question) => {
+              setIsOpen(true);
+              if (question) setInput(question);
+            }}
+            onContact={() => {
+              setTourState(null);
+              window.dispatchEvent(
+                new CustomEvent(AGENT_EVENT, { detail: [{ kind: "section", id: "contact" }] })
+              );
+            }}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }

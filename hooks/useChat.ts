@@ -1,6 +1,9 @@
 import { useState, useCallback, useRef } from "react";
 import {
   AGENT_EVENT,
+  TOUR_EVENT,
+  applyIntent,
+  detectIntent,
   parseAgentReply,
   visibleText,
 } from "@/lib/ai/page-actions";
@@ -93,12 +96,16 @@ export function useChat() {
     let failureMessage: string | null = null;
 
     try {
-      // Role and content only: `actions` is UI state and the API schema does not take it.
+      // Role and content only: `actions` and `tour` are UI state and the API schema does not take
+      // them. A draft goes back inside its markers, so "make it shorter" can revise it.
       // Last 6, not 10: the prompt, this history and the 400-token reply must fit Groq's free-tier
       // 8,000 tokens per minute (see lib/ai/system-prompt.ts), or the request is refused with a 413.
       const historyToSend = nextMessages
         .slice(-6)
-        .map(({ role, content }) => ({ role, content }));
+        .map(({ role, content, draft }) => ({
+          role,
+          content: draft ? `${content}\n<<email>>\n${draft}\n<</email>>` : content,
+        }));
 
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -144,20 +151,34 @@ export function useChat() {
         startTypingInterval();
       }
 
-      const { text, actions } = parseAgentReply(raw);
+      const { text, actions, tour, draft } = applyIntent(
+        parseAgentReply(raw),
+        detectIntent(trimmed),
+        trimmed
+      );
       if (text.length > shownLength) {
         streamBufferRef.current += text.slice(shownLength);
         startTypingInterval();
       }
-      if (actions.length > 0) {
+      if (actions.length > 0 || tour || draft) {
         setMessages((prev) => {
           const updated = [...prev];
           const last = updated[updated.length - 1];
           if (last?.role === "assistant") {
-            updated[updated.length - 1] = { ...last, actions };
+            updated[updated.length - 1] = {
+              ...last,
+              ...(actions.length > 0 && { actions }),
+              ...(tour && { tour }),
+              ...(draft && { draft }),
+            };
           }
           return updated;
         });
+      }
+      // A tour drives the page itself, one step at a time, so it never comes with one-off actions.
+      if (tour) {
+        window.dispatchEvent(new CustomEvent(TOUR_EVENT, { detail: tour }));
+      } else if (actions.length > 0) {
         window.dispatchEvent(new CustomEvent(AGENT_EVENT, { detail: actions }));
       }
     } catch {

@@ -3,7 +3,9 @@
 import {
   ACTION_PROJECTS,
   AGENT_EVENT,
+  SHOW_EXPERIENCE_EVENT,
   SHOW_PROJECT_EVENT,
+  TOUR_STEP_EVENT,
 } from "@/lib/ai/page-actions";
 import type { PageAction } from "@/types";
 import { usePathname, useRouter } from "next/navigation";
@@ -30,6 +32,8 @@ export function AgentRouter() {
   const router = useRouter();
   const pathname = usePathname();
   const runId = useRef(0);
+  // A tour step asked for off the home page: held until the home page has mounted, then run.
+  const pending = useRef<PageAction[] | null>(null);
 
   useEffect(() => {
     async function run(actions: PageAction[]) {
@@ -48,7 +52,7 @@ export function AgentRouter() {
         router.push(
           project?.hasCaseStudy
             ? `/work/${project.id}`
-            : `/#${first.kind === "section" ? first.id : "work"}`
+            : `/#${first.kind === "project" ? "work" : first.kind === "experience" ? "experience" : first.id}`
         );
         return;
       }
@@ -60,8 +64,16 @@ export function AgentRouter() {
           if (!section) continue;
           section.scrollIntoView({ behavior, block: "start" });
           flash(section.querySelector("h2") ?? section);
+        } else if (action.kind === "experience") {
+          document.getElementById("experience")?.scrollIntoView({ behavior, block: "start" });
+          window.dispatchEvent(
+            new CustomEvent(SHOW_EXPERIENCE_EVENT, { detail: action.id })
+          );
         } else {
-          document.getElementById("work")?.scrollIntoView({ behavior, block: "start" });
+          // The deck itself, not the section heading: that puts the project's name and links in view
+          // above the tour bar and the chat panel instead of under them. Grid view has no deck.
+          (document.querySelector("#work [data-deck-stage]") ?? document.getElementById("work"))
+            ?.scrollIntoView({ behavior, block: "start" });
           window.dispatchEvent(
             new CustomEvent(SHOW_PROJECT_EVENT, { detail: action.id })
           );
@@ -75,8 +87,32 @@ export function AgentRouter() {
       if (Array.isArray(actions) && actions.length > 0) void run(actions);
     }
 
+    // A tour always plays on the home page, where the deck and the timeline are, even when the
+    // visitor started it from a case study.
+    function onTourStep(event: Event) {
+      const action = (event as CustomEvent<PageAction>).detail;
+      if (!action) return;
+      if (pathname === "/") {
+        void run([action]);
+      } else {
+        pending.current = [action];
+        router.push("/");
+      }
+    }
+
+    if (pathname === "/" && pending.current) {
+      const actions = pending.current;
+      pending.current = null;
+      // Let the home sections mount and register their listeners first.
+      window.setTimeout(() => void run(actions), 300);
+    }
+
     window.addEventListener(AGENT_EVENT, onAgent);
-    return () => window.removeEventListener(AGENT_EVENT, onAgent);
+    window.addEventListener(TOUR_STEP_EVENT, onTourStep);
+    return () => {
+      window.removeEventListener(AGENT_EVENT, onAgent);
+      window.removeEventListener(TOUR_STEP_EVENT, onTourStep);
+    };
   }, [pathname, router]);
 
   return null;

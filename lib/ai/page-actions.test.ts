@@ -4,10 +4,99 @@ import {
   ACTION_PROJECTS,
   ACTION_SECTIONS,
   MAX_ACTIONS,
+  TOUR_EXPERIENCE,
+  TOUR_WORK,
   actionLabel,
+  applyIntent,
+  detectIntent,
   parseAgentReply,
+  tourStepInfo,
   visibleText,
 } from "./page-actions";
+
+describe("tours", () => {
+  it("starts the full work or experience tour by name", () => {
+    expect(parseAgentReply("Sure, here we go.\n<<tour work>>").tour).toEqual(TOUR_WORK);
+    expect(parseAgentReply("Let's walk through it.\n<<tour experience>>").tour).toEqual(TOUR_EXPERIENCE);
+    expect(TOUR_WORK.steps.length).toBeGreaterThanOrEqual(5);
+    expect(TOUR_EXPERIENCE.steps[0]).toEqual({ kind: "experience", id: "crystal-vision" });
+  });
+
+  it("builds a custom tour from valid project ids only, for compare questions", () => {
+    const { tour, actions } = parseAgentReply(
+      "Here they are side by side.\n<<tour projects:provenly, kol-dashboard, made-up>>\n<<show section:contact>>"
+    );
+    expect(tour?.steps).toEqual([
+      { kind: "project", id: "provenly" },
+      { kind: "project", id: "kol-dashboard" },
+    ]);
+    // The tour drives the page, so one-off actions are dropped.
+    expect(actions).toEqual([]);
+  });
+
+  it("does not make a tour out of a single valid project", () => {
+    expect(parseAgentReply("x\n<<tour projects:provenly, nope>>").tour).toBeUndefined();
+  });
+
+  it("describes every step from the site's own data", () => {
+    for (const step of [...TOUR_WORK.steps, ...TOUR_EXPERIENCE.steps]) {
+      const info = tourStepInfo(step);
+      expect(info.title.length).toBeGreaterThan(0);
+      expect(info.line.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe("intent", () => {
+  it("recognises the guided requests a visitor types", () => {
+    expect(detectIntent("Walk me through John's work")).toBe("tour-work");
+    expect(detectIntent("can you take me through his projects one by one")).toBe("tour-work");
+    expect(detectIntent("Walk me through his experience")).toBe("tour-experience");
+    expect(detectIntent("Compare provenly and the KOL Dashboard")).toBe("compare");
+    expect(detectIntent("Send an email to John about a NestJS role")).toBe("draft");
+    expect(detectIntent("write him a message for me")).toBe("draft");
+    expect(detectIntent("What's his strongest project?")).toBeNull();
+    expect(detectIntent("Does he have NestJS experience?")).toBeNull();
+  });
+
+  it("starts the tour even when the model forgot the directive", () => {
+    const reply = parseAgentReply("John has built a lot of things.\n<<show work>>");
+    expect(applyIntent(reply, "tour-work", "walk me through his work").tour).toEqual(TOUR_WORK);
+  });
+
+  it("builds a compare tour from the projects the visitor named", () => {
+    const reply = parseAgentReply("They differ in scope.");
+    const { tour } = applyIntent(reply, "compare", "Compare provenly and the KOL Dashboard");
+    expect(tour?.steps.map((s) => s.id).sort()).toEqual(["kol-dashboard", "provenly"]);
+  });
+
+  it("leaves a reply alone when the model already got it right", () => {
+    const reply = parseAgentReply("Here.\n<<tour experience>>");
+    expect(applyIntent(reply, "tour-work", "walk me through")).toBe(reply);
+  });
+});
+
+describe("email drafts", () => {
+  const reply =
+    "Here's a draft. Add your name and email, then press Send.\n<<email>>\nHi John,\n\nI'm hiring a NestJS engineer and liked your Rola work. Are you open to a call this week?\n<</email>>";
+
+  it("pulls the draft out and keeps it out of the chat text", () => {
+    const { text, draft } = parseAgentReply(reply);
+    expect(text).toBe("Here's a draft. Add your name and email, then press Send.");
+    expect(draft).toContain("I'm hiring a NestJS engineer");
+    expect(draft?.startsWith("Hi John")).toBe(true);
+  });
+
+  it("never shows a half-written draft while it streams", () => {
+    for (let i = 1; i <= reply.length; i++) {
+      expect(visibleText(reply.slice(0, i))).not.toMatch(/Hi John|<</);
+    }
+  });
+
+  it("labels experience chips by role and company", () => {
+    expect(actionLabel({ kind: "experience", id: "crystal-vision" })).toMatch(/^Showing .+Crystal Vision$/);
+  });
+});
 
 describe("parseAgentReply", () => {
   it("returns the answer without its directives, plus the actions to run", () => {

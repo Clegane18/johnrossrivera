@@ -194,6 +194,7 @@ export function WorkDeck() {
             onPointerUp={onPointerUp}
             onPointerCancel={() => (drag.current = null)}
             style={{ height }}
+            data-deck-stage
             className="relative -mx-4 touch-pan-y select-none overflow-hidden pt-3.5 outline-none [mask-image:linear-gradient(90deg,transparent,#000_6%,#000_94%,transparent)] sm:-mx-12"
           >
             {shown.map((project, index) => {

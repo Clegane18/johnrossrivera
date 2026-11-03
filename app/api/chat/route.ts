@@ -5,6 +5,7 @@ import type {
   ChatCompletionCreateParamsStreaming,
 } from "groq-sdk/resources/chat/completions";
 import { buildSystemPrompt } from "@/lib/ai/system-prompt";
+import { detectIntent } from "@/lib/ai/page-actions";
 import { rateLimit, type RateLimitEntry } from "@/lib/utils/rate-limit";
 import { getClientIp } from "@/lib/utils/client-ip";
 import { chatSchema } from "@/lib/validations/chat";
@@ -96,7 +97,10 @@ export async function POST(request: Request): Promise<Response> {
       .map((m) => m.content)
       .join(" ");
     const messages = [
-      { role: "system" as const, content: buildSystemPrompt(focusText) },
+      {
+        role: "system" as const,
+        content: buildSystemPrompt(focusText, detectIntent(lastUserText(result.data.messages))),
+      },
       ...result.data.messages,
     ];
 
@@ -194,4 +198,11 @@ export async function POST(request: Request): Promise<Response> {
       { status: 500, headers: rateLimitHeaders }
     );
   }
+}
+
+function lastUserText(messages: { role: string; content: string }[]): string {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (messages[i].role === "user") return messages[i].content;
+  }
+  return "";
 }
