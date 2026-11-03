@@ -87,6 +87,37 @@ export const siteConfig = {
   // technology the Skills section omits is the same drift heroMetrics avoids by linking each tile
   // to its case study, and config/site.test.ts fails if this stops being a subset.
   heroStack: ["TypeScript", "React", "Next.js", "NestJS", "MySQL", "Prisma"],
+  // The row of three above the metric tiles. Each one links to the page that backs it, the same
+  // rule the metrics follow, so the strip is a set of pointers rather than new claims.
+  proofCredentials: [
+    {
+      mark: "CV",
+      title: "Crystal Vision",
+      caption: "Full-stack · 2025 to now",
+      href: "/#experience",
+    },
+    {
+      mark: "pv",
+      title: "provenly",
+      caption: "Open source author",
+      href: "/work/provenly",
+    },
+    {
+      mark: "RR",
+      title: "RR Remo Trucking",
+      caption: "Site helped win Zuellig",
+      href: "/work/rr-remo-trucking",
+    },
+  ],
+  // The left rail's section list. The rail renders these as "/#id" links so they also work from
+  // /work/* pages, where none of these sections exist.
+  railNav: [
+    { number: "01", label: "Work", id: "work" },
+    { number: "02", label: "Experience", id: "experience" },
+    { number: "03", label: "Stack", id: "stack" },
+    { number: "04", label: "Open source", id: "open-source" },
+    { number: "05", label: "Contact", id: "contact" },
+  ],
   heroTagline: "Systems over shortcuts.",
   heroTaglineTranslation: "Deliberate architecture. Reliable by default.",
   about: {
