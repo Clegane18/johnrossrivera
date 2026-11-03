@@ -85,6 +85,24 @@ body {
   width: 4px;
 }
 
+/* What Nuggets pointed at. Added and removed by components/layout/AgentRouter.tsx and the deck. */
+.agent-flash {
+  outline: 2px solid var(--foreground);
+  outline-offset: 6px;
+  border-radius: 8px;
+  animation: agent-flash 2.6s ease-out forwards;
+}
+
+@keyframes agent-flash {
+  0%,
+  70% {
+    outline-color: var(--foreground);
+  }
+  100% {
+    outline-color: transparent;
+  }
+}
+
 ::-webkit-scrollbar-track {
   background: var(--background);
 }

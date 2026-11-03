@@ -172,8 +172,11 @@ export const siteConfig = {
     techNote: {
       heading: "How Nuggets works",
       points: [
-        "Model: Llama 3.3 70B via Groq, streamed token-by-token over a ReadableStream.",
+        // Must name the model app/api/chat/route.ts actually calls. This said Llama 3.3 70B for a
+        // while after that model was withdrawn and the route moved to gpt-oss-120b.
+        "Model: gpt-oss-120b via Groq, streamed token-by-token over a ReadableStream.",
         "Grounded on real portfolio data: the system prompt is derived from the same project/experience files the site renders, so answers can't contradict the page.",
+        "Agentic: after answering, it can move the page to the proof, turning the project deck or scrolling to a section. It can only name targets on an allow-list, and anything else is dropped.",
         "Guardrails: Zod-validated requests, a strict factual prompt, and a no-fabrication rule.",
         "Cost & abuse control: best-effort per-IP throttling (~20 req/hour, per instance) and a 400-token response cap.",
       ],

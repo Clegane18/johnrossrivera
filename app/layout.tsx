@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
+import { AgentRouter } from "@/components/layout/AgentRouter";
 import { DeferredWidgets } from "@/components/layout/DeferredWidgets";
 import { Footer } from "@/components/layout/Footer";
 import { Rail } from "@/components/layout/Rail";
@@ -109,6 +110,7 @@ export default function RootLayout({
           <Footer />
         </div>
         <DeferredWidgets />
+        <AgentRouter />
         <SoundEffects />
       </body>
     </html>

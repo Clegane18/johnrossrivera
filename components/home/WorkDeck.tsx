@@ -1,6 +1,8 @@
 "use client";
 
 import { SectionHead } from "@/components/home/SectionHead";
+import { flash } from "@/components/layout/AgentRouter";
+import { SHOW_PROJECT_EVENT } from "@/lib/ai/page-actions";
 import { projects } from "@/lib/data/projects";
 import { cn } from "@/lib/utils/cn";
 import type { Project } from "@/types";
@@ -69,6 +71,25 @@ export function WorkDeck() {
     (index: number) => setCurrent(((index % count) + count) % count),
     [count]
   );
+
+  // Nuggets asks for a project (lib/ai/page-actions.ts): switch to the deck, turn to that card once
+  // the scroll has landed, then outline it.
+  useEffect(() => {
+    function onShow(event: Event) {
+      const index = shown.findIndex(
+        (project) => project.id === (event as CustomEvent<string>).detail
+      );
+      if (index === -1) return;
+      setView("deck");
+      setCurrent(index);
+      window.setTimeout(() => {
+        const card = frontRef.current?.firstElementChild;
+        if (card) flash(card);
+      }, 650);
+    }
+    window.addEventListener(SHOW_PROJECT_EVENT, onShow);
+    return () => window.removeEventListener(SHOW_PROJECT_EVENT, onShow);
+  }, []);
 
   // The deck's cards are absolutely positioned, so the container takes its height from the front
   // card. A ResizeObserver keeps that right as the column narrows.

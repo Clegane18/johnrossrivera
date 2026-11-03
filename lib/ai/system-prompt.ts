@@ -9,6 +9,11 @@
 // The gate cannot verify how the model behaves — it never calls Groq — but it can verify that the
 // scope contract is present, comes first, and that the never-disclose rules survive a refactor.
 
+import {
+  ACTION_PROJECTS,
+  ACTION_SECTIONS,
+  MAX_ACTIONS,
+} from "@/lib/ai/page-actions";
 import { experiences } from "@/lib/data/experience";
 import { profile } from "@/lib/data/profile";
 import { projects } from "@/lib/data/projects";
@@ -113,7 +118,8 @@ Developer Tools: ${cv.devTools.join(", ")}`;
 
 function renderExperienceFacts(): string {
   const blocks = experiences.map((e) => {
-    const bullets = e.description.map((d) => `- ${d}`).join("\n");
+    // Shortened for the token budget (see DECISION_BRIEF_CHARS); the projects carry the detail.
+    const bullets = e.description.map((d) => `- ${brief(d, 180)}`).join("\n");
 
     return `### ${e.company} (${e.startDate} – ${e.endDate}) | ${e.role}
 ${bullets}
@@ -123,6 +129,24 @@ Tech: ${e.tech.join(", ")}`;
   return `## WORK EXPERIENCE\n\n${blocks.join("\n\n")}`;
 }
 
+// The whole request (this prompt, the chat history and the 400-token reply budget) has to fit in
+// Groq's free-tier limit of 8,000 tokens per minute, or the request is refused outright with a 413.
+// The prompt reached 33k characters (~7,600 tokens) and failed as soon as a visitor sent a second
+// message. Case-study decisions and problem statements were the bulk of it (provenly's alone ran
+// ~5,300 characters), so the prompt carries their opening sentence. The page still renders them in
+// full, and descriptions, roles and impact numbers go in whole: those are where the facts live.
+export const DECISION_BRIEF_CHARS = 150;
+
+export function brief(text: string, max = DECISION_BRIEF_CHARS): string {
+  const sentences = text.match(/[^.!?]+[.!?]+(?=\s|$)|[^.!?]+$/g) ?? [text];
+  let out = "";
+  for (const sentence of sentences) {
+    if (out && out.length + sentence.length > max) break;
+    out += sentence;
+  }
+  return out.trim();
+}
+
 function renderProjectFacts(): string {
   const blocks = projects.map((proj) => {
     const lines: string[] = [
@@ -130,12 +154,16 @@ function renderProjectFacts(): string {
       proj.description,
     ];
 
-    if (proj.problem) lines.push(`Problem: ${proj.problem}`);
+    // Only where there are no decisions to say it: the description and decisions already state what
+    // the problem was, and repeating it cost ~1,500 characters across the projects.
+    if (proj.problem && !proj.decisions?.length) {
+      lines.push(`Problem: ${brief(proj.problem, 260)}`);
+    }
     if (proj.role) lines.push(`John's role: ${proj.role}`);
 
     if (proj.decisions?.length) {
       lines.push("Key decisions:");
-      proj.decisions.forEach((d) => lines.push(`• ${d}`));
+      proj.decisions.forEach((d) => lines.push(`• ${brief(d)}`));
     }
 
     if (proj.impact?.length) {
@@ -171,7 +199,11 @@ function renderProjectFacts(): string {
 }
 
 function renderInterviewFacts(): string {
-  const blocks = profile.interviewQa.map((qa) => `### "${qa.q}"\n${qa.a}`);
+  // Each answer's opening sentences only, for the token budget. The full stories repeat facts the
+  // PROJECTS block already carries, so the model can still tell them in detail when asked.
+  const blocks = profile.interviewQa.map(
+    (qa) => `### "${qa.q}"\n${brief(qa.a, 340)}`
+  );
 
   return `## INTERVIEW Q&A
 Use these when a recruiter or employer asks a standard interview question. Deliver them naturally in
@@ -213,6 +245,33 @@ export const ANSWER_RULES = `## HOW I ANSWER
 5. UNKNOWNS: If a question is about John but the answer is not in this prompt, say plainly that I
    do not have that detail, then offer the closest thing I do know. Do not guess.`;
 
+// ── PAGE ACTIONS ─────────────────────────────────────────────────────────────────────────────────
+// The agentic part: Nuggets can move the page to the evidence. The ids are DERIVED from the same
+// lists the client validates against (lib/ai/page-actions.ts), so the prompt can never offer a
+// target the page would refuse.
+export const PAGE_ACTIONS = `## SHOWING THE PROOF ON THE PAGE
+
+The visitor is on John's portfolio page while they talk to me, and I can move the page to show the
+evidence for what I just said. To do that, I end my reply with up to ${MAX_ACTIONS} directives, each on
+its own line, written exactly like this:
+<<show project:ID>>
+<<show section:ID>>
+
+Projects I can show:
+${ACTION_PROJECTS.map((p) => `- ${p.id} (${p.label})`).join("\n")}
+
+Sections I can show:
+${ACTION_SECTIONS.map((s) => `- ${s.id} (${s.label})`).join("\n")}
+
+Rules:
+- Add a directive when it points at the evidence for my answer: the project I just described, the
+  experience section for a career question, the stack section for a skills question, or the contact
+  section when someone wants to reach John or asks if he is available.
+- Use only the IDs above. Never invent one.
+- Directives go after my answer, never inside a sentence. I never mention them, quote them, or say
+  that I am moving the page.
+- A refusal or an out-of-scope reply gets no directive.`;
+
 // One-line restatement so the contract owns the END of the prompt as well as the start. The model
 // attends most strongly to the edges; the facts in the middle do not need that reinforcement.
 const SCOPE_REMINDER = `# REMINDER
@@ -233,6 +292,8 @@ export function buildSystemPrompt(): string {
     renderInterviewFacts(),
     "---",
     ANSWER_RULES,
+    "---",
+    PAGE_ACTIONS,
     "---",
     SCOPE_REMINDER,
   ].join("\n\n");

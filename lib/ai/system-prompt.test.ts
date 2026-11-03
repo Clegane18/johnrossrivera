@@ -5,10 +5,13 @@ import { profile } from "@/lib/data/profile";
 import { projects } from "@/lib/data/projects";
 import { skills } from "@/lib/data/skills";
 
+import { ACTION_PROJECTS, ACTION_SECTIONS } from "./page-actions";
 import {
   ANSWER_RULES,
+  PAGE_ACTIONS,
   PERSONA,
   SCOPE_CONTRACT,
+  brief,
   buildSystemPrompt,
 } from "./system-prompt";
 
@@ -213,5 +216,44 @@ describe("compensation source data", () => {
 
   it("keeps no freelance rate in the data that feeds the prompt", () => {
     expect(profile.freelanceNote).not.toMatch(CURRENCY_OR_AMOUNT);
+  });
+
+  // The page-action ids the model is offered must be exactly the ones the client accepts, or the
+  // agent either invents targets the page drops or never uses ones it could.
+  it("offers every page-action target the client accepts, and sits before the closing reminder", () => {
+    const prompt = buildSystemPrompt();
+    for (const p of ACTION_PROJECTS) {
+      expect(PAGE_ACTIONS).toContain(`- ${p.id} (`);
+    }
+    for (const s of ACTION_SECTIONS) {
+      expect(PAGE_ACTIONS).toContain(`- ${s.id} (`);
+    }
+    expect(prompt.indexOf("## SHOWING THE PROOF")).toBeGreaterThan(
+      prompt.indexOf("## HOW I ANSWER")
+    );
+    expect(prompt.indexOf("## SHOWING THE PROOF")).toBeLessThan(
+      prompt.indexOf("# REMINDER")
+    );
+  });
+
+  // Groq's free tier refuses (HTTP 413) any request over 8,000 tokens per minute, and a request is
+  // this prompt + up to 6 history messages + the 400-token reply budget. At ~4.3 characters per
+  // token, 26,500 characters is ~6,100 tokens, which leaves room for that history. Measured
+  // 2026-11-03: 26,143. If this fails, trim what goes INTO the prompt (see brief() in
+  // system-prompt.ts) rather than raising the number, or the live chat starts failing again.
+  it("stays inside the token budget a free-tier Groq request allows", () => {
+    expect(buildSystemPrompt().length).toBeLessThan(26_500);
+  });
+
+  it("shortens a long decision to its opening sentence for the prompt", () => {
+    const text = "The fix lives outside the model. Hooks record what ran. A gate compares.";
+    expect(brief(text, 40)).toBe("The fix lives outside the model.");
+    // Always keeps at least the first sentence, even one longer than the limit.
+    expect(brief(text, 10)).toBe("The fix lives outside the model.");
+    expect(brief(text)).toBe(text);
+  });
+
+  it("forbids directives on refusals", () => {
+    expect(PAGE_ACTIONS).toContain("A refusal or an out-of-scope reply gets no directive.");
   });
 });
