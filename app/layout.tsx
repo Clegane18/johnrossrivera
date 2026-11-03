@@ -1,39 +1,25 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, DM_Sans, Space_Mono, Barlow } from "next/font/google";
+import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
+import { AgentRouter } from "@/components/layout/AgentRouter";
 import { DeferredWidgets } from "@/components/layout/DeferredWidgets";
 import { Footer } from "@/components/layout/Footer";
-import { MobileDock } from "@/components/layout/MobileDock";
-import { Navbar } from "@/components/layout/Navbar";
+import { Rail } from "@/components/layout/Rail";
 import { SoundEffects } from "@/components/ui/SoundEffects";
 import { siteConfig } from "@/config/site";
 import Script from "next/script";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-space-grotesk",
+  variable: "--font-jakarta",
   display: "swap",
 });
 
-const dmSans = DM_Sans({
+const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
-  weight: ["300", "400", "500"],
-  variable: "--font-dm-sans",
-  display: "swap",
-});
-
-const spaceMono = Space_Mono({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-space-mono",
-  display: "swap",
-});
-
-const barlow = Barlow({
-  subsets: ["latin"],
-  weight: ["700", "800", "900"],
-  variable: "--font-barlow",
+  weight: ["400", "500"],
+  variable: "--font-jetbrains",
   display: "swap",
 });
 
@@ -77,7 +63,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${spaceGrotesk.variable} ${dmSans.variable} ${spaceMono.variable} ${barlow.variable} font-sans antialiased`}
+        className={`${jakarta.variable} ${jetbrains.variable} font-sans antialiased`}
       >
         {/* Reveal animations start hidden and are un-hidden by JS. Without JS (locked-down
             networks, non-JS crawlers), force that content visible so the page isn't blank.
@@ -117,11 +103,14 @@ export default function RootLayout({
             } catch {}
           })();`}
         </Script>
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
-        <MobileDock />
+        <Rail />
+        {/* The rail is fixed at 232px from lg; this column is everything to its right. */}
+        <div className="lg:pl-[232px]">
+          <main>{children}</main>
+          <Footer />
+        </div>
         <DeferredWidgets />
+        <AgentRouter />
         <SoundEffects />
       </body>
     </html>

@@ -20,7 +20,7 @@ export const siteConfig = {
   // What is left is the part no tile can carry: the seniority of the ownership.
   // The card is ~20rem wide on desktop and overflows past ~280 chars, so that is still the ceiling.
   heroDescription:
-    "Sole developer of a live competition platform's admin console, and primary developer of the NestJS backend behind it.",
+    "Sole developer of a live song competition's 52-module admin console, and author of provenly, an open-source verification layer for AI coding agents.",
   heroPrimaryCta: {
     label: "View My Work",
     href: "#projects",
@@ -29,46 +29,34 @@ export const siteConfig = {
     label: "Download Resume",
     href: "/john-ross-rivera-resume.pdf",
   },
-  // Proof strip under the hero. Every value is a real number already present in lib/data/projects.ts —
-  // these are pointers to it, not new claims, so the two cannot drift into disagreeing.
+  // Proof strip under the hero. Every value is a number already in lib/data/projects.ts, and every
+  // one is John's own output, checked against the CV evidence bank (E1, E16, E21) or measured:
+  // pointers, not new claims. Each tile links to the case study that backs it.
   //
-  // "registered users", not "users served": the 917k belong to the CLIENT's platform, not to John,
-  // and the label should not imply he served them. The case study behind this tile now leads with
-  // numbers that ARE his own output (200+ endpoints, 61 data models, 47 pages shipped solo), so the
-  // borrowed-scale number no longer has to carry the claim alone. Each tile links to the case study
-  // that substantiates it — a number a recruiter can check beats a bigger one they cannot.
-  // One number for the scale worked at, three for the work done.
+  // The old set led with "917K users served", "200+ endpoints" and "47 pages". The bank lists the
+  // backend claim under "do not use" (John wrote 38.9% of that API), the page count is out of date,
+  // and the user figure is not one the CV makes. Product scale now lives in the case study as the
+  // 574 active users, where it can be stated precisely.
   //
-  // The previous set was four of the CLIENTS' business numbers: 74 vehicles is a haulier's fleet
-  // size, 1,000+ KOL partners is a marketing programme's headcount, and neither says anything about
-  // the engineer. Scale is still worth stating — it is what separates this from a bootcamp
-  // portfolio — so one tile keeps it, phrased as work done for those users rather than ownership of
-  // them. The other three are output: endpoints, pages, tests.
-  //
-  // Labels are deliberately short and parallel (all past-tense verbs, 12-18 characters). The strip
-  // is a four-across row at lg, so a label long enough to wrap leaves one tile two lines tall beside
-  // three that are not.
+  // Labels stay short (12-18 characters) so the four-across row never wraps one tile.
   heroMetrics: [
     {
-      value: "917K",
-      label: "users served",
+      value: "52",
+      label: "modules built solo",
       href: "/work/rola-access-platform",
     },
     {
-      value: "200+",
-      label: "endpoints built",
+      value: "115/123",
+      label: "routes locked down",
       href: "/work/rola-access-platform",
     },
     {
-      value: "47",
-      // "shipped solo" would be the stronger claim, but at 18 characters it wrapped to two lines
-      // in a 176px tile while the other three stayed on one. The card directly above already opens
-      // "Sole developer of a 47-page competition admin console", so the word is not lost — it is
-      // said once, in a sentence, instead of twice with a ragged strip as the price.
-      label: "pages shipped",
+      value: "251",
+      label: "tests in CI gate",
       href: "/work/rola-access-platform",
     },
-    { value: "523", label: "tests written", href: "/work/provenly" },
+    // Measured 2026-11-03: `node --test` on provenly v0.2.1, 534 passing.
+    { value: "534", label: "provenly tests", href: "/work/provenly" },
   ],
   // The stack row that sits above the proof strip. A recruiter filtering for "React + NestJS" could
   // previously only confirm the stack by scrolling to the Skills section, which is the one question
@@ -87,13 +75,43 @@ export const siteConfig = {
   // technology the Skills section omits is the same drift heroMetrics avoids by linking each tile
   // to its case study, and config/site.test.ts fails if this stops being a subset.
   heroStack: ["TypeScript", "React", "Next.js", "NestJS", "MySQL", "Prisma"],
+  // The row of three above the metric tiles. Each one links to the page that backs it, the same
+  // rule the metrics follow, so the strip is a set of pointers rather than new claims.
+  proofCredentials: [
+    {
+      mark: "CV",
+      title: "Crystal Vision",
+      caption: "Full-stack · 2025 to now",
+      href: "/#experience",
+    },
+    {
+      mark: "pv",
+      title: "provenly",
+      caption: "Open source author",
+      href: "/work/provenly",
+    },
+    {
+      mark: "RR",
+      title: "RR Remo Trucking",
+      caption: "Grounded AI assistant",
+      href: "/work/rr-remo-trucking",
+    },
+  ],
+  // The left rail's section list. The rail renders these as "/#id" links so they also work from
+  // /work/* pages, where none of these sections exist.
+  railNav: [
+    { number: "01", label: "Work", id: "work" },
+    { number: "02", label: "Experience", id: "experience" },
+    { number: "03", label: "Stack", id: "stack" },
+    { number: "04", label: "Open source", id: "open-source" },
+    { number: "05", label: "Contact", id: "contact" },
+  ],
   heroTagline: "Systems over shortcuts.",
   heroTaglineTranslation: "Deliberate architecture. Reliable by default.",
   about: {
-    // Trimmed 591 -> ~190 chars for the minimalist pass. The two things a recruiter must still take
-    // away are kept deliberately: WHAT I build (whole features, front to back) and PROOF OF SCALE
-    // (900k+). Everything cut was elaboration on those two points, not additional evidence.
-    bio: "I build whole features, not halves: the schema and the API, the screens on top of them, and the test coverage over both. TypeScript, React/Next.js and NestJS are my defaults. I've shipped production systems serving 900k+ users.",
+    // The CV's summary (Oct 31 2026) in first person. It replaced a "900k+ users" claim the CV no
+    // longer makes; 574 is the product's active users, never the console's.
+    bio: "I build and run production systems end to end in TypeScript (NestJS, Next.js): the admin console for a live song competition with 574 active users, a fiat payment rail, and a Laravel affiliate portal. I also wrote provenly, an open-source layer that makes AI coding agents prove their work.",
     // Full locality, not just "Philippines". lib/data/profile.ts reads this field rather than
     // keeping its own copy, so the page and the chat can no longer state two different locations.
     location: "Bacoor, Cavite, Philippines",
@@ -154,8 +172,11 @@ export const siteConfig = {
     techNote: {
       heading: "How Nuggets works",
       points: [
-        "Model: Llama 3.3 70B via Groq, streamed token-by-token over a ReadableStream.",
+        // Must name the model app/api/chat/route.ts actually calls. This said Llama 3.3 70B for a
+        // while after that model was withdrawn and the route moved to gpt-oss-120b.
+        "Model: gpt-oss-120b via Groq, streamed token-by-token over a ReadableStream.",
         "Grounded on real portfolio data: the system prompt is derived from the same project/experience files the site renders, so answers can't contradict the page.",
+        "Agentic: after answering, it can move the page to the proof, turning the project deck or scrolling to a section. It can only name targets on an allow-list, and anything else is dropped.",
         "Guardrails: Zod-validated requests, a strict factual prompt, and a no-fabrication rule.",
         "Cost & abuse control: best-effort per-IP throttling (~20 req/hour, per instance) and a 400-token response cap.",
       ],

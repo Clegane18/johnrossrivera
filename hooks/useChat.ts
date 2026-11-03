@@ -1,4 +1,9 @@
 import { useState, useCallback, useRef } from "react";
+import {
+  AGENT_EVENT,
+  parseAgentReply,
+  visibleText,
+} from "@/lib/ai/page-actions";
 import { chatFallback } from "@/lib/utils/chat-fallback";
 import type { ChatFallback, ChatMessage } from "@/types";
 
@@ -88,7 +93,12 @@ export function useChat() {
     let failureMessage: string | null = null;
 
     try {
-      const historyToSend = nextMessages.slice(-10);
+      // Role and content only: `actions` is UI state and the API schema does not take it.
+      // Last 6, not 10: the prompt, this history and the 400-token reply must fit Groq's free-tier
+      // 8,000 tokens per minute (see lib/ai/system-prompt.ts), or the request is refused with a 413.
+      const historyToSend = nextMessages
+        .slice(-6)
+        .map(({ role, content }) => ({ role, content }));
 
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -115,14 +125,40 @@ export function useChat() {
       const reader = response.body?.getReader();
       if (!reader) throw new Error("No response stream.");
 
+      // The raw reply can end with page-action directives (lib/ai/page-actions.ts). Only the
+      // visible part is fed to the typing animation: `visibleText` is recomputed over the whole
+      // reply after each chunk and only ever grows, so the new tail is what gets typed.
       const decoder = new TextDecoder();
+      let raw = "";
+      let shownLength = 0;
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value, { stream: true });
-        streamBufferRef.current += chunk;
+        raw += decoder.decode(value, { stream: true });
+        const visible = visibleText(raw);
+        if (visible.length > shownLength) {
+          streamBufferRef.current += visible.slice(shownLength);
+          shownLength = visible.length;
+        }
         startTypingInterval();
+      }
+
+      const { text, actions } = parseAgentReply(raw);
+      if (text.length > shownLength) {
+        streamBufferRef.current += text.slice(shownLength);
+        startTypingInterval();
+      }
+      if (actions.length > 0) {
+        setMessages((prev) => {
+          const updated = [...prev];
+          const last = updated[updated.length - 1];
+          if (last?.role === "assistant") {
+            updated[updated.length - 1] = { ...last, actions };
+          }
+          return updated;
+        });
+        window.dispatchEvent(new CustomEvent(AGENT_EVENT, { detail: actions }));
       }
     } catch {
       // failureStatus is null for anything that never produced an HTTP response — a dropped

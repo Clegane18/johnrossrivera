@@ -112,9 +112,20 @@ export interface ContactFormData {
   message: string;
 }
 
+/**
+ * Something Nuggets asks the page to do after an answer: bring a section into view, or turn the
+ * project deck to a project. The model can only request these by id, and lib/ai/page-actions.ts
+ * drops any id that is not on the page, so a hallucinated target does nothing.
+ */
+export type PageAction =
+  | { kind: "section"; id: string }
+  | { kind: "project"; id: string };
+
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
+  /** Page actions this answer ran. Shown as chips under the reply; never sent back to the API. */
+  actions?: PageAction[];
 }
 
 // Homepage card copy for a project.

@@ -15,6 +15,7 @@ import { useChat } from "@/hooks/useChat";
 import { useCommandPalette } from "@/hooks/useCommandPalette";
 import { useSound } from "@/hooks/useSound";
 import { siteConfig } from "@/config/site";
+import { AGENT_EVENT, actionLabel } from "@/lib/ai/page-actions";
 
 // ── Message render helpers ──────────────────────────────────────────────────
 const BOLD_RE = /\*\*(.+?)\*\*/g;
@@ -153,6 +154,16 @@ export function ChatWidget() {
   useEffect(() => {
     window.dispatchEvent(new CustomEvent("nuggets:open", { detail: isOpen }));
   }, [isOpen]);
+
+  // Below md the panel is full screen (inset-0), so a page action would happen behind it. Close the
+  // panel there and let the visitor watch; the answer and its chip stay in the history.
+  useEffect(() => {
+    function onAgent() {
+      if (window.matchMedia("(max-width: 767px)").matches) setIsOpen(false);
+    }
+    window.addEventListener(AGENT_EVENT, onAgent);
+    return () => window.removeEventListener(AGENT_EVENT, onAgent);
+  }, []);
 
   // Step aside over the contact form.
   //
@@ -400,23 +411,42 @@ export function ChatWidget() {
                         {msg.content}
                       </div>
                     ) : (
-                      <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-white px-4 py-2.5 text-sm leading-relaxed text-zinc-800 shadow-sm dark:bg-zinc-800 dark:text-zinc-100">
-                        {isActiveAssistant ? (
-                          isTyping ? (
-                            <>
-                              {renderMsg(typedContent)}
-                              <span className="animate-pulse text-muted-foreground">
-                                |
-                              </span>
-                            </>
+                      <div className="flex max-w-[85%] flex-col items-start gap-1.5">
+                        <div className="rounded-2xl rounded-tl-sm bg-white px-4 py-2.5 text-sm leading-relaxed text-zinc-800 shadow-sm dark:bg-zinc-800 dark:text-zinc-100">
+                          {isActiveAssistant ? (
+                            isTyping ? (
+                              <>
+                                {renderMsg(typedContent)}
+                                <span className="animate-pulse text-muted-foreground">
+                                  |
+                                </span>
+                              </>
+                            ) : (
+                              <TypingDots />
+                            )
+                          ) : msg.content ? (
+                            renderMsg(msg.content)
                           ) : (
                             <TypingDots />
-                          )
-                        ) : msg.content ? (
-                          renderMsg(msg.content)
-                        ) : (
-                          <TypingDots />
-                        )}
+                          )}
+                        </div>
+                        {/* What this answer did on the page. Clicking replays it, so a visitor who
+                            scrolled away can get back to the proof. */}
+                        {msg.actions?.map((action) => (
+                          <button
+                            key={`${action.kind}:${action.id}`}
+                            type="button"
+                            onClick={() =>
+                              window.dispatchEvent(
+                                new CustomEvent(AGENT_EVENT, { detail: [action] })
+                              )
+                            }
+                            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-[11.5px] font-medium text-muted-foreground transition-colors hover:border-muted-foreground hover:text-foreground"
+                          >
+                            <span aria-hidden="true">↳</span>
+                            {actionLabel(action)}
+                          </button>
+                        ))}
                       </div>
                     )}
                   </div>

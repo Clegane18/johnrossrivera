@@ -58,7 +58,7 @@ export default function CaseStudyPage({
     <article className="section-padding">
       <div className="section-container max-w-4xl">
         <Link
-          href="/#projects"
+          href="/#work"
           className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
@@ -287,7 +287,7 @@ export default function CaseStudyPage({
           className="mt-16 flex flex-col gap-4 border-t border-border pt-8 sm:flex-row sm:items-center sm:justify-between"
         >
           <Link
-            href="/#projects"
+            href="/#work"
             className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />

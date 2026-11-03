@@ -24,7 +24,7 @@ export default function NotFound() {
               Back To Home
             </Link>
             <Link
-              href="/#projects"
+              href="/#work"
               className="inline-flex items-center justify-center rounded-full border border-border bg-card px-6 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               View Projects

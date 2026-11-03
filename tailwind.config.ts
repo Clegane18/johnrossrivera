@@ -24,10 +24,12 @@ const config: Config = {
         ring: "var(--ring)",
       },
       fontFamily: {
-        sans: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
-        display: ["var(--font-space-grotesk)", "system-ui", "sans-serif"],
-        mono: ["var(--font-space-mono)", "ui-monospace", "monospace"],
-        hero: ["var(--font-barlow)", "system-ui", "sans-serif"],
+        sans: ["var(--font-jakarta)", "system-ui", "sans-serif"],
+        // display and hero stay as keys so the case study pages keep compiling, but they now
+        // resolve to the same face as the body: one sans family plus one mono is the whole system.
+        display: ["var(--font-jakarta)", "system-ui", "sans-serif"],
+        mono: ["var(--font-jetbrains)", "ui-monospace", "monospace"],
+        hero: ["var(--font-jakarta)", "system-ui", "sans-serif"],
       },
       screens: {
         sm: "640px",

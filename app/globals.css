@@ -19,35 +19,37 @@
 }
 
 .dark {
-  /* Terminal-inspired dark palette */
-  --background: #0a0e12;
-  --foreground: #e2e8f0;
-  --card: #0f1419;
-  --card-foreground: #e2e8f0;
-  --primary: #e2e8f0;
-  --primary-foreground: #0a0e12;
-  --muted: #141c24;
-  /* Was #64748b, which is 3.89:1 against --card and 4.07:1 against --background — both under the
-     4.5:1 WCAG AA floor for normal text. This token carries ~70 usages across the site (every
-     secondary label, date, caption), so the whole page's supporting text was failing AA in dark
-     mode. #7c8797 is the nearest value that clears it on both surfaces (5.09:1 / 5.32:1) while
-     staying visibly secondary to --foreground. */
-  --muted-foreground: #7c8797;
-  --accent: #141c24;
-  --accent-foreground: #e2e8f0;
-  --border: #1e2d3d;
-  --input: #141c24;
-  --ring: #7c8797;
+  /* Pure black, neutral greys. No blue cast: the black-and-white redesign keeps colour for the
+     project screenshots only. */
+  --background: #000000;
+  --foreground: #ededed;
+  --card: #0d0d0d;
+  --card-foreground: #ededed;
+  --primary: #ededed;
+  --primary-foreground: #000000;
+  --muted: #141414;
+  /* 6.0:1 against --background and 5.6:1 against --card, so secondary text clears the 4.5:1
+     WCAG AA floor on both surfaces while staying visibly secondary to --foreground. */
+  --muted-foreground: #8a8a8a;
+  --accent: #141414;
+  --accent-foreground: #ededed;
+  --border: #1f1f1f;
+  --input: #141414;
+  --ring: #8a8a8a;
 }
 
 html {
   scroll-behavior: smooth;
-  /* The navbar is `fixed`, so it is out of flow and an anchor jump parks the target's first line
-     underneath it. Every in-page link on this site is a section anchor, so the offset belongs on
-     the scroll container once rather than as a scroll-mt utility repeated on seven sections. The
-     bar is ~72px tall (py-4 around a 40px control row); the extra clears it and leaves the heading
-     breathing room instead of tucked against the blur edge. */
-  scroll-padding-top: 6rem;
+  /* Below lg the sticky mobile bar (56px) sits over anchor targets, so jumps clear it. From lg the
+     navigation is the left rail, nothing covers the top, and a small offset just gives headings
+     room. */
+  scroll-padding-top: 5rem;
+}
+
+@media (min-width: 1280px) {
+  html {
+    scroll-padding-top: 2rem;
+  }
 }
 
 html.dark {
@@ -81,6 +83,24 @@ body {
 
 ::-webkit-scrollbar {
   width: 4px;
+}
+
+/* What Nuggets pointed at. Added and removed by components/layout/AgentRouter.tsx and the deck. */
+.agent-flash {
+  outline: 2px solid var(--foreground);
+  outline-offset: 6px;
+  border-radius: 8px;
+  animation: agent-flash 2.6s ease-out forwards;
+}
+
+@keyframes agent-flash {
+  0%,
+  70% {
+    outline-color: var(--foreground);
+  }
+  100% {
+    outline-color: transparent;
+  }
 }
 
 ::-webkit-scrollbar-track {

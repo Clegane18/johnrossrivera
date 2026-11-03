@@ -42,7 +42,7 @@ export const profile = {
   careerGoal:
     "Owning features end to end (data model, API, and UI) and the architecture decisions behind them (TypeScript/NestJS/Next.js preferred)",
   summary:
-    "John has been building since he started self-studying in 2022 (four years hands-on), with professional production work at Crystal Vision since August 2025. He is a full-stack engineer: he owns a feature from the schema and the NestJS API through to the React/Next.js screens and the tests that cover both, without handoffs. At Crystal Vision he is sole developer of a 47-page competition admin console and primary developer of the NestJS backend behind it and the mobile app: 200+ REST endpoints across 61 data models, including a two-rail payment stack and a concurrency-safe voting engine, and he built the Laravel 12 KOL payout portal solo. TypeScript is his default across both halves of the stack.",
+    "John has been building since he started self-studying in 2022 (four years hands-on), with professional production work at Crystal Vision since August 2025. He is a full-stack TypeScript engineer (NestJS, Next.js) who builds and operates production systems end to end: the admin console for a live song competition with 574 active users, where he is the sole developer of all 52 modules; the Xendit fiat payment rail; and a Laravel affiliate portal he owns end to end. He closed an authorisation hole that left 115 of 123 API endpoints role-unchecked, and took the console from 0 tests to a 251-test gate. He is also the author of provenly, an open-source verification layer that makes AI coding agents prove their work.",
   education: siteConfig.education,
   // The page's Skills section is a deliberate SHORTLIST (lib/data/skills.ts) — the stack John is
   // applying with. This is the COMPLETE list from his CV, in CV order, and it exists for one job:
@@ -70,6 +70,7 @@ export const profile = {
       "Prisma",
       "Sequelize",
       "Redis",
+      "BullMQ",
       "JWT",
       "RBAC",
       "Jest",
@@ -88,7 +89,7 @@ export const profile = {
   interviewQa: [
     {
       q: "Tell me about yourself / Walk me through your background",
-      a: "John holds a BS in Information Technology (Web and Mobile App Development) from Bulacan State University. He started self-studying programming in 2022 and has been building ever since. His first full production system was a complete e-commerce platform for G&F Auto Supply: POS, inventory, and an in-store pickup flow for items that need a face-to-face check before purchase. He then completed an SAP ABAP training at Accenture PH, followed by a role at Crystal Vision where he wrote tests for the ROLA.ai Flutter mobile app and built LMS quiz features full-stack. Most recently he has owned two production systems at Crystal Vision. On the Rola Competition Platform, a live song competition with 917,026 registered users, he is sole developer of the admin console (34 modules, 47 pages) and primary developer of the NestJS backend behind both it and the mobile app (37 modules, 200+ REST endpoints, 61 data models), including a two-rail payment stack and a concurrency-safe voting engine. Separately he built the KOL Dashboard solo: a Laravel 12 affiliate and payout portal serving 1,000+ partners. He's full-stack: he ships the whole feature, not one half of it.",
+      a: "John holds a BS in Information Technology (Web and Mobile App Development) from Bulacan State University. He started self-studying programming in 2022 and has been building ever since. His first full production system was a complete e-commerce platform for G&F Auto Supply: POS, inventory, and an in-store pickup flow for items that need a face-to-face check before purchase. He then completed an SAP ABAP training at Accenture PH, followed by a role at Crystal Vision where he wrote tests for the ROLA.ai Flutter mobile app and built LMS quiz features full-stack. Most recently he has owned two production systems at Crystal Vision. On the Rola Competition Platform, a live song competition with 574 active users, he is the sole developer of the 52-module admin console, owns 8 modules of the shared NestJS admin API, and built the Xendit fiat payment rail. Separately he owns the KOL Dashboard end to end: a Laravel 12 affiliate and payout portal. Outside work he wrote provenly, an open-source verification layer for AI coding agents. He's full-stack: he ships the whole feature, not one half of it.",
     },
     {
       q: "Are you open to opportunities right now?",
@@ -98,15 +99,19 @@ export const profile = {
     // scope, and a recruiter who asks one standard question usually asks it early.
     {
       q: "Tell me about a system you own end to end",
-      a: "The Rola Competition Platform. John is sole developer of its admin console (34 modules, 47 pages in Next.js and React) and primary developer of the NestJS backend behind both that console and the mobile app: 37 modules, 200+ REST endpoints, 61 data models. The result is that operations staff run judging, moderation, payments and analytics themselves, with no engineer in the loop.",
+      a: "The admin console for the Rola Competition Platform. John is the sole developer of all 52 modules (61 pages in Next.js and React), and he owns 8 modules and 49 endpoints of the shared NestJS admin API behind it. The result is that operations staff run judging, moderation, payments and analytics themselves, with no engineer in the loop. He also took it from 0 tests to a 251-test gate that fails the build on any new red.",
     },
     {
       q: "What is the hardest technical problem you have solved?",
-      a: "Keeping contest results trustworthy under load. Votes arrive in bursts, and a result has to hold against both deliberate manipulation and ordinary race conditions: two requests landing at the same instant must not become two counted votes. John built a concurrency-safe voting engine with per-user and per-IP rate limiting, so the integrity of a result no longer depends on how much traffic hit it that second.",
+      a: "A payment queue that stranded people who had paid. The worker confirmed a payment, then registered the entrant. If it crashed between those two steps, the next retry saw the payment already confirmed, hit the duplicate-job early return and never registered them, and all 5 retries ended the same way, so the user saw 'You are not registered' after paying. John moved the registration upsert above that early return. The upsert is idempotent, so duplicate jobs stay harmless, and a crashed job now recovers on the first retry.",
+    },
+    {
+      q: "What security problem have you fixed?",
+      a: "The admin API's role guard was fail-open: any endpoint without an explicit role decorator was let through, and that was 115 of its 123 endpoints. John registered the guard globally and made undecorated routes admin-only by default. A route that is missing its decorator now fails loudly instead of quietly staying open to everyone.",
     },
     {
       q: "How do you handle sensitive user data?",
-      a: "He keeps it out of the places people forget to check. On the KOL Dashboard, emails, names and wallet addresses were reaching the UI, the logs and the CSV exports, so John built one reusable masking layer covering all three and locked it down with 25 unit tests. The tests are the real point: an export added months later cannot quietly bypass the masking.",
+      a: "He handles it at the model layer, not screen by screen. On the KOL Dashboard, partner emails, names, wallet addresses and bank details showed raw on 5 admin views, and masking had been copied into controllers. John replaced that with one masking trait covering 7 kinds of personal data, locked down by 25 unit tests, so a new screen gets masked data by default.",
     },
     {
       q: "What are your strengths?",
@@ -118,7 +123,7 @@ export const profile = {
     },
     {
       q: "How do you handle tight deadlines or pressure?",
-      a: "John prioritizes by impact. At Crystal Vision, the team needed to add a FIAT payment option to the song competition, a significant backend change. But the CTO correctly identified the mobile API as Phase 1, the user-facing priority that had to ship first. John set the fiat work aside, shipped the mobile API first, then came back and delivered both payment rails (on-chain USDC on Polygon and Xendit), so users could pay in crypto or fiat without ever being double-charged. No drama, just execution in the right order.",
+      a: "John prioritizes by impact. At Crystal Vision, the team needed to add a FIAT payment option to the song competition, a significant backend change. But the CTO correctly identified the mobile API as Phase 1, the user-facing priority that had to ship first. John set the fiat work aside, shipped the mobile API first, then came back and built the Xendit fiat rail end to end, so a product that only took crypto could take fiat too. No drama, just execution in the right order.",
     },
     {
       q: "Where do you see yourself in 3–5 years?",
@@ -126,7 +131,7 @@ export const profile = {
     },
     {
       q: "Why should we hire you?",
-      a: "Because he has already done the job at the scale you're hiring for. At Crystal Vision he is sole developer of a 47-page competition admin console and primary developer of the 200+ endpoint NestJS backend behind it, and he built the entire KOL payout portal on his own: two payment rails, and a PII masking layer with 25 tests holding it in place. He ships whole systems, not tickets.",
+      a: "Because he already owns production systems end to end. At Crystal Vision he is the sole developer of a 52-module competition admin console, he closed an authorisation hole that left 115 of 123 endpoints unchecked, he built the Xendit fiat rail, and he owns the Laravel affiliate portal from schema to screens. He also builds the guardrails that make AI coding agents prove their work. He ships whole systems, not tickets.",
     },
   ] as InterviewQa[],
 } as const;
