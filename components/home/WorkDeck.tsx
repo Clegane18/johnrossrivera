@@ -194,7 +194,7 @@ export function WorkDeck() {
             onPointerUp={onPointerUp}
             onPointerCancel={() => (drag.current = null)}
             style={{ height }}
-            className="relative -mx-4 touch-pan-y select-none overflow-hidden pt-3.5 outline-none [mask-image:linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)] sm:-mx-12"
+            className="relative -mx-4 touch-pan-y select-none overflow-hidden pt-3.5 outline-none [mask-image:linear-gradient(90deg,transparent,#000_6%,#000_94%,transparent)] sm:-mx-12"
           >
             {shown.map((project, index) => {
               let offset = index - current;
@@ -221,7 +221,7 @@ export function WorkDeck() {
                 >
                   <div
                     className={cn(
-                      "overflow-hidden rounded-xl border border-border bg-card shadow-[0_1px_2px_rgba(0,0,0,0.06),0_20px_50px_rgba(0,0,0,0.16)]",
+                      "overflow-hidden rounded-xl border border-border bg-card shadow-[0_1px_2px_rgba(0,0,0,0.05),0_12px_28px_-16px_rgba(0,0,0,0.28)]",
                       !front && "group-hover:border-muted-foreground"
                     )}
                   >
@@ -255,7 +255,7 @@ export function WorkDeck() {
                   {phone && (
                     <div
                       className={cn(
-                        "absolute -bottom-[7%] -right-[3%] w-[21%] overflow-hidden rounded-2xl border-4 border-foreground bg-foreground shadow-[0_14px_30px_rgba(0,0,0,0.25)] transition-[opacity,transform] delay-200 duration-500",
+                        "absolute -bottom-[7%] -right-[3%] w-[21%] overflow-hidden rounded-2xl border-4 border-foreground bg-foreground shadow-[0_8px_18px_-8px_rgba(0,0,0,0.3)] transition-[opacity,transform] delay-200 duration-500",
                         front ? "opacity-100" : "translate-y-4 opacity-0"
                       )}
                     >

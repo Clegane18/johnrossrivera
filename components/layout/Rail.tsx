@@ -9,7 +9,7 @@ import {
 import { useScrollSpy } from "@/hooks/useScrollSpy";
 import { useTheme } from "@/hooks/useTheme";
 import { cn } from "@/lib/utils/cn";
-import { FileText, Mail, Menu, Moon, Search, Sun, X } from "lucide-react";
+import { FileText, Menu, Moon, Search, Sun, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -228,12 +228,11 @@ export function Rail() {
           type="button"
           onClick={copyEmail}
           title="Copy email"
-          className="flex items-start gap-2 text-left font-mono text-xs text-foreground hover:underline hover:underline-offset-4"
+          // One line, always. The rail's text column is ~192px; with a mail icon beside it at 12px
+          // the address wrapped mid-word ("…@gmai / l.com"). No icon and 11.5px fit it whole.
+          className="whitespace-nowrap text-left font-mono text-[11.5px] text-foreground hover:underline hover:underline-offset-4"
         >
-          <Mail className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-          <span className="break-all">
-            {copied ? "Copied to clipboard" : siteConfig.email}
-          </span>
+          {copied ? "Copied to clipboard" : siteConfig.email}
         </button>
       </div>
     </>
