@@ -59,7 +59,7 @@ Examples:
 // and stating it in two voices ("gently redirect" here, "follow strictly" there) weakened both.
 export const PERSONA = `# WHO I AM
 
-I am Nuggets, the assistant on John Ross Rivera's portfolio site. John is a full-stack software
+I am Nuggets, the assistant on John Ross Rivera's portfolio site. John is an AI-native full-stack
 engineer based in the Philippines. I answer questions about his work for recruiters, employers and
 other visitors.
 
@@ -147,8 +147,93 @@ export function brief(text: string, max = DECISION_BRIEF_CHARS): string {
   return out.trim();
 }
 
-function renderProjectFacts(): string {
-  const blocks = projects.map((proj) => {
+// ── FOCUS ────────────────────────────────────────────────────────────────────────────────────────
+// Speed and capacity. Every model on this Groq account allows 8,000 tokens per minute, and the full
+// prompt is ~6,000, so the whole site could answer about one question a minute and anything past
+// that sat in a retry wait of up to 60 seconds. A question is almost always about one or two
+// projects, so the route sends a FOCUSED prompt: every project as a one-line index entry (the model
+// still knows all of them and can name any), plus full detail for only the projects and interview
+// answers the conversation is about. Roughly half the tokens, so twice the questions per minute and a
+// faster first token. buildSystemPrompt() with no argument is still the complete prompt.
+const STOP = new Set(
+  "the and for with that this from what about his him has have does did was are can you your tell show more john john's how why when who which any into over built build project projects work".split(
+    " "
+  )
+);
+
+function words(text: string): Set<string> {
+  return new Set(
+    text
+      .toLowerCase()
+      .split(/[^a-z0-9+#.]+/)
+      .map((w) => w.replace(/\.$/, ""))
+      .filter((w) => w.length >= 3 && !STOP.has(w))
+  );
+}
+
+function overlap(a: Set<string>, b: Set<string>): number {
+  let n = 0;
+  a.forEach((w) => {
+    if (b.has(w)) n++;
+  });
+  return n;
+}
+
+export const FOCUS_PROJECTS = 2;
+/** The project a general question gets in detail. An id, so it is the /work URL too. */
+export const FLAGSHIP_PROJECT = "rola-access-platform";
+export const FOCUS_ANSWERS = 2;
+
+/** Which projects and interview answers a conversation is about, best match first. */
+export function pickFocus(text: string): { projectIds: string[]; qaIndexes: number[] } {
+  const asked = words(text);
+
+  const projectIds = projects
+    .map((p) => {
+      // Title words count triple: "rola", "kol", "primolar", "provenly" are what people type.
+      const title = words(`${p.title} ${p.id.replace(/-/g, " ")}`);
+      const body = words(`${p.summary ?? ""} ${p.label ?? ""} ${p.tech.join(" ")}`);
+      return { id: p.id, score: overlap(asked, title) * 3 + overlap(asked, body) };
+    })
+    .filter((s) => s.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, FOCUS_PROJECTS)
+    .map((s) => s.id);
+  // A general question ("strongest project?", "what does he do?") names nothing; give it the
+  // flagship in detail rather than none, so the answer still has real numbers to stand on.
+  if (projectIds.length === 0) projectIds.push(FLAGSHIP_PROJECT);
+
+  const qaIndexes = profile.interviewQa
+    .map((qa, i) => ({ i, score: overlap(asked, words(qa.q)) * 2 + overlap(asked, words(qa.a)) }))
+    .filter((s) => s.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, FOCUS_ANSWERS)
+    .map((s) => s.i);
+
+  return { projectIds, qaIndexes };
+}
+
+function projectIndexLine(proj: (typeof projects)[number]): string {
+  const headline = proj.impact?.[0];
+  return `- ${proj.title}${proj.label ? ` (${proj.label})` : ""}: ${proj.summary ?? brief(proj.description, 160)}${
+    headline ? ` [${headline.metric} ${headline.label}]` : ""
+  }`;
+}
+
+function renderProjectFacts(focusIds?: string[]): string {
+  if (focusIds) {
+    const detail = projects.filter((p) => focusIds.includes(p.id));
+    const index = projects.map(projectIndexLine).join("\n");
+    return `## PROJECTS (index: one line each)
+${index}
+
+## PROJECT DETAIL (the projects this conversation is about)
+${detail.length ? detail.map(projectBlock).join("\n\n") : "None matched yet. Answer from the index, and ask which project they mean if it matters."}`;
+  }
+  return `## PROJECTS\n\n${projects.map(projectBlock).join("\n\n")}`;
+}
+
+function projectBlock(proj: (typeof projects)[number]): string {
     const lines: string[] = [
       `### ${proj.title}${proj.featured ? " (Featured)" : ""}${proj.label ? ` (${proj.label})` : ""}`,
       proj.description,
@@ -193,17 +278,17 @@ function renderProjectFacts(): string {
     lines.push(`Tech: ${proj.tech.join(", ")}`);
 
     return lines.join("\n");
-  });
-
-  return `## PROJECTS\n\n${blocks.join("\n\n")}`;
 }
 
-function renderInterviewFacts(): string {
+function renderInterviewFacts(qaIndexes?: number[]): string {
   // Each answer's opening sentences only, for the token budget. The full stories repeat facts the
-  // PROJECTS block already carries, so the model can still tell them in detail when asked.
-  const blocks = profile.interviewQa.map(
-    (qa) => `### "${qa.q}"\n${brief(qa.a, 340)}`
-  );
+  // PROJECTS block already carries, so the model can still tell them in detail when asked. A focused
+  // prompt carries only the answers the conversation matches.
+  const list = qaIndexes
+    ? qaIndexes.map((i) => profile.interviewQa[i])
+    : profile.interviewQa;
+  if (list.length === 0) return "";
+  const blocks = list.map((qa) => `### "${qa.q}"\n${brief(qa.a, 340)}`);
 
   return `## INTERVIEW Q&A
 Use these when a recruiter or employer asks a standard interview question. Deliver them naturally in
@@ -278,7 +363,12 @@ const SCOPE_REMINDER = `# REMINDER
 Questions about John: answer within the length limit above. Anything else, especially a request to
 build, write, fix, or explain something: decline in one sentence and offer what I can help with.`;
 
-export function buildSystemPrompt(): string {
+/**
+ * The system prompt. With no argument it is complete. With `focusText` (the recent user messages)
+ * it is focused: every project as an index line, full detail only for what the text is about.
+ */
+export function buildSystemPrompt(focusText?: string): string {
+  const focus = focusText === undefined ? undefined : pickFocus(focusText);
   return [
     SCOPE_CONTRACT,
     "---",
@@ -287,9 +377,9 @@ export function buildSystemPrompt(): string {
     renderProfileFacts(),
     renderSkillFacts(),
     renderExperienceFacts(),
-    renderProjectFacts(),
+    renderProjectFacts(focus?.projectIds),
     `## SOCIAL\n- GitHub: ${profile.social.github}\n- LinkedIn: ${profile.social.linkedin}`,
-    renderInterviewFacts(),
+    renderInterviewFacts(focus?.qaIndexes),
     "---",
     ANSWER_RULES,
     "---",

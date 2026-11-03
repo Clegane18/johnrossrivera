@@ -29,7 +29,7 @@ export const profile = {
   location: siteConfig.about.location,
   email: siteConfig.email,
   roleTarget:
-    "Full-Stack Software Engineer (TypeScript: React/Next.js front end, NestJS/Node.js back end); also open to frontend-focused roles",
+    "AI-Native Full-Stack Engineer (TypeScript: React/Next.js front end, NestJS/Node.js back end, AI agent tooling and LLM features); also open to frontend-focused roles",
   availability:
     "Actively looking, and open to full-stack or frontend roles with global teams, and able to start after a 30-day notice period at his current role. Also open to freelance/contract projects alongside that.",
   workSetup:

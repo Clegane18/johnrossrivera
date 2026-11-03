@@ -13,7 +13,37 @@ import {
   SCOPE_CONTRACT,
   brief,
   buildSystemPrompt,
+  pickFocus,
 } from "./system-prompt";
+
+describe("focused prompt (speed and capacity)", () => {
+  it("picks the project a question names", () => {
+    expect(pickFocus("Tell me about the KOL dashboard").projectIds[0]).toBe("kol-dashboard");
+    expect(pickFocus("What is Primolar?").projectIds[0]).toBe("pedia-dental");
+    expect(pickFocus("how does provenly work").projectIds[0]).toBe("provenly");
+    expect(pickFocus("what did he do with Laravel").projectIds).toContain("kol-dashboard");
+  });
+
+  it("matches the interview answer a standard question asks for", () => {
+    const { qaIndexes } = pickFocus("Are you open to opportunities right now?");
+    expect(profile.interviewQa[qaIndexes[0]].q).toBe("Are you open to opportunities right now?");
+  });
+
+  it("still names every project and keeps the contract at both edges", () => {
+    const focused = buildSystemPrompt("Is he available to hire?");
+    for (const p of projects) expect(focused).toContain(`- ${p.title}`);
+    expect(focused.indexOf("# SCOPE")).toBe(0);
+    expect(focused.trimEnd().endsWith("offer what I can help with.")).toBe(true);
+    for (const p of ACTION_PROJECTS) expect(focused).toContain(`- ${p.id} (`);
+  });
+
+  it("is much smaller than the full prompt, so more questions fit in Groq's per-minute limit", () => {
+    const full = buildSystemPrompt().length;
+    for (const q of ["What's his strongest project?", "Tell me about provenly", "Is he available?"]) {
+      expect(buildSystemPrompt(q).length).toBeLessThan(full * 0.7);
+    }
+  });
+});
 
 // WHAT THESE TESTS CAN AND CANNOT PROVE
 //
