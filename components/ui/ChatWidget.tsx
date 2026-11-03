@@ -12,7 +12,11 @@ import Image from "next/image";
 import { Info, Mail, Send, X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { useChat } from "@/hooks/useChat";
-import { useCommandPalette } from "@/hooks/useCommandPalette";
+import {
+  SHORTCUT_KEY,
+  useCommandPalette,
+  useShortcutModifier,
+} from "@/hooks/useCommandPalette";
 import { useSound } from "@/hooks/useSound";
 import { siteConfig } from "@/config/site";
 import { AGENT_EVENT, actionLabel } from "@/lib/ai/page-actions";
@@ -117,9 +121,9 @@ function renderMsg(text: string): ReactNode {
 function TypingDots() {
   return (
     <span className="flex items-center gap-1 py-1">
-      <span className="h-2 w-2 animate-bounce rounded-full bg-zinc-400 [animation-delay:-0.3s] dark:bg-zinc-500" />
-      <span className="h-2 w-2 animate-bounce rounded-full bg-zinc-400 [animation-delay:-0.15s] dark:bg-zinc-500" />
-      <span className="h-2 w-2 animate-bounce rounded-full bg-zinc-400 dark:bg-zinc-500" />
+      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.3s]" />
+      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.15s]" />
+      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground" />
     </span>
   );
 }
@@ -144,6 +148,7 @@ export function ChatWidget() {
     remaining,
   } = useChat();
   const { play } = useSound();
+  const modifier = useShortcutModifier();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -293,10 +298,12 @@ export function ChatWidget() {
           <motion.div
             className={cn(
               "fixed z-50 flex flex-col overflow-hidden",
-              "border border-zinc-200 bg-white shadow-2xl dark:border-zinc-700/60 dark:bg-zinc-900",
+              // The site's own tokens, thin border and squarer corners, so the panel reads as part
+              // of the page rather than a third-party widget dropped on top of it.
+              "border border-border bg-background shadow-[0_24px_60px_-20px_rgba(0,0,0,0.45)]",
               "inset-0",
-              "md:inset-auto md:bottom-24 md:right-6 md:h-[520px] md:w-[22rem] md:rounded-2xl",
-              "lg:w-96"
+              "md:inset-auto md:bottom-24 md:right-6 md:h-[520px] md:w-[22rem] md:rounded-xl",
+              "lg:bottom-20 lg:w-96"
             )}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -304,19 +311,20 @@ export function ChatWidget() {
             transition={{ duration: 0.15 }}
           >
             {/* Header */}
-            <div className="flex flex-shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-zinc-900">
+            <div className="flex flex-shrink-0 items-center justify-between border-b border-border bg-background px-4 py-3">
               <div className="flex items-center gap-2.5">
-                <div className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-full ring-1 ring-border">
+                {/* Greyscale, like everything else on the page that is not a project screenshot. */}
+                <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-md border border-border">
                   <Image
                     src={siteConfig.chat.avatarPath}
                     alt="Nuggets"
                     fill
-                    className="object-cover"
-                    sizes="36px"
+                    className="object-cover grayscale"
+                    sizes="32px"
                   />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold leading-none text-zinc-900 dark:text-zinc-100">
+                  <p className="font-mono text-[13px] font-medium leading-none text-foreground">
                     {siteConfig.chat.name}
                   </p>
                   {/* What it is, not a pulsing "Online" dot.
@@ -324,7 +332,7 @@ export function ChatWidget() {
                       and it animated forever. The navbar dropped exactly this pattern for exactly
                       this reason; the widget kept it. A plain role line uses the same space to
                       answer the question a first-time visitor actually has. */}
-                  <p className="mt-1 text-[11px] leading-none text-zinc-500 dark:text-zinc-400">
+                  <p className="mt-1.5 font-mono text-[10px] uppercase leading-none tracking-[0.08em] text-muted-foreground">
                     {siteConfig.chat.role}
                   </p>
                 </div>
@@ -332,7 +340,7 @@ export function ChatWidget() {
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setShowTech((v) => !v)}
-                  className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                  className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   aria-label="How Nuggets works"
                   aria-expanded={showTech}
                   aria-controls="nuggets-tech-panel"
@@ -341,7 +349,7 @@ export function ChatWidget() {
                 </button>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                  className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   aria-label="Close chat"
                 >
                   <X className="h-4 w-4" />
@@ -358,17 +366,17 @@ export function ChatWidget() {
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="flex-shrink-0 overflow-hidden border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900/60"
+                  className="flex-shrink-0 overflow-hidden border-b border-border bg-muted/40"
                 >
                   <div className="space-y-1.5 px-4 py-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                    <p className="font-mono text-[10.5px] uppercase tracking-[0.08em] text-muted-foreground">
                       {siteConfig.chat.techNote.heading}
                     </p>
                     <ul className="space-y-1">
                       {siteConfig.chat.techNote.points.map((pt) => (
                         <li
                           key={pt}
-                          className="flex gap-1.5 text-[11px] leading-snug text-zinc-600 dark:text-zinc-300"
+                          className="flex gap-1.5 text-[11px] leading-snug text-muted-foreground"
                         >
                           <span className="mt-1 h-1 w-1 flex-shrink-0 rounded-full bg-muted-foreground" />
                           {pt}
@@ -381,7 +389,7 @@ export function ChatWidget() {
             </AnimatePresence>
 
             {/* Messages */}
-            <div className="flex-1 space-y-3 overflow-y-auto bg-zinc-50 p-4 dark:bg-zinc-900/50">
+            <div className="flex-1 space-y-3 overflow-y-auto bg-background p-4">
               {messages.map((msg, i) => {
                 const isActiveAssistant =
                   i === messages.length - 1 &&
@@ -396,23 +404,23 @@ export function ChatWidget() {
                     })}
                   >
                     {msg.role === "assistant" && (
-                      <div className="relative h-7 w-7 flex-shrink-0 overflow-hidden rounded-full ring-1 ring-border">
+                      <div className="relative h-6 w-6 flex-shrink-0 overflow-hidden rounded-md border border-border">
                         <Image
                           src={siteConfig.chat.avatarPath}
                           alt="Nuggets"
                           fill
-                          className="object-cover"
-                          sizes="28px"
+                          className="object-cover grayscale"
+                          sizes="24px"
                         />
                       </div>
                     )}
                     {msg.role === "user" ? (
-                      <div className="max-w-[82%] rounded-2xl rounded-br-sm bg-foreground px-4 py-2.5 text-sm text-background">
+                      <div className="max-w-[82%] rounded-lg rounded-br-sm bg-foreground px-3.5 py-2.5 text-sm text-background">
                         {msg.content}
                       </div>
                     ) : (
                       <div className="flex max-w-[85%] flex-col items-start gap-1.5">
-                        <div className="rounded-2xl rounded-tl-sm bg-white px-4 py-2.5 text-sm leading-relaxed text-zinc-800 shadow-sm dark:bg-zinc-800 dark:text-zinc-100">
+                        <div className="rounded-lg rounded-bl-sm border border-border bg-card px-3.5 py-2.5 text-sm leading-relaxed text-foreground">
                           {isActiveAssistant ? (
                             isTyping ? (
                               <>
@@ -441,7 +449,7 @@ export function ChatWidget() {
                                 new CustomEvent(AGENT_EVENT, { detail: [action] })
                               )
                             }
-                            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-[11.5px] font-medium text-muted-foreground transition-colors hover:border-muted-foreground hover:text-foreground"
+                            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:border-muted-foreground hover:text-foreground"
                           >
                             <span aria-hidden="true">↳</span>
                             {actionLabel(action)}
@@ -459,7 +467,7 @@ export function ChatWidget() {
               {fallback && (
                 <div
                   role="alert"
-                  className="flex flex-col gap-2 rounded-xl border border-border bg-muted px-3 py-2.5 text-xs text-foreground"
+                  className="flex flex-col gap-2 rounded-lg border border-border bg-muted/50 px-3 py-2.5 text-xs text-foreground"
                 >
                   <span>{fallback.message}</span>
 
@@ -470,7 +478,7 @@ export function ChatWidget() {
                   {fallback.showContact && (
                     <a
                       href={`mailto:${siteConfig.email}`}
-                      className="inline-flex w-fit items-center gap-1.5 rounded-lg bg-foreground px-2.5 py-1.5 font-medium text-background transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                      className="inline-flex w-fit items-center gap-1.5 rounded-md bg-foreground px-2.5 py-1.5 font-medium text-background transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                     >
                       <Mail className="h-3.5 w-3.5" aria-hidden="true" />
                       Email John directly
@@ -483,7 +491,7 @@ export function ChatWidget() {
             </div>
 
             {/* Input */}
-            <div className="flex-shrink-0 border-t border-zinc-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900">
+            <div className="flex-shrink-0 border-t border-border bg-background p-3">
               <div className="flex items-end gap-2">
                 <textarea
                   ref={inputRef}
@@ -493,19 +501,19 @@ export function ChatWidget() {
                   onKeyDown={handleKeyDown}
                   placeholder="Ask Nuggets anything..."
                   disabled={isStreaming}
-                  className="max-h-24 w-full resize-none overflow-y-auto rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-foreground"
+                  className="max-h-24 w-full resize-none overflow-y-auto rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-foreground focus:outline-none disabled:opacity-50"
                 />
                 <button
                   onClick={handleSend}
                   disabled={!input.trim() || isStreaming}
                   aria-label="Send message"
-                  className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-foreground text-background transition-opacity hover:opacity-90 disabled:opacity-30"
+                  className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-foreground text-background transition-opacity hover:opacity-90 disabled:opacity-30"
                 >
                   <Send className="h-3.5 w-3.5" />
                 </button>
               </div>
               {remaining !== null && (
-                <p className="mt-1.5 text-right font-mono text-[10px] text-zinc-400 dark:text-zinc-500">
+                <p className="mt-1.5 text-right font-mono text-[10px] text-muted-foreground">
                   {remaining} {remaining === 1 ? "ask" : "asks"} left this hour
                 </p>
               )}
@@ -528,9 +536,12 @@ export function ChatWidget() {
           <AnimatePresence>
             {showHint && !isOpen && (
               <motion.div
-                initial={{ opacity: 0, x: 12, scale: 0.88 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: 12, scale: 0.88 }}
+                // y: -50% with top-1/2 centres the bubble on the launcher. It lives in the motion
+                // values, not a Tailwind translate class, because framer-motion owns `transform`
+                // here and would overwrite the class.
+                initial={{ opacity: 0, x: 12, y: "-50%", scale: 0.92 }}
+                animate={{ opacity: 1, x: 0, y: "-50%", scale: 1 }}
+                exit={{ opacity: 0, x: 12, y: "-50%", scale: 0.92 }}
                 transition={{ type: "spring", stiffness: 380, damping: 22 }}
                 /* right-full, NOT a fixed right-16. The launcher is two different widths: a bare
                    56px circle over the hero, and a ~176px labelled pill everywhere else (see the
@@ -538,18 +549,18 @@ export function ChatWidget() {
                    circle by 8px and landed 112px INSIDE the pill, so the hint painted across the
                    label. right-full pins the bubble's right edge to the launcher's left edge
                    whatever that width happens to be, and mr-3 is the gap the arrow sits in. */
-                className="absolute bottom-2 right-full mr-3 w-52 rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-xs font-medium leading-snug text-zinc-700 shadow-[0_8px_24px_rgba(0,0,0,0.18)] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
+                // One line, centred on the launcher: a four-line bubble sat low and covered page
+                // content for its five seconds.
+                className="absolute right-full top-1/2 mr-3 whitespace-nowrap rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground shadow-[0_8px_24px_-8px_rgba(0,0,0,0.22)]"
               >
-                Ask Nuggets about John&rsquo;s work. It answers from this
-                site&rsquo;s project data.
-                <span className="absolute right-[-6px] top-1/2 -translate-y-1/2 border-4 border-transparent border-l-white dark:border-l-zinc-900" />
+                Ask me about John&rsquo;s work
+                <span className="absolute right-[-6px] top-1/2 -translate-y-1/2 border-4 border-transparent border-l-card" />
               </motion.div>
             )}
           </AnimatePresence>
           <motion.button
             onClick={() => setIsOpen((prev) => !prev)}
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.93 }}
+            whileTap={{ scale: 0.96 }}
             /* A labelled control on anything wider than a phone.
                A bare circular portrait with an orange halo is a mascot: it says "pet" and gives no
                clue what pressing it does. Naming the action is the single biggest thing separating
@@ -557,27 +568,37 @@ export function ChatWidget() {
                it. Below sm there is no room for the label and the circle stands alone.
                The halo also went: it was `rgba(251,146,60,.35)`, the last orange on a site that was
                deliberately swept to monochrome, so the widget glowed in a colour used nowhere else. */
+            // Same vocabulary as the rail's buttons: card fill, thin border, squarer corners, a
+            // greyscale mark and the shortcut in mono. The old round photo button read as a widget
+            // bolted onto the page.
             className={cn(
-              "relative flex h-14 items-center gap-2.5 overflow-hidden rounded-full border border-border bg-card p-1 text-sm font-semibold text-foreground shadow-md transition-shadow duration-200 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+              "relative flex h-12 items-center gap-2.5 overflow-hidden rounded-xl border border-border bg-card p-1.5 text-[13px] font-medium text-foreground shadow-[0_10px_30px_-12px_rgba(0,0,0,0.45)] transition-colors duration-200 hover:border-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
               // Also collapsed while the panel is open: the close overlay is `inset-0` and was drawn
-              // for a 56px circle, so over the 172px pill it painted a dark slab across the label
-              // with the X centred on top of it — "As✕Nuggets".
-              !atHero && !isOpen && "sm:pr-5"
+              // for the bare mark, so over the labelled button it painted across the label.
+              !atHero && !isOpen && "sm:pr-3"
             )}
             aria-label={isOpen ? "Close chat" : "Ask Nuggets about John's work"}
           >
-            <span className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-full">
+            <span className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg border border-border">
               <Image
                 src={siteConfig.chat.avatarPath}
                 alt=""
                 fill
-                className="object-cover"
-                sizes="48px"
+                className="object-cover grayscale"
+                sizes="36px"
               />
             </span>
             {!atHero && !isOpen && (
-              <span className="hidden whitespace-nowrap sm:inline">
+              <span className="hidden items-center gap-2.5 whitespace-nowrap sm:flex">
                 Ask {siteConfig.chat.name}
+                <span className="flex gap-1" aria-hidden="true">
+                  <kbd className="rounded border border-border bg-background px-1.5 font-mono text-[10.5px] font-normal text-muted-foreground">
+                    {modifier}
+                  </kbd>
+                  <kbd className="rounded border border-border bg-background px-1.5 font-mono text-[10.5px] font-normal text-muted-foreground">
+                    {SHORTCUT_KEY}
+                  </kbd>
+                </span>
               </span>
             )}
             <AnimatePresence>
@@ -588,9 +609,9 @@ export function ChatWidget() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute inset-0 flex items-center justify-center rounded-full bg-zinc-900/80"
+                  className="absolute inset-0 flex items-center justify-center bg-foreground"
                 >
-                  <X className="h-5 w-5 text-white" />
+                  <X className="h-5 w-5 text-background" />
                 </motion.span>
               )}
             </AnimatePresence>

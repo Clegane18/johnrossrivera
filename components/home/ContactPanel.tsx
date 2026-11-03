@@ -7,15 +7,19 @@ import {
   type ContactFormValues,
 } from "@/lib/validations/contact";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Check, Copy, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-function CopyButton({ value }: { value: string }) {
+// An icon, not a "Copy" text button: in the two-column layout the text button took ~56px from the
+// value column, which pushed the email onto a second line mid-word ("…gmail.co / m").
+function CopyButton({ value, label }: { value: string; label: string }) {
   const [copied, setCopied] = useState(false);
   return (
     <button
       type="button"
+      aria-label={copied ? `${label} copied` : `Copy ${label.toLowerCase()}`}
+      title={copied ? "Copied" : "Copy"}
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(value);
@@ -25,9 +29,13 @@ function CopyButton({ value }: { value: string }) {
           // Clipboard refused (older browsers, some in-app views): the value is selectable text.
         }
       }}
-      className="min-w-[56px] rounded-md border border-border px-2 py-1 text-[11.5px] font-medium text-muted-foreground hover:border-muted-foreground hover:text-foreground"
+      className="grid h-7 w-7 place-items-center rounded-md border border-border text-muted-foreground hover:border-muted-foreground hover:text-foreground"
     >
-      {copied ? "Copied" : "Copy"}
+      {copied ? (
+        <Check className="h-3.5 w-3.5" aria-hidden="true" />
+      ) : (
+        <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+      )}
     </button>
   );
 }
@@ -84,16 +92,20 @@ export function ContactPanel() {
             ].map(([label, value]) => (
               <div
                 key={label}
-                className="grid grid-cols-[72px_minmax(0,1fr)_auto] items-center gap-2.5 border-b border-border py-2.5 text-[13.5px]"
+                className="grid grid-cols-[64px_minmax(0,1fr)_auto] items-center gap-2.5 border-b border-border py-2.5 text-[13.5px]"
               >
                 <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
                   {label}
                 </span>
-                <span className="select-all break-words text-foreground">{value}</span>
-                <CopyButton value={value} />
+                {/* One line always; if a very narrow column ever can't fit it, it scrolls in place
+                    rather than breaking the address mid-word. */}
+                <span className="select-all overflow-x-auto whitespace-nowrap text-foreground">
+                  {value}
+                </span>
+                <CopyButton value={value} label={label} />
               </div>
             ))}
-            <div className="grid grid-cols-[72px_minmax(0,1fr)] items-center gap-2.5 border-b border-border py-2.5 text-[13.5px]">
+            <div className="grid grid-cols-[64px_minmax(0,1fr)] items-center gap-2.5 border-b border-border py-2.5 text-[13.5px]">
               <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
                 Based
               </span>

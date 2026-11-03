@@ -3,14 +3,26 @@
 import { cn } from "@/lib/utils/cn";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUp } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useScrollPosition } from "@/hooks/useScrollPosition";
 
 export function ScrollToTop() {
   const { isVisible, scrollToTop } = useScrollPosition(0.3);
+  // Hidden while the chat is open: its panel ends where this button sits, so the button would
+  // cover the chat's Send button. ChatWidget announces open/close with this event.
+  const [chatOpen, setChatOpen] = useState(false);
+
+  useEffect(() => {
+    function onChat(event: Event) {
+      setChatOpen(Boolean((event as CustomEvent<boolean>).detail));
+    }
+    window.addEventListener("nuggets:open", onChat);
+    return () => window.removeEventListener("nuggets:open", onChat);
+  }, []);
 
   return (
     <AnimatePresence>
-      {isVisible && (
+      {isVisible && !chatOpen && (
         <motion.button
           key="scroll-to-top"
           type="button"
@@ -26,8 +38,12 @@ export function ScrollToTop() {
             // scroll offset (on the contact section, over the Email field). The dock's first chip
             // is "About", which is the top of the page, so the mobile affordance already exists in
             // the thumb zone and did not need a duplicate laid over the content.
-            "fixed bottom-24 right-24 z-[60] hidden h-11 w-11 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-900 shadow-lg transition-colors duration-200 lg:bottom-[30px] lg:flex dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100",
-            "hover:bg-zinc-100 dark:hover:bg-zinc-700",
+            //
+            // Stacked above the chat launcher, not beside it: the launcher became a labelled
+            // ~190px button, and the old right-24 slot landed on top of it. Styled like the rail's
+            // controls so the two floating buttons read as one set.
+            "fixed bottom-24 right-6 z-[60] hidden h-11 w-11 items-center justify-center rounded-xl border border-border bg-card text-foreground shadow-[0_10px_30px_-12px_rgba(0,0,0,0.45)] transition-colors duration-200 lg:bottom-[84px] lg:flex",
+            "hover:border-muted-foreground",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           )}
         >
