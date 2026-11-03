@@ -117,9 +117,6 @@ export const siteConfig = {
     location: "Bacoor, Cavite, Philippines",
     lightImageUrl: "/images/light-profile.webp",
     darkImageUrl: "/images/dark-profile.webp",
-    // Head-and-shoulders cut-out (transparent background) that the hero dithers for both themes.
-    // Made from a phone photo with macOS Vision person segmentation, cropped square on the face.
-    portraitCutoutUrl: "/images/portrait-cutout.webp",
     imageAlt: "Portrait of John Ross Rivera",
   },
   // The single copy of the degree. It used to be written one way here and another in
