@@ -1,12 +1,15 @@
 export const siteConfig = {
   name: "John Ross Rivera",
-  title: "John Ross Rivera - Full-Stack Software Engineer",
+  title: "John Ross Rivera - AI-Native Full-Stack Engineer",
   description:
-    "Personal portfolio of John Ross Rivera, a full-stack software engineer shipping production systems end to end: TypeScript, React and Next.js on the front, NestJS APIs and MySQL behind them.",
+    "Personal portfolio of John Ross Rivera, an AI-native full-stack engineer shipping production systems end to end in TypeScript (Next.js, NestJS), and building the guardrails that make AI coding agents prove their work.",
   url: "https://johnrossrivera.vercel.app",
   email: "johnrossrivera20@gmail.com",
   phone: "+63 921 670 6170",
-  role: "Full-Stack Software Engineer",
+  // "AI-Native Full-Stack Engineer", not "AI Engineer": the evidence bank backs full-stack systems
+  // built and verified with AI agents (provenly, the Claude Code harness, grounded Groq assistants),
+  // not model training, which is what many recruiters read "AI Engineer" as.
+  role: "AI-Native Full-Stack Engineer",
   // One copy, read by BOTH the navbar label and the hero role card. It used to sit under `navbar`,
   // which framed a hiring fact as chrome and left the hero unable to use it without a second copy.
   // The hero needs it because the navbar label is `hidden lg:flex`, and lg is 1280 here, so on

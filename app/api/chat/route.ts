@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
+import type {
+  ChatCompletionChunk,
+  ChatCompletionCreateParamsStreaming,
+} from "groq-sdk/resources/chat/completions";
 import { buildSystemPrompt } from "@/lib/ai/system-prompt";
 import { rateLimit, type RateLimitEntry } from "@/lib/utils/rate-limit";
 import { getClientIp } from "@/lib/utils/client-ip";
@@ -9,10 +13,20 @@ const RATE_LIMIT_MAP = new Map<string, RateLimitEntry>();
 const MAX_REQUESTS = 20;
 const WINDOW_MS = 60 * 60 * 1000; // 1 hour
 
-// The system prompt lives in lib/ai/system-prompt.ts so its invariants (scope contract present and
-// FIRST, never-disclose rules intact) can be unit-tested. Built once at module load — it is derived
-// from static data and does not change per request.
-const SYSTEM_PROMPT = buildSystemPrompt();
+// Models to try, in order. Each has its OWN 8,000 tokens-per-minute allowance on the free tier, so
+// when one is at its limit the next answers immediately instead of the visitor waiting out the
+// minute. All three measured under a second for a short reply (2026-11-03). qwen needs
+// reasoning_format "hidden" or its thinking text lands in the answer.
+const MODELS = [
+  { model: "openai/gpt-oss-120b", extra: { reasoning_effort: "low" } },
+  { model: "openai/gpt-oss-20b", extra: { reasoning_effort: "low" } },
+  { model: "qwen/qwen3.8-27b", extra: { reasoning_format: "hidden" } },
+] as const;
+
+function statusOf(err: unknown): number | undefined {
+  const status = (err as { status?: unknown })?.status;
+  return typeof status === "number" ? status : undefined;
+}
 
 export async function POST(request: Request): Promise<Response> {
   const ip = getClientIp(request);
@@ -69,31 +83,48 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
-  const groq = new Groq({ apiKey });
+  // maxRetries 0: the SDK's default retry honours Groq's retry-after, which on a per-minute limit
+  // is up to 60 seconds of a visitor watching typing dots. The model fallback above replaces it.
+  const groq = new Groq({ apiKey, maxRetries: 0, timeout: 20_000 });
 
   try {
-    const stream = await groq.chat.completions.create({
-      // llama-3.3-70b-versatile was withdrawn from this Groq account (404 model_not_found → every
-      // chat 500'd). gpt-oss-120b is a reasoning model: its reasoning tokens count against
-      // max_tokens, so effort is kept low to leave the 400-token budget for the actual answer.
-      // Reasoning arrives in a separate delta field, never in `content`, so it is not streamed out.
-      model: "openai/gpt-oss-120b",
-      reasoning_effort: "low",
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        ...result.data.messages,
-      ],
-      stream: true,
-      // Brevity is enforced in two places, because the prompt alone did not hold: the rules ask for
-      // 2–4 sentences, and this is the hard ceiling behind them. 1024 permitted ~750 words, which is
-      // far longer than any answer here should be. 400 leaves headroom for a genuinely detailed
-      // answer (an interview-style story with a Live URL) without allowing a wall of text —
-      // truncating mid-sentence reads worse than being slightly long, so this is deliberately not
-      // set to the 2–4 sentence budget itself.
-      max_tokens: 400,
-      // Lowered from 0.4: less drift from the answer rules and the scope contract, tighter phrasing.
-      temperature: 0.2,
-    });
+    // The system prompt is focused on what the visitor is asking about (see pickFocus in
+    // lib/ai/system-prompt.ts): the last two user messages, so a follow-up keeps its subject.
+    const focusText = result.data.messages
+      .filter((m) => m.role === "user")
+      .slice(-2)
+      .map((m) => m.content)
+      .join(" ");
+    const messages = [
+      { role: "system" as const, content: buildSystemPrompt(focusText) },
+      ...result.data.messages,
+    ];
+
+    // Rate-limited (429) or over the per-minute size (413) on one model: move straight to the
+    // next. Anything else is a real failure and goes to the catch below.
+    let lastErr: unknown;
+    let stream: AsyncIterable<ChatCompletionChunk> | undefined;
+    for (const { model, extra } of MODELS) {
+      try {
+        stream = await groq.chat.completions.create({
+          model,
+          ...extra,
+          messages,
+          stream: true,
+          // Brevity is enforced in two places, because the prompt alone did not hold: the rules ask
+          // for 2-4 sentences, and this is the hard ceiling behind them.
+          max_tokens: 400,
+          temperature: 0.2,
+        } as ChatCompletionCreateParamsStreaming);
+        break;
+      } catch (err) {
+        lastErr = err;
+        const status = statusOf(err);
+        if (status !== 429 && status !== 413) throw err;
+        console.warn(`Groq ${model} at its limit (HTTP ${status}); trying the next model.`);
+      }
+    }
+    if (!stream) throw lastErr;
 
     const encoder = new TextEncoder();
     const readable = new ReadableStream({
