@@ -8,7 +8,6 @@ import {
   useState,
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import Image from "next/image";
 import { Info, Mail, Send, X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { useChat } from "@/hooks/useChat";
@@ -27,6 +26,7 @@ import {
 } from "@/lib/ai/page-actions";
 import type { Tour } from "@/types";
 import { DraftCard } from "./DraftCard";
+import { NuggetsMascot } from "./NuggetsMascot";
 import { TourBar } from "./TourBar";
 
 // How long the panel stays open after a tour is proposed, so the visitor sees Nuggets' one-line
@@ -166,6 +166,17 @@ export function ChatWidget() {
   const { play } = useSound();
   const modifier = useShortcutModifier();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // The mascot's mood: a short cheer when clicked, thinking while an answer is on its way.
+  const [cheering, setCheering] = useState(false);
+  const cheerTimer = useRef<ReturnType<typeof setTimeout>>();
+  const cheer = useCallback(() => {
+    setCheering(true);
+    clearTimeout(cheerTimer.current);
+    cheerTimer.current = setTimeout(() => setCheering(false), 900);
+  }, []);
+  useEffect(() => () => clearTimeout(cheerTimer.current), []);
+  const mascotState = cheering ? "happy" : isStreaming || isTyping ? "thinking" : "idle";
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -359,16 +370,14 @@ export function ChatWidget() {
             {/* Header */}
             <div className="flex flex-shrink-0 items-center justify-between border-b border-border bg-background px-4 py-3">
               <div className="flex items-center gap-2.5">
-                {/* Greyscale, like everything else on the page that is not a project screenshot. */}
-                <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-md border border-border">
-                  <Image
-                    src={siteConfig.chat.avatarPath}
-                    alt="Nuggets"
-                    fill
-                    className="object-cover grayscale"
-                    sizes="32px"
-                  />
-                </div>
+                <button
+                  type="button"
+                  onClick={cheer}
+                  aria-label="Nuggets"
+                  className="flex-shrink-0 rounded-md"
+                >
+                  <NuggetsMascot state={mascotState} size={34} />
+                </button>
                 <div>
                   <p className="font-mono text-[13px] font-medium leading-none text-foreground">
                     {siteConfig.chat.name}
@@ -450,15 +459,11 @@ export function ChatWidget() {
                     })}
                   >
                     {msg.role === "assistant" && (
-                      <div className="relative h-6 w-6 flex-shrink-0 overflow-hidden rounded-md border border-border">
-                        <Image
-                          src={siteConfig.chat.avatarPath}
-                          alt="Nuggets"
-                          fill
-                          className="object-cover grayscale"
-                          sizes="24px"
-                        />
-                      </div>
+                      <NuggetsMascot
+                        state={isActiveAssistant ? "thinking" : "rest"}
+                        size={26}
+                        className="flex-shrink-0"
+                      />
                     )}
                     {msg.role === "user" ? (
                       <div className="max-w-[82%] rounded-lg rounded-br-sm bg-foreground px-3.5 py-2.5 text-sm text-background">
@@ -621,7 +626,10 @@ export function ChatWidget() {
             )}
           </AnimatePresence>
           <motion.button
-            onClick={() => setIsOpen((prev) => !prev)}
+            onClick={() => {
+              if (!isOpen) cheer();
+              setIsOpen((prev) => !prev);
+            }}
             whileTap={{ scale: 0.96 }}
             /* A labelled control on anything wider than a phone.
                A bare circular portrait with an orange halo is a mascot: it says "pet" and gives no
@@ -641,14 +649,8 @@ export function ChatWidget() {
             )}
             aria-label={isOpen ? "Close chat" : "Ask Nuggets about John's work"}
           >
-            <span className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg border border-border">
-              <Image
-                src={siteConfig.chat.avatarPath}
-                alt=""
-                fill
-                className="object-cover grayscale"
-                sizes="36px"
-              />
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center">
+              <NuggetsMascot state={mascotState} size={34} />
             </span>
             {!atHero && !isOpen && (
               <span className="hidden items-center gap-2.5 whitespace-nowrap sm:flex">

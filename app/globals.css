@@ -86,6 +86,101 @@ body {
 }
 
 /* What Nuggets pointed at. Added and removed by components/layout/AgentRouter.tsx and the deck. */
+/* ── Nuggets mascot (components/ui/NuggetsMascot.tsx) ───────────────────────────────────────── */
+/* fill-box on the animated groups only: on an element with its own transform="rotate(a x y)" it
+   would move that rotation's centre and throw the part off the body. */
+.nug-body,
+.nug-arm,
+.nug-eyes-open,
+.nug-burst,
+.nug-q {
+  transform-box: fill-box;
+}
+.nug-body { transform-origin: 50% 100%; }
+.nug-arm-l { transform-origin: 100% 60%; }
+.nug-arm-r { transform-origin: 0% 60%; }
+.nug-eyes-open { transform-origin: 50% 50%; }
+.nug-eyes-closed,
+.nug-burst,
+.nug-q { opacity: 0; }
+
+/* Poses hold with or without motion. */
+.nug-happy .nug-eyes-open { opacity: 0; }
+.nug-happy .nug-eyes-closed,
+.nug-happy .nug-burst { opacity: 1; }
+.nug-happy .nug-arm-l { transform: rotate(35deg); }
+.nug-happy .nug-arm-r { transform: rotate(-35deg); }
+.nug-thinking .nug-q { opacity: 1; }
+.nug-thinking .nug-eyes-open { transform: translate(1.5px, -1px); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .nug-idle .nug-body { animation: nug-bob 3.2s ease-in-out infinite; }
+  .nug-idle .nug-eyes-open { animation: nug-blink 4.6s infinite; }
+  .nug-idle .nug-arm-l { animation: nug-wave 7s ease-in-out infinite; }
+
+  .nug-happy .nug-body { animation: nug-hop 0.7s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+  .nug-happy .nug-arm-l { animation: nug-cheer-l 0.35s ease-in-out infinite alternate; }
+  .nug-happy .nug-arm-r { animation: nug-cheer-r 0.35s ease-in-out infinite alternate; }
+  .nug-happy .nug-burst { animation: nug-pop 0.7s ease-out both; }
+
+  .nug-thinking .nug-body { animation: nug-sway 1.6s ease-in-out infinite; }
+  .nug-thinking .nug-eyes-open { animation: nug-glance 1.6s ease-in-out infinite; }
+  .nug-thinking .nug-arm-r { animation: nug-tap 0.8s ease-in-out infinite; }
+  .nug-thinking .nug-q { animation: nug-q 1.6s ease-in-out infinite; }
+}
+
+@keyframes nug-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2.5px); }
+}
+@keyframes nug-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+@keyframes nug-wave {
+  0%, 70%, 100% { transform: rotate(0); }
+  76% { transform: rotate(50deg); }
+  82% { transform: rotate(25deg); }
+  88% { transform: rotate(50deg); }
+  94% { transform: rotate(0); }
+}
+@keyframes nug-hop {
+  0% { transform: translateY(0) scale(1, 1); }
+  20% { transform: translateY(0) scale(1.08, 0.9); }
+  50% { transform: translateY(-10px) scale(0.95, 1.06); }
+  80% { transform: translateY(0) scale(1.05, 0.95); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+@keyframes nug-cheer-l {
+  from { transform: rotate(30deg); }
+  to { transform: rotate(55deg); }
+}
+@keyframes nug-cheer-r {
+  from { transform: rotate(-30deg); }
+  to { transform: rotate(-55deg); }
+}
+@keyframes nug-pop {
+  0% { opacity: 0; transform: scale(0.4); }
+  40% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes nug-sway {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+@keyframes nug-glance {
+  0%, 100% { transform: translate(-2px, -1px); }
+  50% { transform: translate(2px, -1px); }
+}
+@keyframes nug-tap {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(-25deg); }
+}
+@keyframes nug-q {
+  0%, 100% { transform: translateY(0) rotate(-8deg); }
+  50% { transform: translateY(-4px) rotate(8deg); }
+}
+
 .agent-flash {
   outline: 2px solid var(--foreground);
   outline-offset: 6px;

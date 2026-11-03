@@ -170,7 +170,6 @@ export const siteConfig = {
     // the fake pulsing "Online" dot used to occupy.
     name: "Nuggets",
     role: "Portfolio assistant",
-    avatarPath: "/images/nuggets.webp",
     // "How I built this" — surfaced in the widget so the chat reads as an engineering demo, not a toy.
     techNote: {
       heading: "How Nuggets works",
