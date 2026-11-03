@@ -536,9 +536,12 @@ export function ChatWidget() {
           <AnimatePresence>
             {showHint && !isOpen && (
               <motion.div
-                initial={{ opacity: 0, x: 12, scale: 0.88 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: 12, scale: 0.88 }}
+                // y: -50% with top-1/2 centres the bubble on the launcher. It lives in the motion
+                // values, not a Tailwind translate class, because framer-motion owns `transform`
+                // here and would overwrite the class.
+                initial={{ opacity: 0, x: 12, y: "-50%", scale: 0.92 }}
+                animate={{ opacity: 1, x: 0, y: "-50%", scale: 1 }}
+                exit={{ opacity: 0, x: 12, y: "-50%", scale: 0.92 }}
                 transition={{ type: "spring", stiffness: 380, damping: 22 }}
                 /* right-full, NOT a fixed right-16. The launcher is two different widths: a bare
                    56px circle over the hero, and a ~176px labelled pill everywhere else (see the
@@ -546,10 +549,11 @@ export function ChatWidget() {
                    circle by 8px and landed 112px INSIDE the pill, so the hint painted across the
                    label. right-full pins the bubble's right edge to the launcher's left edge
                    whatever that width happens to be, and mr-3 is the gap the arrow sits in. */
-                className="absolute bottom-1 right-full mr-3 w-52 rounded-lg border border-border bg-card px-3 py-2.5 text-xs leading-snug text-foreground shadow-[0_8px_24px_rgba(0,0,0,0.18)]"
+                // One line, centred on the launcher: a four-line bubble sat low and covered page
+                // content for its five seconds.
+                className="absolute right-full top-1/2 mr-3 whitespace-nowrap rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground shadow-[0_8px_24px_-8px_rgba(0,0,0,0.22)]"
               >
-                Ask Nuggets about John&rsquo;s work. It answers from this
-                site&rsquo;s project data, then shows you the proof.
+                Ask me about John&rsquo;s work
                 <span className="absolute right-[-6px] top-1/2 -translate-y-1/2 border-4 border-transparent border-l-card" />
               </motion.div>
             )}
