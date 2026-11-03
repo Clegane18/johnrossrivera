@@ -221,7 +221,7 @@ export function WorkDeck() {
                 >
                   <div
                     className={cn(
-                      "overflow-hidden rounded-xl border border-border bg-card shadow-[0_1px_2px_rgba(0,0,0,0.05),0_12px_28px_-16px_rgba(0,0,0,0.28)]",
+                      "overflow-hidden rounded-xl border border-border bg-card shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_2px_4px_rgba(0,0,0,0.06),0_14px_28px_-12px_rgba(0,0,0,0.22)]",
                       !front && "group-hover:border-muted-foreground"
                     )}
                   >
