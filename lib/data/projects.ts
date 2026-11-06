@@ -31,7 +31,7 @@ export const projects: Project[] = [
     summary:
       "A lending ledger with an AI assistant that never writes a number itself: the model translates, the server computes.",
     description:
-      "A loan ledger used by a small lending business, with Dex-E, a chat assistant inside it. Money is stored as whole centavos and one function owns rounding, so every split adds back up. Dex-E reads plain English and Taglish, but the model only translates the question into the app's own terms; the server reads every figure from the database. Any change, such as a new loan or a payment, appears as a card the admin must confirm. Next.js, Prisma on PostgreSQL (Supabase), Groq with model fallback, and a local Ollama mode for testing.",
+      "A loan ledger used by a small lending business, with Dex-E, a chat assistant inside it. Money is stored as whole centavos and one function owns rounding, so every split adds back up. Dex-E reads plain English and Taglish, but the model only translates the question into the app's own terms; the server reads every figure from the database. Any change, such as a new loan or a payment, appears as a card the admin must confirm. Next.js, Prisma on PostgreSQL (Supabase), Groq with model fallback, and a local Ollama mode for testing. The live app has a demo account with made-up borrowers; the sign-in page shows the login.",
     problem:
       "An assistant that answers money questions cannot guess. A wrong balance or a made-up payment is worse than no assistant at all, and the people asking type in loose English and Taglish.",
     role: "Built the app and the assistant, its guardrails and its eval suite.",
@@ -58,12 +58,18 @@ export const projects: Project[] = [
       "Ollama",
       "Vercel",
     ],
+    // Screenshots taken 2026-11-06 on the live app, signed in as the demo account (made-up borrowers,
+    // "Demo data" badge on every screen). Desktop at 1470x837 and mobile at 343x744, both 2x, like the
+    // other projects. The first frame is Dex-E's Confirm card, the point of the case study.
+    liveUrl: "https://lending-app-theta.vercel.app/",
     repoUrls: [
       {
         label: "Source",
         url: "https://github.com/HeisenbergI8/lending-app",
       },
     ],
+    images: seqPrefixed("pondex-dex-e", "d-", 17),
+    mobileImages: seqPrefixed("pondex-dex-e", "m-", 14),
     featured: true,
   },
   {
