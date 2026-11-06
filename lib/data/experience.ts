@@ -84,6 +84,7 @@ export const experiences: Experience[] = [
       "Took the console from 0 tests to a 251-test gate that fails the build on any new red, across 110 unit suites and 69 Playwright end-to-end specs.",
       "Built an in-house Claude Code harness that ledgers every file edit and verification command, and blocks any agent \"tests passed\" claim the record cannot support.",
       "Replaced manual commission and payout reconciliation with a Laravel 12 affiliate portal owned end to end, authoring 15 of its 17 migrations and a 16-model schema.",
+      "Cut staging redeploy downtime from about 3.5 minutes to about 1 to 2 seconds by building into a spare folder and swapping it in, with automatic rollback when the new build does not answer.",
     ],
     tech: [
       "Next.js",

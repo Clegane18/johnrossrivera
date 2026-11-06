@@ -16,73 +16,54 @@ function seqPrefixed(id: string, prefix: string, count: number): string[] {
 }
 
 export const projects: Project[] = [
-  // Coffeegusto and Pedia Dental are written to read for a small business owner and a recruiter
-  // alike: plain words, no metrics nobody can check, and bullets about what the build does.
-  // First in the array on purpose, so Coffeegusto is the card the deck opens on.
+  // Added 2026-11-06. The deck order follows a scored pick from the CV evidence bank, aimed at remote
+  // AI-native / automation roles for overseas teams at PHP 100k+ a month: role fit (AI and
+  // automation, weighted double), proof (live, real users, measured numbers), ownership, recency,
+  // hiring signal (security, correctness, money, testing) and safe to show. Entries scoring 7+ of
+  // 12 are featured; 4 to 6 sit in "More work". From the bank: E28, E42, E43. "Built", not "sole
+  // author": 183 of the repo's 266 commits are John's and 83 are an AI coding agent's, though the
+  // assistant code itself is 92 of 93. The 143 of 181 is on a small local test model and a demo
+  // account, so never present it as production accuracy.
   {
-    id: "coffeegusto",
-    title: "Coffeegusto",
-    label: "Prototype",
+    id: "pondex-dex-e",
+    title: "Pondex + Dex-E",
+    label: "In use",
     summary:
-      "Customers order and pay from their phone, so orders stop piling up in chat.",
+      "A lending ledger with an AI assistant that never writes a number itself: the model translates, the server computes.",
     description:
-      "A brand site and ordering app for a coffee shop, built as a prototype for a proposal. Customers browse the menu, choose a pickup branch, pay with GCash, and earn a stamp toward a free drink. The same setup fits any shop that takes orders.",
+      "A loan ledger used by a small lending business, with Dex-E, a chat assistant inside it. Money is stored as whole centavos and one function owns rounding, so every split adds back up. Dex-E reads plain English and Taglish, but the model only translates the question into the app's own terms; the server reads every figure from the database. Any change, such as a new loan or a payment, appears as a card the admin must confirm. Next.js, Prisma on PostgreSQL (Supabase), Groq with model fallback, and a local Ollama mode for testing.",
     problem:
-      "Taking orders over chat eats the whole day. Every customer asks what is available, how much it costs, and when it will be ready. The owner answers each one by hand.",
-    // "Built", not "sole author": 32 of its 42 commits are John's and 10 are an AI coding agent's
-    // (evidence bank E32). The partnership the pitch led to is verbal, and there are no paying users.
-    role: "Built the prototype and pitched it to the owners, which led to a partnership offer: menu, item options, branch picker, checkout with GCash, and a digital stamp card.",
-    decisionsHeading: "What it does",
+      "An assistant that answers money questions cannot guess. A wrong balance or a made-up payment is worse than no assistant at all, and the people asking type in loose English and Taglish.",
+    role: "Built the app and the assistant, its guardrails and its eval suite.",
     decisions: [
-      "Customers see every item with a photo and a price, and choose sugar, ice and add-ons on their own.",
-      "They pick a branch and a pickup time, then pay with GCash or at the counter. The order comes in complete.",
-      "A digital stamp card brings them back. Ten orders earn a free drink.",
-    ],
-    tech: ["Next.js", "Vercel"],
-    liveUrl: "https://coffee-gusto-eight.vercel.app/",
-    images: seqPrefixed("coffeegusto", "d-", 6),
-    mobileImages: seqPrefixed("coffeegusto", "m-", 6),
-    featured: true,
-  },
-  {
-    // The id stays `pedia-dental` so the existing /work URL keeps working; the product is now called
-    // Primolar, as on the CV. From the evidence bank (E27): a demo only. The backend is not deployed
-    // and there are no real clinics on it, so never say "deployed" or "in use".
-    id: "pedia-dental",
-    title: "Primolar",
-    label: "Demo",
-    summary:
-      "A multi-tenant clinic SaaS built solo: 53 data models, 142 API routes and about 2,150 tests.",
-    description:
-      "A SaaS for pediatric dental clinics, built solo (297 of 297 commits). Each clinic gets its own branches, staff, branding and plan tier, plus an operator console. NestJS and Prisma on MySQL, a Next.js web app and shared Zod schemas in a pnpm monorepo, with AWS CDK stacks and a GitHub Actions deploy. The web demo runs on sample data; the backend is not deployed and no clinic uses it yet.",
-    problem:
-      "A small clinic runs on calls and chat messages. Booking, reminding and confirming each visit takes a lot of back and forth, and it is easy to lose track of who is coming in.",
-    role: "Sole developer: the API, the web app, the shared schemas, the infrastructure and the tests.",
-    decisions: [
-      "One codebase serves many clinics: each gets its own branches, staff, branding and a Small, Mid or Big tier.",
-      "AWS CDK stacks (ECS Fargate, RDS) deployed by a GitHub Actions workflow that signs in with OIDC, so no AWS keys are stored anywhere.",
-      "A pilot by 9 AI tester personas ran 469 UI tests and found 13 unique bugs. All 13 were fixed.",
-      "Each role sees only what it needs: parents, front desk, dentists and admin.",
+      "The model only translates. It names what to look up and the server reads the real figure, so the AI never writes an amount.",
+      "Every change waits for a person. Dex-E proposes a card, the admin confirms it, and a payment needs the same proof upload as the form.",
+      "Repeat questions skip the AI. A memory of past translations answers the same kind of question again with no model call.",
+      "It stays on its job. Off-topic requests and tricks hidden in notes are turned away.",
+      "Measured, then fixed. 181 written scenarios run against a demo account in rounds, and every failure graded as a code bug got a fix and a regression check.",
     ],
     impact: [
-      { metric: "53", label: "data models" },
-      { metric: "142", label: "API routes" },
-      { metric: "~2,150", label: "test cases" },
+      { metric: "181", label: "eval scenarios written and run" },
+      { metric: "65 → 143", label: "scenarios passing after fix rounds" },
+      { metric: "14 of 14", label: "safety tricks refused" },
+      { metric: "~713", label: "app test cases" },
     ],
     tech: [
-      "NestJS",
-      "Prisma",
-      "MySQL",
       "Next.js",
-      "Zod",
-      "pnpm",
-      "AWS CDK",
-      "GitHub Actions",
-      "Playwright",
+      "TypeScript",
+      "Prisma",
+      "PostgreSQL",
+      "Supabase",
+      "Groq API",
+      "Ollama",
+      "Vercel",
     ],
-    liveUrl: "https://primoral.vercel.app/login",
-    images: seqPrefixed("pedia-dental", "d-", 4),
-    mobileImages: seqPrefixed("pedia-dental", "m-", 4),
+    repoUrls: [
+      {
+        label: "Source",
+        url: "https://github.com/HeisenbergI8/lending-app",
+      },
+    ],
     featured: true,
   },
   {
@@ -135,96 +116,6 @@ export const projects: Project[] = [
     liveUrl: "https://dashboard.rola.ai/en/login",
     liveAuthGated: true,
     images: seq("rola-access-platform", 16),
-    featured: true,
-  },
-  {
-    id: "kol-dashboard",
-    title: "KOL Dashboard",
-    // From the evidence bank (E2, E3, E13, E22). "Owned end to end", not "sole builder": John has
-    // 86% of the commits. Partner and signup counts are gone because nothing in the bank backs them.
-    summary:
-      "A Laravel 12 affiliate and payout portal, owned end to end: schema, payouts, OTP lockout and PII masking.",
-    description:
-      "The company's KOL and affiliate program in one system, replacing manual commission and payout reconciliation. Laravel 12 on a 16-model schema (John authored 15 of its 17 migration commits): referral tracking, commission on verification, a withdrawal flow with admin approval across 4 access levels, OTP login with lockout, and a masking layer that keeps partner PII off admin screens.",
-    problem:
-      "Finance reconciled affiliate commissions and payouts by hand, login codes could be guessed without limit, and partner emails, names and wallet details showed raw on admin screens.",
-    role: "Owned it end to end (86% of commits): schema, service layer, payout flow, OTP hardening, PII masking and the admin UI.",
-    decisions: [
-      "A withdrawal flow from request to admin approval to completion, with receipt upload and transaction ID capture, across 4 access levels including a finance-restricted admin role.",
-      "OTP login that used to allow unlimited guesses now expires in 10 minutes, waits 30 seconds between resends, and locks out after 5 failed attempts.",
-      "A masking trait with 7 accessors (email, full name, wallet address, bank account and more) applied at the model layer across 5 admin views, covered by 25 unit tests, replacing masking that had been duplicated in controllers.",
-      "Referral tracking moved to referral codes, with geo and device analytics from real data and CSV exports.",
-    ],
-    impact: [
-      { metric: "16", label: "data models in the schema" },
-      { metric: "15 of 17", label: "migration commits authored" },
-      { metric: "4", label: "access levels in the payout flow" },
-      { metric: "25", label: "unit tests on the PII masking layer" },
-    ],
-    architectureSvg: "/images/architecture/kol-dashboard.svg",
-    tech: [
-      "Laravel 12",
-      "PHP",
-      "MySQL",
-      "RBAC",
-      "FormRequest Validation",
-      "CSV Export",
-      "OTP Security",
-    ],
-    liveUrl: "https://kol.rola.ai/login",
-    liveAuthGated: true,
-    images: seq("kol-dashboard", 16),
-    featured: true,
-  },
-  {
-    id: "smart-lift-ai",
-    title: "Smart-lift AI",
-    // From the evidence bank (E20). No user count: none of John's personal projects has outside
-    // users yet. The 249 tests are the API's; the client has none, so never say "fully tested".
-    summary:
-      "Built solo: a 78-endpoint NestJS API with 249 tests and real training logic, plus a Next.js client.",
-    description:
-      "A training platform built solo across two repos (135 commits). The NestJS API has 19 modules, 78 REST endpoints and 30 Prisma models, with domain logic rather than CRUD: plateau and ego-lift detection, progression evaluation, and nutrition targets that cap the calorie deficit. 249 API test cases, written alongside the features, and a Docker setup. The Next.js 16 client has 102 components.",
-    problem:
-      "General fitness apps don't adapt to the individual, so plateaus go undetected and macros drift as training changes.",
-    role: "Sole developer of both repos: the NestJS API and the Next.js client.",
-    decisions: [
-      "Plateau detection and ego-lift detection with notifications, so the app flags a stall or an unsafe jump in weight.",
-      "Nutrition targets that cap the calorie deficit and floor TDEE by training days, instead of a fixed formula.",
-      "One in-progress session per user, enforced by the API rather than trusted to the client.",
-      "Tests written alongside each feature: 249 cases across 17 spec files.",
-    ],
-    impact: [
-      { metric: "78", label: "REST endpoints" },
-      { metric: "249", label: "API test cases" },
-      { metric: "30", label: "data models" },
-    ],
-    architectureSvg: "/images/architecture/smart-lift-ai.svg",
-    tech: [
-      "Next.js 16",
-      "React 19",
-      "TypeScript",
-      "Redux Toolkit",
-      "NestJS 11",
-      "Node.js",
-      "Prisma",
-      "MariaDB",
-      "Docker",
-      "JWT",
-    ],
-    liveUrl: "https://smartlift-web.netlify.app/dashboard",
-    repoUrls: [
-      {
-        label: "Frontend",
-        url: "https://github.com/HeisenbergI8/smartlift",
-      },
-      {
-        label: "Backend",
-        url: "https://github.com/HeisenbergI8/smarlift-api",
-      },
-    ],
-    images: seqPrefixed("smart-lift-ai", "d-", 15),
-    mobileImages: seqPrefixed("smart-lift-ai", "m-", 14),
     featured: true,
   },
   {
@@ -294,6 +185,233 @@ export const projects: Project[] = [
     featured: true,
   },
   {
+    id: "rr-remo-trucking",
+    title: "RR Remo Trucking",
+    // From the evidence bank (E17) and the CV, which names no clients for this engagement. The fleet
+    // size, the client list and the Zuellig pitch are gone: they are the company's facts, not the
+    // software's, and nothing in the bank backs the pitch claim.
+    summary:
+      "A trucking company's site and Groq assistant that refuses to invent a price, address or delivery date.",
+    description:
+      "A Next.js 16 site for a Philippine trucking company with 'Traki', a Groq LLaMA 3.1 assistant grounded in a fixed fact sheet. Its standing rules: answer only from the facts given, never invent an address, phone number, price or date, and send anything unlisted to a real phone number. Validated input and a Resend contact form.",
+    problem:
+      "A trucking company wanted an assistant that answers customers at any hour, and an assistant that guesses a price or a delivery date does more harm than having none.",
+    role: "Sole author (freelance): the site, the assistant and its guardrails, and the contact form.",
+    decisions: [
+      "Grounded on a fixed fact sheet: the assistant refuses rather than invents, and routes anything it does not know to a real phone number.",
+      "Replies capped at 300 tokens and streamed, so answers stay short and arrive fast.",
+      "Malformed message arrays are rejected with a 400 before they reach the model.",
+    ],
+    architectureSvg: "/images/architecture/rr-remo-trucking.svg",
+    tech: [
+      "Next.js 16",
+      "React 19",
+      "TypeScript",
+      "Tailwind CSS",
+      "Groq API",
+      "LLaMA 3.1",
+      "Resend",
+      "Vercel",
+    ],
+    liveUrl: "https://rrremo-trucking.vercel.app/",
+    repoUrls: [
+      {
+        label: "Source",
+        url: "https://github.com/HeisenbergI8/rrremo-trucking",
+      },
+    ],
+    images: seqPrefixed("rr-remo-trucking", "d-", 6),
+    mobileImages: seqPrefixed("rr-remo-trucking", "m-", 7),
+    featured: true,
+  },
+  // Added 2026-11-06 from the evidence bank (E45, E46). Framed as automation on purpose: John asked
+  // that the site not say he is job hunting, so no job-board names and no application count here.
+  // Not in git, so no repo link. The time figures are his own estimates, hence "about".
+  {
+    id: "claude-automations",
+    title: "Claude Code automations",
+    label: "Personal tool",
+    summary:
+      "Agents that run my weekly admin: about an hour a day of email and tracker work down to a minute of review.",
+    description:
+      "A set of Claude Code skills with plain Python scripts underneath. One reads email replies, updates a spreadsheet tracker and drafts responses, and sends nothing until I approve it. Another reads PDF bank-style statements and checks its own row totals against the statement's totals before saving anything. Others make the month's invoices and rebuild a dashboard from my notes.",
+    problem:
+      "Small admin jobs ate an hour a day: reading replies, copying details into a tracker, filling the same forms, and editing the same documents every month.",
+    role: "Built each skill and script myself, with Claude Code.",
+    decisions: [
+      "A person approves anything that leaves the machine. The agent drafts; I read and confirm.",
+      "Scripts do the exact work. Totals, files and spreadsheets go through small scripts, not free-form model output.",
+      "A parser checks itself. If its totals do not match the statement's own totals, it stops and saves nothing.",
+      "One writer per file. Every tracker change goes through one script, which refuses to write while the file is open elsewhere, after an office app once overwrote it and erased 7 rows.",
+    ],
+    impact: [
+      { metric: "~1 h → 1 min", label: "daily email and tracker work (estimate)" },
+      { metric: "~30 → 1 min", label: "monthly invoices (estimate)" },
+    ],
+    tech: ["Claude Code", "Python", "PyMuPDF", "openpyxl", "Bash"],
+    featured: true,
+  },
+  {
+    id: "kol-dashboard",
+    title: "KOL Dashboard",
+    // From the evidence bank (E2, E3, E13, E22). "Owned end to end", not "sole builder": John has
+    // 86% of the commits. Partner and signup counts are gone because nothing in the bank backs them.
+    summary:
+      "A Laravel 12 affiliate and payout portal, owned end to end: schema, payouts, OTP lockout and PII masking.",
+    description:
+      "The company's KOL and affiliate program in one system, replacing manual commission and payout reconciliation. Laravel 12 on a 16-model schema (John authored 15 of its 17 migration commits): referral tracking, commission on verification, a withdrawal flow with admin approval across 4 access levels, OTP login with lockout, and a masking layer that keeps partner PII off admin screens.",
+    problem:
+      "Finance reconciled affiliate commissions and payouts by hand, login codes could be guessed without limit, and partner emails, names and wallet details showed raw on admin screens.",
+    role: "Owned it end to end (86% of commits): schema, service layer, payout flow, OTP hardening, PII masking and the admin UI.",
+    decisions: [
+      "A withdrawal flow from request to admin approval to completion, with receipt upload and transaction ID capture, across 4 access levels including a finance-restricted admin role.",
+      "OTP login that used to allow unlimited guesses now expires in 10 minutes, waits 30 seconds between resends, and locks out after 5 failed attempts.",
+      "A masking trait with 7 accessors (email, full name, wallet address, bank account and more) applied at the model layer across 5 admin views, covered by 25 unit tests, replacing masking that had been duplicated in controllers.",
+      "Referral tracking moved to referral codes, with geo and device analytics from real data and CSV exports.",
+    ],
+    impact: [
+      { metric: "16", label: "data models in the schema" },
+      { metric: "15 of 17", label: "migration commits authored" },
+      { metric: "4", label: "access levels in the payout flow" },
+      { metric: "25", label: "unit tests on the PII masking layer" },
+    ],
+    architectureSvg: "/images/architecture/kol-dashboard.svg",
+    tech: [
+      "Laravel 12",
+      "PHP",
+      "MySQL",
+      "RBAC",
+      "FormRequest Validation",
+      "CSV Export",
+      "OTP Security",
+    ],
+    liveUrl: "https://kol.rola.ai/login",
+    liveAuthGated: true,
+    images: seq("kol-dashboard", 16),
+    featured: true,
+  },
+  {
+    // The id stays `pedia-dental` so the existing /work URL keeps working; the product is now called
+    // Primolar, as on the CV. From the evidence bank (E27): a demo only. The backend is not deployed
+    // and there are no real clinics on it, so never say "deployed" or "in use".
+    id: "pedia-dental",
+    title: "Primolar",
+    label: "Demo",
+    summary:
+      "A multi-tenant clinic SaaS built solo: 53 data models, 142 API routes and about 2,150 tests.",
+    description:
+      "A SaaS for pediatric dental clinics, built solo (297 of 297 commits). Each clinic gets its own branches, staff, branding and plan tier, plus an operator console. NestJS and Prisma on MySQL, a Next.js web app and shared Zod schemas in a pnpm monorepo, with AWS CDK stacks and a GitHub Actions deploy. The web demo runs on sample data; the backend is not deployed and no clinic uses it yet.",
+    problem:
+      "A small clinic runs on calls and chat messages. Booking, reminding and confirming each visit takes a lot of back and forth, and it is easy to lose track of who is coming in.",
+    role: "Sole developer: the API, the web app, the shared schemas, the infrastructure and the tests.",
+    decisions: [
+      "One codebase serves many clinics: each gets its own branches, staff, branding and a Small, Mid or Big tier.",
+      "AWS CDK stacks (ECS Fargate, RDS) deployed by a GitHub Actions workflow that signs in with OIDC, so no AWS keys are stored anywhere.",
+      "A pilot by 9 AI tester personas ran 469 UI tests and found 13 unique bugs. All 13 were fixed.",
+      "Each role sees only what it needs: parents, front desk, dentists and admin.",
+    ],
+    impact: [
+      { metric: "53", label: "data models" },
+      { metric: "142", label: "API routes" },
+      { metric: "~2,150", label: "test cases" },
+    ],
+    tech: [
+      "NestJS",
+      "Prisma",
+      "MySQL",
+      "Next.js",
+      "Zod",
+      "pnpm",
+      "AWS CDK",
+      "GitHub Actions",
+      "Playwright",
+    ],
+    liveUrl: "https://primoral.vercel.app/login",
+    images: seqPrefixed("pedia-dental", "d-", 4),
+    mobileImages: seqPrefixed("pedia-dental", "m-", 4),
+    featured: true,
+  },
+  {
+    id: "smart-lift-ai",
+    title: "Smart-lift AI",
+    // From the evidence bank (E20). No user count: none of John's personal projects has outside
+    // users yet. The 249 tests are the API's; the client has none, so never say "fully tested".
+    summary:
+      "Built solo: a 78-endpoint NestJS API with 249 tests and real training logic, plus a Next.js client.",
+    description:
+      "A training platform built solo across two repos (135 commits). The NestJS API has 19 modules, 78 REST endpoints and 30 Prisma models, with domain logic rather than CRUD: plateau and ego-lift detection, progression evaluation, and nutrition targets that cap the calorie deficit. 249 API test cases, written alongside the features, and a Docker setup. The Next.js 16 client has 102 components.",
+    problem:
+      "General fitness apps don't adapt to the individual, so plateaus go undetected and macros drift as training changes.",
+    role: "Sole developer of both repos: the NestJS API and the Next.js client.",
+    decisions: [
+      "Plateau detection and ego-lift detection with notifications, so the app flags a stall or an unsafe jump in weight.",
+      "Nutrition targets that cap the calorie deficit and floor TDEE by training days, instead of a fixed formula.",
+      "One in-progress session per user, enforced by the API rather than trusted to the client.",
+      "Tests written alongside each feature: 249 cases across 17 spec files.",
+    ],
+    impact: [
+      { metric: "78", label: "REST endpoints" },
+      { metric: "249", label: "API test cases" },
+      { metric: "30", label: "data models" },
+    ],
+    architectureSvg: "/images/architecture/smart-lift-ai.svg",
+    tech: [
+      "Next.js 16",
+      "React 19",
+      "TypeScript",
+      "Redux Toolkit",
+      "NestJS 11",
+      "Node.js",
+      "Prisma",
+      "MariaDB",
+      "Docker",
+      "JWT",
+    ],
+    liveUrl: "https://smartlift-web.netlify.app/dashboard",
+    repoUrls: [
+      {
+        label: "Frontend",
+        url: "https://github.com/HeisenbergI8/smartlift",
+      },
+      {
+        label: "Backend",
+        url: "https://github.com/HeisenbergI8/smarlift-api",
+      },
+    ],
+    images: seqPrefixed("smart-lift-ai", "d-", 15),
+    mobileImages: seqPrefixed("smart-lift-ai", "m-", 14),
+    featured: true,
+  },
+  // Coffeegusto and Pedia Dental are written to read for a small business owner and a recruiter
+  // alike: plain words, no metrics nobody can check, and bullets about what the build does.
+  // Moved out of the deck on 2026-11-06 (portfolio picks, see the comment on pondex-dex-e): it scores
+  // low for the target role, but its case study and the "More work" grid keep it one click away.
+  {
+    id: "coffeegusto",
+    title: "Coffeegusto",
+    label: "Prototype",
+    summary:
+      "Customers order and pay from their phone, so orders stop piling up in chat.",
+    description:
+      "A brand site and ordering app for a coffee shop, built as a prototype for a proposal. Customers browse the menu, choose a pickup branch, pay with GCash, and earn a stamp toward a free drink. The same setup fits any shop that takes orders.",
+    problem:
+      "Taking orders over chat eats the whole day. Every customer asks what is available, how much it costs, and when it will be ready. The owner answers each one by hand.",
+    // "Built", not "sole author": 32 of its 42 commits are John's and 10 are an AI coding agent's
+    // (evidence bank E32). The partnership the pitch led to is verbal, and there are no paying users.
+    role: "Built the prototype and pitched it to the owners, which led to a partnership offer: menu, item options, branch picker, checkout with GCash, and a digital stamp card.",
+    decisionsHeading: "What it does",
+    decisions: [
+      "Customers see every item with a photo and a price, and choose sugar, ice and add-ons on their own.",
+      "They pick a branch and a pickup time, then pay with GCash or at the counter. The order comes in complete.",
+      "A digital stamp card brings them back. Ten orders earn a free drink.",
+    ],
+    tech: ["Next.js", "Vercel"],
+    liveUrl: "https://coffee-gusto-eight.vercel.app/",
+    images: seqPrefixed("coffeegusto", "d-", 6),
+    mobileImages: seqPrefixed("coffeegusto", "m-", 6),
+    featured: false,
+  },
+  {
     id: "gf-commerce",
     // See the matching entry in lib/data/experience.ts — dropped from the CV, hidden from the page,
     // retained here so the chat can still speak to it.
@@ -346,45 +464,5 @@ export const projects: Project[] = [
       },
     ],
     featured: false,
-  },
-  {
-    id: "rr-remo-trucking",
-    title: "RR Remo Trucking",
-    // From the evidence bank (E17) and the CV, which names no clients for this engagement. The fleet
-    // size, the client list and the Zuellig pitch are gone: they are the company's facts, not the
-    // software's, and nothing in the bank backs the pitch claim.
-    summary:
-      "A trucking company's site and Groq assistant that refuses to invent a price, address or delivery date.",
-    description:
-      "A Next.js 16 site for a Philippine trucking company with 'Traki', a Groq LLaMA 3.1 assistant grounded in a fixed fact sheet. Its standing rules: answer only from the facts given, never invent an address, phone number, price or date, and send anything unlisted to a real phone number. Validated input and a Resend contact form.",
-    problem:
-      "A trucking company wanted an assistant that answers customers at any hour, and an assistant that guesses a price or a delivery date does more harm than having none.",
-    role: "Sole author (freelance): the site, the assistant and its guardrails, and the contact form.",
-    decisions: [
-      "Grounded on a fixed fact sheet: the assistant refuses rather than invents, and routes anything it does not know to a real phone number.",
-      "Replies capped at 300 tokens and streamed, so answers stay short and arrive fast.",
-      "Malformed message arrays are rejected with a 400 before they reach the model.",
-    ],
-    architectureSvg: "/images/architecture/rr-remo-trucking.svg",
-    tech: [
-      "Next.js 16",
-      "React 19",
-      "TypeScript",
-      "Tailwind CSS",
-      "Groq API",
-      "LLaMA 3.1",
-      "Resend",
-      "Vercel",
-    ],
-    liveUrl: "https://rrremo-trucking.vercel.app/",
-    repoUrls: [
-      {
-        label: "Source",
-        url: "https://github.com/HeisenbergI8/rrremo-trucking",
-      },
-    ],
-    images: seqPrefixed("rr-remo-trucking", "d-", 6),
-    mobileImages: seqPrefixed("rr-remo-trucking", "m-", 7),
-    featured: true,
   },
 ];
