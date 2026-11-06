@@ -112,9 +112,9 @@ export const siteConfig = {
   heroTagline: "Systems over shortcuts.",
   heroTaglineTranslation: "Deliberate architecture. Reliable by default.",
   about: {
-    // The CV's summary (Oct 31 2026) in first person. It replaced a "900k+ users" claim the CV no
+    // The CV's summary (Nov 6 2026) in first person. It replaced a "900k+ users" claim the CV no
     // longer makes; 574 is the product's active users, never the console's.
-    bio: "I build and run production systems end to end in TypeScript (NestJS, Next.js): the admin console for a live song competition with 574 active users, a fiat payment rail, and a Laravel affiliate portal. I also wrote provenly, an open-source layer that makes AI coding agents prove their work.",
+    bio: "I build and run production systems end to end in TypeScript (NestJS, Next.js): the admin console for a live song competition with 574 active users, a fiat payment rail, and a Laravel affiliate portal. I build AI features that stay correct, and wrote provenly, an open-source layer that makes AI coding agents prove their work.",
     // Full locality, not just "Philippines". lib/data/profile.ts reads this field rather than
     // keeping its own copy, so the page and the chat can no longer state two different locations.
     location: "Bacoor, Cavite, Philippines",
@@ -155,7 +155,7 @@ export const siteConfig = {
   },
   contact: {
     intro:
-      "I'm actively looking for full-stack or frontend roles with global teams (remote, hybrid, or relocation), and I can start after a 30-day notice period. I also take on freelance and contract work: email me and I'll scope it with you. I respond within 24 hours.",
+      "I'm open to remote, contract and freelance work with global teams. Email me with the role or the project and I'll scope it with you. I respond within 24 hours.",
   },
   footer: {
     copyrightText: "All rights reserved.",

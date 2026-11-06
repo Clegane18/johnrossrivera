@@ -3,9 +3,9 @@
 // prompt from this module + those two data files, so a fact is edited in exactly one place.
 //
 // IMPORTANT: positioning fields (roleTarget, availability, workSetup, salaryExpectation,
-// freelanceNote) reflect John's current stance — ACTIVELY looking for full-stack/frontend roles,
-// still at Crystal Vision so starting after a 30-day notice period, open to freelance, and NOT
-// disclosing a salary/rate figure. Level is signalled through SCOPE (owning features front to back,
+// freelanceNote) reflect John's current stance (changed 2026-11-06): open to remote, contract and
+// freelance work, worded neutrally because he is still at Crystal Vision and the site is public, so
+// it must not say he is job hunting or name a notice period. NOT disclosing a salary/rate figure. Level is signalled through SCOPE (owning features front to back,
 // leading systems, mentoring) rather than the word "senior" — describing the work is more credible
 // than claiming the title, and it does not date as the title inflates.
 //
@@ -31,7 +31,7 @@ export const profile = {
   roleTarget:
     "AI-Native Full-Stack Engineer (TypeScript: React/Next.js front end, NestJS/Node.js back end, AI agent tooling and LLM features); also open to frontend-focused roles",
   availability:
-    "Actively looking, and open to full-stack or frontend roles with global teams, and able to start after a 30-day notice period at his current role. Also open to freelance/contract projects alongside that.",
+    "Open to remote, contract and freelance work with global teams. He is employed full-time now, so start dates are best discussed with him directly by email.",
   workSetup:
     "Open to remote / WFH (including remote roles for overseas companies), onsite, or hybrid, and open to relocation for the right full-time role",
   salaryExpectation:
@@ -93,7 +93,7 @@ export const profile = {
     },
     {
       q: "Are you open to opportunities right now?",
-      a: "Yes, John is actively looking. He's after a full-stack or frontend role with a global team, and he's open to remote, hybrid, onsite, or relocating for the right one. He's still at Crystal Vision, so he can start after a 30-day notice period. He also takes on freelance and contract work. The fastest route either way is to email him.",
+      a: "John is open to remote, contract and freelance work with global teams. He's employed full-time now, so for a role, timing or a project, the best route is to email him and he'll reply within 24 hours.",
     },
     // The three technical answers sit high on purpose. They are the only ones backed by countable
     // scope, and a recruiter who asks one standard question usually asks it early.
