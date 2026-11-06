@@ -60,7 +60,9 @@ export const projects: Project[] = [
     ],
     // Screenshots taken 2026-11-06 on the live app, signed in as the demo account (made-up borrowers,
     // "Demo data" badge on every screen). Desktop at 1470x837 and mobile at 343x744, both 2x, like the
-    // other projects. The first frame is Dex-E's Confirm card, the point of the case study.
+    // other projects. Ordered as a demo walkthrough: sign in, dashboard, lenders, borrowers, record a
+    // loan, track it, money history, reports, then Dex-E doing the same work by being asked (answers,
+    // a Confirm card, an off-topic refusal). The deck cover is the Confirm card (COVER_INDEX in WorkDeck).
     liveUrl: "https://lending-app-theta.vercel.app/",
     repoUrls: [
       {
@@ -68,8 +70,8 @@ export const projects: Project[] = [
         url: "https://github.com/HeisenbergI8/lending-app",
       },
     ],
-    images: seqPrefixed("pondex-dex-e", "d-", 17),
-    mobileImages: seqPrefixed("pondex-dex-e", "m-", 14),
+    images: seqPrefixed("pondex-demo", "d-", 17),
+    mobileImages: seqPrefixed("pondex-demo", "m-", 14),
     featured: true,
   },
   {

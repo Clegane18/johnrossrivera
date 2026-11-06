@@ -22,8 +22,9 @@ import {
 const shown = projects.filter((p) => p.featured && !p.hiddenOnPage);
 
 // The deck shows one desktop screenshot per project. Rola's first frame is the login wall, so its
-// second (the dashboard) is the one that says what was built.
-const COVER_INDEX: Record<string, number> = { "rola-access-platform": 1 };
+// second (the dashboard) is the one that says what was built. Pondex opens on its sign-in page too, so
+// its cover is Dex-E's Confirm card (frame 16), the point of that case study.
+const COVER_INDEX: Record<string, number> = { "rola-access-platform": 1, "pondex-dex-e": 15 };
 
 function cover(p: Project): string | undefined {
   return p.images?.[COVER_INDEX[p.id] ?? 0] ?? p.images?.[0];
